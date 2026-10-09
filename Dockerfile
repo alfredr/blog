@@ -1,6 +1,17 @@
-# The site as a container image: kiln's dist/, served by Caddy on port 80. The
-# box server's proxy terminates TLS in front of it. kiln runs on the host, so
-# build dist/ first; deploy/publish.sh does both.
+# The site as a container image: kiln builds dist/ from the sources, then Caddy
+# serves it on port 80. The box server's proxy terminates TLS in front of it.
+#
+# kiln and the site build run on the build machine's own platform (the output is
+# plain HTML); only the final Caddy stage is per target platform.
+FROM --platform=$BUILDPLATFORM rust:1-bookworm AS build
+# The kiln commit that builds the site. Bump it to pick up kiln changes.
+ARG KILN_REV=d818c396d0694103572ea8b8cefd2a04fe826cb1
+RUN cargo install --locked --git https://github.com/alfredr/kiln --rev "$KILN_REV" kiln
+WORKDIR /site
+COPY . .
+RUN kiln build
+
 FROM caddy:2-alpine
+LABEL org.opencontainers.image.source=https://github.com/alfredr/blog
 COPY deploy/serve.Caddyfile /etc/caddy/Caddyfile
-COPY dist /srv
+COPY --from=build /site/dist /srv

@@ -1,10 +1,13 @@
 #!/usr/bin/env bash
-# Build the site, publish its image to GHCR, and ask the box server to deploy it.
+# Build the site's image, publish it to GHCR, and ask the box server to deploy it.
+# Pushing to main does the same through .github/workflows/image.yml; this is for
+# deploying from this machine.
 #
 #   deploy/publish.sh
 #
-# Needs kiln, Docker with buildx, a GHCR login that can write packages, and the
-# box client (set BOX if it isn't on PATH). The box server is x86_64.
+# Needs Docker with buildx, a GHCR login that can write packages, and the box
+# client (set BOX if it isn't on PATH). kiln runs inside the image build, so it
+# doesn't need to be installed here. The box server is x86_64.
 set -euo pipefail
 
 image=${IMAGE:-ghcr.io/alfredr/blog}
@@ -14,7 +17,6 @@ box=${BOX:-$(command -v box || echo "$(go env GOBIN)/box")}
 
 cd "$(dirname "$0")/.."
 
-kiln build
 tag=$(date -u +%Y%m%d-%H%M%S)
 docker buildx build --platform linux/amd64 \
   -t "$image:latest" -t "$image:$tag" --push .

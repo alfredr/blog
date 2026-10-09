@@ -1,4 +1,8 @@
-# The image needs only the built site and its Caddyfile.
+# The image build needs only the site sources and the Caddyfile.
 *
-!dist
+!kiln.toml
+!content
+!data
+!static
+!templates
 !deploy/serve.Caddyfile
