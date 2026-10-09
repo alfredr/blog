@@ -224,14 +224,46 @@ article header time {
   max-width: var(--prose);
 }
 
+/* Pages that set page-body--wide (About) use the full width, so the text
+   meets the portrait and the nav's right edge. */
+.page-body--wide :is(p, ul, ol, blockquote):not(.links) {
+  max-width: none;
+}
+
 .post-body p,
 .page-body p {
   margin-bottom: 1em;
 }
 
-.page-body > p:first-child {
+.page-body > p:first-of-type {
   font-size: 1.1875rem;
   line-height: 1.6;
+}
+
+/* Portrait on the About page, beside the opening paragraphs with its right
+   edge under the nav. Text follows the circle rather than its square box, so
+   lines beside it stay long enough to justify evenly. */
+.portrait {
+  float: right;
+  width: 11rem;
+  margin: 0.4rem 0 1rem 1.5rem;
+  shape-outside: circle(50%) border-box;
+  shape-margin: 1.5rem;
+}
+
+.portrait img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 50%;
+}
+
+@media (max-width: 36rem) {
+  .portrait {
+    width: 7.5rem;
+    margin-left: 1rem;
+    shape-margin: 1rem;
+  }
 }
 
 .post-body ul,
@@ -790,7 +822,7 @@ footer {
    keep a ragged right edge. Citations stay ragged too: titles and DOIs are
    long unbreakable runs that open wide gaps when justified. */
 @media (min-width: 36rem) {
-  .page-body p:not(:first-child, :has(cite), .links),
+  .page-body > p:not(:first-of-type, :has(cite), .links),
   .page-body--justified p:not(:has(cite), .links),
   .post-body p:not(:has(cite), .links),
   .cv-lede,
@@ -800,8 +832,14 @@ footer {
     -webkit-hyphens: auto;
     hyphens: auto;
     hyphenate-limit-chars: 6 3 2;
-    text-wrap: pretty;
   }
+}
+
+/* The paragraph beside the portrait stays ragged-right: its lines change
+   length around the circle, and justifying the first full-width line after
+   it opens wide gaps. */
+.page-body .portrait + p {
+  text-align: start;
 }
 
 @media (max-width: 36rem) {

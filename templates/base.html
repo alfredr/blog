@@ -16,7 +16,7 @@
   <nav class="site-nav" aria-label="Main navigation">
     <a class="site-title" href="/">{{ site_title }}</a>
     {% set current_path = path | default(value="") %}
-    <a href="/bio/"{% if current_path == "bio" %} aria-current="page"{% endif %}>Bio</a>
+    <a href="/about/"{% if current_path == "about" %} aria-current="page"{% endif %}>About</a>
     <a href="/projects/"{% if current_path == "projects" or current_path is starting_with("projects/") %} aria-current="page"{% endif %}>Projects</a>
     <a href="/cv/"{% if current_path == "cv" %} aria-current="page"{% endif %}>CV</a>
     <a href="/blog/"{% if current_path == "blog" or date is defined %} aria-current="page"{% endif %}>Blog</a>

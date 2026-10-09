@@ -1,0 +1,12 @@
+{% extends "page.html" %}
+
+{% block page_body_class %} page-body--justified page-body--wide{% endblock %}
+
+{% block page_body %}
+  <picture class="portrait">
+    <source srcset="{{ asset_url(path="images/alfred.webp") }}" type="image/webp">
+    <img src="{{ asset_url(path="images/alfred.jpg") }}" alt="Alfred Rossi" width="480" height="480">
+  </picture>
+  {{ super() }}
+  <p class="links"><a href="/cv/">Full CV</a></p>
+{% endblock %}
