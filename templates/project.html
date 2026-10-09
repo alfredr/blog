@@ -1,0 +1,24 @@
+{% extends "page.html" %}
+
+{% block page_body %}
+  {% set projects = load_data(path="projects.toml") %}
+  {% set project = projects[slug] %}
+  {{ super() }}
+  <p class="links">
+    <a href="{{ project.website }}">Homepage</a>
+    {% if project.paper %}
+    <a href="{{ project.paper.url }}">Paper</a>
+    <a href="{{ project.paper.pdf }}">PDF</a>
+    {% endif %}
+    {% if project.source %}<a href="{{ project.source }}">Code and examples</a>{% endif %}
+    {% if project.archive %}<a href="{{ project.archive }}">Archived software</a>{% endif %}
+  </p>
+  {% if project.paper %}
+  <h2 id="citation">Preferred citation</h2>
+  <p>{{ project.paper.authors }}. {{ project.paper.year }}. <cite>{{ project.paper.title }}</cite> arXiv:{{ project.paper.arxiv }}. <a href="https://doi.org/{{ project.paper.doi }}">doi:{{ project.paper.doi }}</a>.</p>
+  {% if project.bibtex %}
+  <p class="links"><a href="/projects/{{ slug }}/{{ project.bibtex }}" download>BibTeX</a></p>
+  {% endif %}
+  {% endif %}
+  <p class="links"><a href="/projects/">All projects</a></p>
+{% endblock %}

@@ -1,0 +1,11 @@
+{#- Contact links, from data/cv.toml. The email is written as its two halves,
+    reversed and without the @, so scrapers matching addresses find nothing;
+    js/contact.js reassembles it when someone clicks "Email". -#}
+{%- set contact = load_data(path="cv.toml") -%}
+{%- if contact.email -%}
+{%- set address = contact.email | split(pat="@") -%}
+<button type="button" class="contact-email" data-u="{{ address | first | reverse }}" data-d="{{ address | last | reverse }}" hidden>Email</button>
+{%- endif -%}
+{%- if contact.linkedin %}
+<a href="{{ contact.linkedin }}">LinkedIn</a>
+{%- endif -%}

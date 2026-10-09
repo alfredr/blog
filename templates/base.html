@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}{{ site_title }}{% endblock %}</title>
+  {#- Apply a saved light/dark choice before first paint (see js/theme.js). #}
+  <script>try { const t = localStorage.getItem("theme"); if (t === "light" || t === "dark") document.documentElement.dataset.theme = t; } catch {}</script>
+  <link rel="icon" type="image/svg+xml" href="{{ asset_url(path="favicon.svg") }}">
+  <link rel="stylesheet" href="{{ asset_url(path="css/main.css") }}">
+  <script src="{{ asset_url(path="js/contact.js") }}" defer></script>
+  <script src="{{ asset_url(path="js/theme.js") }}" defer></script>
+  {% block head %}{% endblock %}
+</head>
+<body>
+  <nav class="site-nav" aria-label="Main navigation">
+    <a class="site-title" href="/">{{ site_title }}</a>
+    {% set current_path = path | default(value="") %}
+    <a href="/bio/"{% if current_path == "bio" %} aria-current="page"{% endif %}>Bio</a>
+    <a href="/projects/"{% if current_path == "projects" or current_path is starting_with("projects/") %} aria-current="page"{% endif %}>Projects</a>
+    <a href="/cv/"{% if current_path == "cv" %} aria-current="page"{% endif %}>CV</a>
+    <a href="/blog/"{% if current_path == "blog" or date is defined %} aria-current="page"{% endif %}>Blog</a>
+    <button type="button" class="theme-toggle" aria-label="Switch color theme" hidden>
+      <svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M20.5 14.3A8.5 8.5 0 0 1 9.7 3.5a8.5 8.5 0 1 0 10.8 10.8z"/></svg>
+      <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6"/></svg>
+    </button>
+  </nav>
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+  <footer class="site-footer">
+    {% include "contact.html" %}
+  </footer>
+</body>
+</html>

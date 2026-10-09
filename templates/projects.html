@@ -1,0 +1,12 @@
+{% extends "page.html" %}
+
+{% block page_body %}
+  {{ super() }}
+  {% set projects = load_data(path="projects.toml") %}
+  {% for project_slug, project in projects %}
+  <section>
+    <h2><a href="/projects/{{ project_slug }}/">{{ project.title }}</a></h2>
+    <p>{{ project.summary }}</p>
+  </section>
+  {% endfor %}
+{% endblock %}

@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}Blog — {{ site_title }}{% endblock %}
+
+{% block content %}
+<article>
+  <header><h1>Blog</h1></header>
+  {% if posts %}
+  <ul class="post-list">
+    {% for post in posts %}
+    <li>
+      <a href="/posts/{{ post.path }}/">{{ post.title }}</a>
+      <time datetime="{{ post.date }}">{{ post.date }}</time>
+      {% if post.summary %}<p>{{ post.summary }}</p>{% endif %}
+    </li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p>No posts yet.</p>
+  {% endif %}
+</article>
+{% endblock %}

@@ -1,0 +1,572 @@
+# Source of truth for the CV page (templates/cv.html).
+#
+# Each section has a `title` and either `text` or a list of `entries`, plus an
+# optional `toc` label to use in the contents panel instead of the title.
+# style = "citations" sets entry titles in regular weight, for works rather
+# than roles.
+# Entry fields (all optional, but give each entry a title or roles):
+#   title    entry heading (markdown)
+#   url      makes the title a link
+#   date     shown right-aligned
+#   roles    several title/date rows sharing one entry, e.g. promotions
+#   with     co-authors or collaborators
+#   venue    publication venue or patent number (markdown)
+#   place    organization and location (markdown)
+#   note     extra line (markdown)
+#   links    [{ label, url }] shown after the details
+#   bullets  list of highlights (markdown)
+# Sections with layout = "compact" render entries as a label/text list.
+
+name = "Alfred Rossi"
+headline = "Distinguished Scientist and Engineer at Immuta"
+interests = "Mathematical privacy and privacy risk assessment; formal models of data protection law; automated reasoning and knowledge representation."
+# Contact details also feed the site footer (templates/contact.html). The
+# email is never written to the page whole; a script assembles it on click.
+email = "alfredr@gmail.com"
+linkedin = "https://www.linkedin.com/in/alfred-rossi/"
+
+[[sections]]
+title = "Education"
+
+[[sections.entries]]
+title = "Doctor of Philosophy, Computer Science and Engineering"
+date = "2017"
+place = "The Ohio State University, Columbus, Ohio"
+note = "Thesis: *Temporal Clustering of Finite Metric Spaces and Spectral k-Clustering.*"
+
+[[sections.entries]]
+title = "Master of Science, Computer Science and Engineering"
+date = "2017"
+place = "The Ohio State University, Columbus, Ohio"
+
+[[sections.entries]]
+title = "Master of Science, Physics"
+date = "2010"
+place = "The Ohio State University, Columbus, Ohio"
+
+[[sections.entries]]
+title = "Bachelor of Science, Physics and Mathematics"
+date = "2007"
+place = "The Ohio State University, Columbus, Ohio"
+
+[[sections]]
+title = "Academic Employment"
+
+[[sections.entries]]
+title = "Visiting Fellow"
+date = "June 2025 - August 2025"
+place = "Dept. of Computer Science & Engineering, The Ohio State University"
+
+[[sections.entries]]
+title = "Senior Lecturer"
+date = "February 2018 - June 2025"
+place = "Dept. of Computer Science & Engineering, The Ohio State University"
+
+[[sections.entries]]
+title = "Postdoctoral Researcher"
+date = "Fall 2017 - January 2018"
+place = "Dept. of Computer Science & Engineering, The Ohio State University"
+
+[[sections.entries]]
+title = "Research Assistant"
+date = "Fall 2013 - Summer 2017"
+place = "Dept. of Computer Science & Engineering, The Ohio State University"
+
+[[sections]]
+title = "Publications"
+style = "citations"
+
+[[sections.entries]]
+title = "Anonymisation in motion: from data protection to digital markets law."
+with = ["Sophie Stalla-Bourdillon"]
+venue = "*Privacy and Data Protection*, Volume 26, Issue 7, pp. 16-23."
+date = "July 2026"
+
+[[sections.entries]]
+title = "Parajudica: An RDF-Based Reasoner and Metamodel for Multi-Framework Context-Dependent Data Compliance Assessments."
+with = ["Luc Moreau", "Sophie Stalla-Bourdillon"]
+venue = "Preprint, arXiv:2512.05453."
+date = "December 2025"
+links = [
+  { label = "Project", url = "/projects/parajudica/" },
+  { label = "arXiv", url = "https://arxiv.org/abs/2512.05453" },
+  { label = "DOI", url = "https://doi.org/10.5281/zenodo.17825090" },
+  { label = "Code", url = "https://github.com/alfredr/parajudica" },
+]
+
+[[sections.entries]]
+title = "A critical assessment of EDPB Opinion 28/2024: Towards a principle-based approach to innovation?"
+with = ["Sophie Stalla-Bourdillon"]
+venue = "*Privacy and Data Protection*, Volume 25, Issue 6, pp. 12-16."
+date = "2025"
+
+[[sections.entries]]
+title = "Pseudonymous Data."
+with = ["Sophie Stalla-Bourdillon"]
+venue = "*Oxford Encyclopedia of EU Law*."
+date = "March 2023"
+
+[[sections.entries]]
+title = "What are Trusted Third Parties? (Part 2)"
+with = ["Hamsa Hassan", "Sophie Stalla-Bourdillon"]
+venue = "*Privacy and Data Protection*, Volume 22, Issue 1."
+date = "2022"
+
+[[sections.entries]]
+title = "What are Trusted Third Parties? (Part 1)"
+with = ["Hamsa Hassan", "Sophie Stalla-Bourdillon"]
+venue = "*Privacy and Data Protection*, Volume 21, Issue 8."
+date = "September 2021"
+
+[[sections.entries]]
+title = "The technical fix for international data transfers - a word of caution."
+with = ["Sophie Stalla-Bourdillon"]
+venue = "*Privacy and Data Protection*, Volume 21, Issue 4."
+date = "March 2021"
+
+[[sections.entries]]
+title = "Aggregation, synthesization and anonymization: a call for a risk-based assessment of anonymization approaches."
+with = ["Sophie Stalla-Bourdillon"]
+venue = "*Data Protection and Artificial Intelligence (CPDP 2020)*. Hart Publishing."
+date = "February 2021"
+
+[[sections.entries]]
+title = "Spectral Concentration and Greedy *k*-Clustering."
+with = ["Tamal K. Dey", "Anastasios Sidiropoulos"]
+venue = "*Computational Geometry Theory and Application*, Volume 76."
+date = "2019"
+
+[[sections.entries]]
+title = "Temporal Hierarchical Clustering."
+with = ["Tamal K. Dey", "Anastasios Sidiropoulos"]
+venue = "*28th International Symposium on Algorithms and Computation (ISAAC 2017)*."
+date = "2017"
+
+[[sections.entries]]
+title = "Temporal Clustering."
+with = ["Tamal K. Dey", "Anastasios Sidiropoulos"]
+venue = "*25th Annual European Symposium on Algorithms (ESA 2017)*."
+date = "2017"
+
+[[sections.entries]]
+title = "Polyak-Viro Formulas for the Coefficients of the Conway Polynomial."
+with = ["S. Chmutov", "M. Khoury"]
+venue = "*Journal of Knot Theory and Its Ramifications*, 18.6."
+date = "2009"
+
+[[sections]]
+title = "Patents"
+style = "citations"
+
+[[sections.entries]]
+title = "Systems and Methods for Reduction of Privacy Risk in Data."
+with = ["Joseph J. Regensburger", "Sophie Stalla-Bourdillon"]
+venue = "US Patent 12,271,364."
+date = "April 8, 2025"
+
+[[sections.entries]]
+title = "Systems and Methods to Enhance Privacy through Decision Tree Based Suppression Rules on Relational Databases."
+with = ["John R. Murray", "Joseph J. Regensburger", "Mason Sharp"]
+venue = "US Patent 11,960,624."
+date = "April 16, 2024"
+
+[[sections.entries]]
+title = "Systems and Methods for Privacy-Enhancing Modification of a Database Query."
+with = ["Kyle Thomas Lilly", "Joseph J. Regensburger", "Mason Sharp"]
+venue = "US Patent 11,783,077."
+date = "October 10, 2023"
+
+[[sections.entries]]
+title = "Systems and Methods for Obscuring Data from a Data Source. (Continuation.)"
+with = ["Joseph J. Regensburger", "Andrew D. Burt", "Barry R. Hammen"]
+venue = "US Patent 11,734,452."
+date = "August 22, 2023"
+
+[[sections.entries]]
+title = "Systems and Methods for Privacy-Enhancing Transformation of a SQL Query."
+with = ["Kyle Thomas Lilly", "Joseph J. Regensburger", "Mason Sharp"]
+venue = "US Patent 11,593,506."
+date = "February 28, 2023"
+
+[[sections.entries]]
+title = "Systems and Methods for Obscuring Data from a Data Source."
+with = ["Joseph J. Regensburger", "Andrew D. Burt", "Barry R. Hammen"]
+venue = "US Patent 11,443,065."
+date = "September 13, 2022"
+
+[[sections]]
+title = "Patent Applications"
+style = "citations"
+
+[[sections.entries]]
+title = "Systems and Methods for Classifying a Data Source Containing String Values."
+with = ["Arthur J. Neuman III", "Joseph J. Regensburger"]
+venue = "US Patent Application Publication 2026/0252666. Pending."
+date = "Filed February 24, 2026"
+
+[[sections.entries]]
+title = "Systems and Methods for Determining a Risk Level of Data in a Response to Queries to a Database."
+with = ["Joseph J. Regensburger", "Sophie Stalla-Bourdillon"]
+venue = "US Patent Application Publication 2024/0249014. Pending."
+date = "Filed January 19, 2024"
+
+[[sections]]
+title = "Advisory Activities"
+style = "citations"
+
+[[sections.entries]]
+title = "The Battle for Data Availability under EU Digital Regulation: Anonymisation, Reuse, and the Future of Personal Data."
+date = "September 25, 2026"
+place = "Expert Workshop. Brussels Privacy Hub, Vrije Universiteit Brussel."
+note = "Invited participant."
+
+[[sections.entries]]
+title = "Consultation on the data protection-compliant handling of personal data in AI models."
+date = "2025"
+with = ["Sophie Stalla-Bourdillon"]
+place = "The German Federal Commissioner for Data Protection and Freedom of Information (BfDI)."
+note = "Consultation response, and invited expert at the follow-up roundtable (October 9, 2025)."
+
+[[sections.entries]]
+title = "PETs for Health Data."
+date = "March 2, 2022"
+place = "Solution Development Workshop. Pets for Public Good. The Information Commissioner's Office (ICO) of the United Kingdom."
+note = "Workshop panelist discussing the use of PETs in the context of health data."
+
+[[sections.entries]]
+title = "PETs Experts Forum."
+date = "February 2022"
+place = "The Information Commissioner's Office (ICO) of the United Kingdom."
+
+[[sections.entries]]
+title = "Why a good additional technical safeguard is hard to find."
+url = "https://edpb.europa.eu/sites/default/files/webform/public_consultation_reply/response_sto_edpb_recommendations.pdf"
+date = "2021"
+with = ["Sophie Stalla-Bourdillon"]
+note = "Comments on European Data Protection Board (EDPB) draft recommendations on the use of PETs in the context of the European General Data Protection Regulation (GDPR)."
+
+[[sections.entries]]
+title = "Technologies for the Ethical Deployment of Algorithms."
+date = "September 16, 2020"
+place = "Business Data Ethics Forum, The Moritz College of Law Program on Data and Governance."
+note = "Workshop panelist discussing the ethical use of AI in decision making processes."
+
+[[sections.entries]]
+title = "Private Set Intersection."
+date = "June 26, 2020"
+place = "The Information Commissioner's Office (ICO) of the United Kingdom."
+note = "Met with the ICO to discuss legal and technical aspects of data sharing using PSI."
+
+[[sections.entries]]
+title = "PETs Expert Roundtable."
+date = "September 9, 2019"
+place = "The Information Commissioner's Office (ICO) of the United Kingdom."
+
+[[sections]]
+title = "Presentations, Lectures, & Workshops"
+style = "citations"
+toc = "Presentations"
+
+[[sections.entries]]
+title = "De-Identification at the Intersection of Law and Technology."
+date = "January 26, 2026"
+with = ["Sophie Stalla-Bourdillon"]
+note = "Level-setting workshop at the invitation-only Regulatory Strategy Roundtable *Notions of Personal Data in the Digital Omnibus: How to Uphold a Principles-Based Approach?* Future of Privacy Forum and Brussels Privacy Hub, in collaboration with the LSTS Research Group, Vrije Universiteit Brussel. FARI, Brussels. (Presented online.)"
+
+[[sections.entries]]
+title = "On Unconditional PET love & a few inconsistencies."
+date = "June 23, 2023"
+with = ["Sophie Stalla-Bourdillon"]
+note = "Summer Academy For Global Privacy Law 2023. Brussels Privacy Hub. Vrije Universiteit Brussel."
+
+[[sections.entries]]
+title = "Designing a Private Approach."
+date = "June 23, 2023"
+note = "Summer Academy For Global Privacy Law 2023. Brussels Privacy Hub. Vrije Universiteit Brussel."
+
+[[sections.entries]]
+title = "Homomorphic Encryption."
+url = "https://www.youtube.com/watch?v=r1J93rTeeaY&t=440s"
+date = "May 25, 2022"
+with = ["Sophie Stalla-Bourdillon"]
+note = "State of Play of De-identification Techniques. *Future of Privacy Forum Master Class* at *Computers, Privacy & Data Protection (CPDP2022)* in Brussels, Belgium."
+
+[[sections.entries]]
+title = "Your Guide to Understanding and Operationalizing the Privacy by Design Framework."
+date = "July 26, 2019"
+with = ["Sophie Stalla-Bourdillon"]
+note = "Explained the role of privacy enhancing technologies in a technical/legal talk on Privacy by Design. Talk hosted by the International Association of Privacy Professionals and offered for Continuing-Privacy Education (CPE) credit."
+
+[[sections.entries]]
+title = "A Data Scientist's Guide to Preserving Privacy."
+date = "March 20, 2019"
+with = ["Stephen Bailey"]
+note = "Explained the use of privacy-enhancing technologies such as *k*-anonymization, differential privacy in data science and machine learning."
+
+[[sections.entries]]
+title = "Temporal Clustering."
+date = "March 29, 2017"
+note = "Presentation to [CSE Industrial Advisory Board](https://cse.osu.edu/department/industrial-advisory-board). Dept. of Computer Science & Engineering, The Ohio State University."
+
+[[sections.entries]]
+title = "Temporal Clustering."
+date = "February 24, 2017"
+note = "CSE Student Research Poster Exhibition. Dept. of Computer Science & Engineering, The Ohio State University."
+
+[[sections.entries]]
+title = "Spectral concentration and greedy *k*-clustering."
+date = "February 10, 2016"
+note = "CSE Student Research Poster Exhibition. Dept. of Computer Science & Engineering, The Ohio State University."
+
+[[sections.entries]]
+title = "Spectral concentration and greedy *k*-clustering."
+date = "April 10, 2015"
+note = "Presentation to CSE Industrial Advisory Board. Dept. of Computer Science & Engineering, The Ohio State University."
+
+[[sections.entries]]
+title = "Spectral concentration and greedy *k*-clustering."
+date = "February 20, 2015"
+note = "CSE Student Research Poster Exhibition. Dept. of Computer Science & Engineering, The Ohio State University."
+
+[[sections.entries]]
+title = "Constructive Generation of Arrow Diagram Formulas for the Coefficients of the Conway Polynomial"
+date = "Fall 2007"
+note = "Young Mathematicians Conference, The Ohio State University."
+
+[[sections.entries]]
+title = "An Algorithm for Producing Arrow Diagram Formulas for the Coefficients of the Conway Polynomial"
+date = "Fall 2006"
+note = "SUMs, James Madison University, Harrisonburg, VA."
+
+[[sections]]
+title = "Professional Experience"
+
+[[sections.entries]]
+roles = [
+  { title = "Distinguished Scientist and Engineer", date = "August 2022 - Present" },
+  { title = "Research Scientist", date = "September 2018 - August 2022" },
+]
+place = "Immuta, Columbus, OH"
+bullets = [
+  "Pioneered cutting-edge SQL transformers for the integration of privacy mechanisms. Particularly, for rewriting aggregate queries to ensure differential privacy (US Patent 11,593,506, February 2023), and for achieving local differential privacy through randomized response (US Patent 11,783,077, October 2023).",
+  "Led the architectural design and contributed to the development of a system that infers database column types from column data without requiring explicit transfer. Notably, this locality-preserving system works remotely over a sample, offering PAC-like robustness guarantees.",
+  "Implemented critical cryptographic libraries, such as format-preserving encryption (FF1), order-preserving encryption (Boldyreva, Chenette, Lee, O'Neil), and AES.",
+  "Advanced format-preserving encryption and randomized response techniques to finite regular languages. This was achieved by creating an efficient library to enumerate the accepting set of a regular expression, supporting conversion between an accepted value and its index in constant time for a fixed pattern.",
+  "Developed effective best-effort solutions to hard combinatorial optimization problems such as reducing excess privilege in role-based access policies while simultaneously minimizing the number of replacement roles. (NP-hard to even approximate by reduction to boolean matrix factorization.)",
+  "Conceived and implemented a unique clustering algorithm that leverages minimum capacity constraints for *k*-anonymization.",
+  "Designed and implemented a novel one-pass streaming algorithm for constructing a *k*-anonymizing attribute suppression decision tree.",
+  "Conceived, developed, and implemented a framework for differential data risk assessment enabling, e.g., detection of queries that would inadvertently re-identify de-identified data.",
+  "Provided expert consultation to the company on modern best practices in mathematical privacy, including the application of differential privacy, zero-knowledge proofs, partially and fully homomorphic encryption, queries over encrypted data, and secure multi-party computation techniques.",
+  "Authored numerous scholarly papers and guidance materials on the application of Privacy-Enhancing Technologies (PETs).",
+  "Frequently served as an advisor to the UK Information Commissioner's Office (ICO) on the application of PETs, including active participation in the PETs Expert Forum (2021-2022) and PETs Expert Roundtable (September 9, 2019).",
+]
+
+[[sections.entries]]
+title = "Founder and CTO"
+date = "2017 - September 2018"
+place = "VentureTech Group, LLC. Columbus, OH"
+bullets = [
+  "Advise company technical direction in accordance with best current practice, specifically in the areas of data model design, disaster recovery, internationalization, operations, scalability, security, software development methodology, system architecture, and user data privacy.",
+  "Establish policies and procedures for compliance, governance, and management of risk, especially in the handling of personal data under the General Data Protection Regulation (GDPR).",
+  "Developed a multi-tenant Learning Management Platform (VueJS, golang, Postgres, Google Cloud Platform, Kubernetes), currently in use by Cooper Tire & Rubber Company.",
+  "Architectural and technical lead on a product (under development) that optimizes vehicle service center resource utilization through smart appointment scheduling.",
+]
+
+[[sections.entries]]
+title = "Founder and Developer"
+date = "June 2014 - March 2019"
+place = "Alder Analytics, LLC. Columbus, OH"
+bullets = [
+  "Developed novel cryptographic services to facilitate digital document signing.",
+  "Architected and developed an internationalized (multi-lingual) Learning Management System (C#, VueJS, ASP.NET MVC, MS SQL Server, Azure) for retailers. Currently in use by [Under Armour](https://armouru2.underarmour.com/) to train third party sales associates (e.g. retail sales associates at Dick's Sporting Goods, Cabela's, ...) on Under Armour products.",
+  "Helped a top 30 U.S. Bank (by asset size) predict the cost of premiums associated with new account marketing campaigns.",
+  "Provided architectural direction and was sole backend developer (golang, Postgres) of a streaming music application (SavageTrap). App was a five star application in both iOS and Google Play stores, and had supported over 290k registered users at the time of shutdown.",
+  "Guided the transition of a top 250 U.S. website (by traffic) from traditional monolithic application architecture to distributed, containerized microservice architecture enhancing availability and fault-tolerance.",
+  "Developed several high-performance application-specific reverse proxies (golang) responsible for operations such as realtime forensic analysis of web traffic, realtime marketing analytics (Druid, Hadoop, Kafka, Zookeeper), template expansion, and load balancing (among others).",
+  "Migrated traditional web-application infrastructure to containerized Docker-based cluster infrastructure with multihost-networking (Rancher, libnetwork) and automated service discovery (consul, etcd, skydock).",
+  "Implemented transparent distributed high performance real time traffic analysis for advertiser dashboards (golang, druid, zookeeper, kafka).",
+  "Applied best practices from distributed systems to architect highly available applications.",
+  "Developed a business intelligence portal (Java, OSGI) integrating Saiku BI with customer databases for a cloud-based sales management service.",
+  "Automated server provisioning with ansible.",
+]
+
+[[sections.entries]]
+title = "Consultant"
+date = "December 2012 - September 2015"
+place = "Battelle Memorial Institute, Columbus, OH"
+bullets = [
+  "Provided consulting to Battelle, as needed, on a variety of topics in the realms of scientific computing and systems administration.",
+  "Consulted on the technical planning and feasibility analysis for the implementation of the next generation of Battelle's HPC cluster (Galileo).",
+  "Investigated graph layout algorithms for fast visualization of large (approximately 10,000-node) nearly-planar graphs for use in custom software tool for modeling large scale electrical networks.",
+  "Jointly supported a combined Linux / Windows Server environment including VMware ESXi and WebLogic application servers.",
+  "Jointly responsible for administration and support of 30+ node Linux HPC cluster.",
+]
+
+[[sections.entries]]
+title = "Operations Manager and Lead DevOps Engineer"
+date = "March 2012 - June 2014"
+place = "Action Verb, LLC. Las Vegas, NV"
+bullets = [
+  "Responsible for designing, implementing, monitoring, and maintaining efficient and fault-tolerant infrastructure for highly available web applications.",
+  "Developed custom DAV (milton.io-based), SFTP (apache mina-based), FTP (mina-based) file servers in Java enabling customer access to files stored in BrickFTP (the company's flag-ship product).",
+  "Instrumented code to capture performance data from applications in production, enabling real-time monitoring and analysis.",
+  "Maintainer of Action Verb's heavily modified internal branch of S3FS (a fuse based file system (C++) backed with Amazon's S3 service.)",
+  "Developed drop-in extension libraries enabling hosted applications to interface with Action Verb's deployment platform.",
+  "Automated infrastructure deployment with Chef (Ruby).",
+  "Systems Administrator for 50+ Linux servers (Ubuntu, RHEL) and several MySQL databases. Systems covered included DNS, FTP, SVN, NFS, mail, web, and application servers.",
+  "Worked extensively with Amazon AWS services including EC2, S3, IAM, RDS, and VPC.",
+]
+
+[[sections.entries]]
+title = "Researcher"
+date = "October 2007 - March 2012"
+place = "Energetic Systems & Security Technology, Battelle Memorial Institute"
+bullets = [
+  "Aided in the design of physical test articles and developed computer-vision based analysis software for performing diagnostic evaluation of multi-view, multi-energy transmission x-ray systems.",
+  "Performed mathematical modeling of the system response of CT scanners and statistical analysis of CT images for diagnostic evaluation.",
+  "Developed applications for the visualization of tomographic reconstructions of CT data and image analysis.",
+  "Analyzed the evolving DICOS standard (a data storage and interchange standard for security imaging devices based on the medical data acquisition standard DICOM), and developed DICOS related software tools. Most notably, a configurable rule based validator for DICOS data sets.",
+  "Performed mathematical modeling of general sensor / system response, with an additional focus on heat flux sensors for use in gathering burn injury prediction data.",
+  "Responsible for supporting group efforts which require software development, most notably a software package for the automated post-processing of test data and report generation.",
+  "Jointly responsible for the design, administration, and continued functioning of the group high-performance computing cluster.",
+  "Recipient of 5 outstanding performance awards, and pending nomination for the Emerging Scientist award at time of departure.",
+]
+
+[[sections]]
+title = "Teaching"
+
+[[sections.entries]]
+title = "Foundations I: Discrete Structures (CSE 2321)"
+date = "Fall 2017 - Spring 2023"
+place = "Dept. of Computer Science & Engineering, The Ohio State University"
+note = "Taught Fall 2017, Spring 2018, Fall 2018, Spring 2019, Spring 2020, Fall 2022, and Spring 2023."
+bullets = [
+  "Topics include propositional and first-order logic, basic mathematical proof techniques, graphs, analysis of algorithms, asymptotic analysis, solving recurrence relations, and basic sorting and searching.",
+]
+
+[[sections.entries]]
+title = "Machine Learning and Statistical Pattern Recognition (CSE 5523)"
+date = "Spring 2022"
+place = "Dept. of Computer Science & Engineering, The Ohio State University"
+bullets = [
+  "Topics include concentration inequalities, probability theory, formal learning models (including the PAC, mistake-bound, consistency, and agnostic PAC models), VC dimension, formal models of privacy and their use in machine learning.",
+]
+
+[[sections.entries]]
+title = "Foundations II: Data Structures and Algorithms (CSE 2331)"
+date = "Spring 2021, Fall 2021"
+place = "Dept. of Computer Science & Engineering, The Ohio State University"
+bullets = [
+  "Topics include design and analysis of algorithms and data structures, divide-and-conquer, sorting and selection, search trees, hashing, graph algorithms, string matching, probabilistic analysis, randomized algorithms, and NP-completeness.",
+]
+
+[[sections]]
+title = "Blogs"
+style = "citations"
+
+[[sections.entries]]
+title = "A guide to the EU's unclear anonymization standards."
+url = "https://iapp.org/news/a/a-guide-to-the-eus-unclear-anonymization-standards/"
+with = ["Andrew Burt", "Sophie Stalla-Bourdillon"]
+venue = "*The Privacy Advisor*, IAPP."
+date = "July 15, 2021"
+
+[[sections.entries]]
+title = "Differential Privacy: An Introduction for First Graders."
+url = "https://www.dataversity.net/differential-privacy-an-introduction-for-first-graders/"
+venue = "DATAVERSITY's Industry Expert Blog Series."
+
+[[sections.entries]]
+title = "Deidentification 201: A lawyer's guide to pseudonymization and anonymization."
+url = "https://iapp.org/news/a/de-identification-201-a-lawyers-guide-to-pseudonymization-and-anonymization/"
+with = ["Andrew Burt", "Sophie Stalla-Bourdillon"]
+venue = "*The Privacy Advisor*, IAPP."
+date = "May 28, 2020"
+
+[[sections.entries]]
+title = "Deidentification 101: A lawyer's guide to masking, encryption and everything in between."
+url = "https://iapp.org/news/a/de-identification-101-a-lawyers-guide-to-masking-encryption-and-everything-in-between/"
+with = ["Andrew Burt", "Sophie Stalla-Bourdillon"]
+venue = "*The Privacy Advisor*, IAPP."
+date = "April 30, 2020"
+
+[[sections]]
+title = "Other Academic & Professional Experience"
+toc = "Other experience"
+
+[[sections.entries]]
+title = "Teaching Assistant"
+date = "Fall 2008 - Fall 2009"
+place = "Dept. of Physics, The Ohio State University"
+bullets = [
+  "Taught recitation courses and labs corresponding to calculus-based mechanics (Physics 131 Autumn 2008), and calculus-based electrostatics (Physics 132).",
+]
+
+[[sections.entries]]
+title = "Instructor"
+date = "Fall 2007"
+place = "Dept. of Mathematics, The Ohio State University"
+bullets = [
+  "Responsible for teaching the recitation course corresponding to Math 150 (Autumn 2007), grading, holding office hours, and working one-on-one to tutor and enhance student's understanding of pre-calculus mathematics.",
+]
+
+[[sections.entries]]
+title = "Proprietor"
+date = "January 2006 - October 2007"
+place = "thatvideogamesite.com"
+bullets = [
+  "Developed several websites for the purpose of selling online advertising.",
+  "thatvideogamesite.com (sold 10/2007): Developed flash game site in PHP. Implemented custom caching system for reducing system load under heavy traffic from digg, fark, and addictinggames.com.",
+  "theunverse.net (no longer online): Social link sharing site developed in Ruby on Rails. Developed javascript heavy front-end with script.aculo.us. Profiled extensively to identify and mitigate bottlenecks in ActiveRecord queries.",
+]
+
+[[sections.entries]]
+title = "Programmer"
+date = "August 2004 - August 2007"
+place = "Condensed Matter Physics Group, Dept. of Physics, The Ohio State University"
+bullets = [
+  "Implemented numerous custom software packages including a web based system for submitting molecular dynamics simulation jobs to a supercomputer, and custom visualization software in C++ for displaying and animating the results of such a simulation.",
+  "Evaluated the efficacy of Bezier curves in the modeling of physical potentials.",
+]
+
+[[sections.entries]]
+title = "Student Researcher"
+date = "January 2003 - August 2004"
+place = "High Energy Physics Group, Dept. of Physics, The Ohio State University"
+bullets = [
+  "Conceived, designed, and implemented a custom software package to help oversee the manufacturing, testing, and shipment of components for the Stanford Linear Accelerator.",
+  "Interfaced custom test equipment with centralized back-end database.",
+]
+
+[[sections]]
+title = "Languages, Libraries, Packages, Platforms, and Technologies"
+toc = "Technologies"
+layout = "compact"
+
+[[sections.entries]]
+title = "Languages"
+text = "C, C++, C#, Clay, Go (golang), Haskell, HaXe, Java, Javascript, OCaml, PHP, Python, Ruby, Rust, TypeScript, x86 and z80 assembly."
+
+[[sections.entries]]
+title = "Libraries"
+text = "Boost, Elixir, jQuery, Qt, numpy, OpenCV, Ruby on Rails, scipy, SQLAlchemy, VueJS, wxWidgets."
+
+[[sections.entries]]
+title = "Packages"
+text = "Ansible, Apache HTTPd, Cacti, Chef, Consul, Docker, Doxygen, etcd, Git, Kafka, lighttpd, Maui, Mercurial, Nginx, Salt, TORQUE Resource Manager, Redmine, Subversion, Zookeeper."
+
+[[sections.entries]]
+title = "Platforms"
+text = "(Unix-likes) Darwin/OSX, Linux, OpenBSD. (Runtime Environments) .NET, Java. (Cloud Providers) Amazon Web Services, Google Cloud Platform, Microsoft Azure. (Container Orchestration) Docker Swarm, Rancher, Kubernetes."
+
+[[sections.entries]]
+title = "Markup"
+text = "CSS, HTML, Markdown."
+
+[[sections.entries]]
+title = "Database Engines"
+text = "(Relational) MS SQL Server, MySQL, Postgres, and SQLite. (Time-Series) Druid, InfluxDB."
+
+[[sections.entries]]
+title = "Visualization"
+text = "OpenGL, VTK."

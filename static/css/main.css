@@ -1,0 +1,874 @@
+/* Colors are light/dark pairs (light-dark()). The page follows the system
+   setting unless the nav toggle (js/theme.js) sets data-theme on <html>.
+   Dark mode keeps body text near 9:1 on a slightly warm gray: very bright
+   text on a cool blue-black blooms into the background and tires the eyes. */
+:root {
+  color-scheme: light dark;
+
+  --paper: light-dark(#fbfbfa, #1e1e1c);
+  --ink: light-dark(#1d2228, #c4c1ba);
+  --ink-2: light-dark(#59616b, #94918a);
+  --ink-3: light-dark(#868d96, #77746d);
+  --rule: light-dark(#e2e4e7, #33322f);
+  --accent: light-dark(#2b4c9b, #93a5cc);
+  --code-bg: light-dark(#eef0f2, #292926);
+
+  --serif: Charter, "Bitstream Charter", "Sitka Text", Cambria, serif;
+  --sans: system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, monospace;
+
+  /* Page width, the prose measure (about 70 characters), and the CV's
+     timeline column for dates. */
+  --measure: 44rem;
+  --prose: 38rem;
+  --gutter: 5.5rem;
+  --gap: 1.75rem;
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--serif);
+  font-size: 1.0625rem;
+  line-height: 1.7;
+  letter-spacing: 0.01em;
+  max-width: calc(var(--measure) + 2rem);
+  margin: 0 auto;
+  padding: 2rem 1rem;
+  color: var(--ink);
+  background: var(--paper);
+}
+
+/* Light-on-dark text renders better with thinner smoothing. Spacing is the
+   same in both modes so switching themes doesn't reflow the page. */
+:root[data-theme="dark"] body {
+  -webkit-font-smoothing: antialiased;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) body {
+    -webkit-font-smoothing: antialiased;
+  }
+}
+
+a {
+  color: inherit;
+  text-decoration-color: var(--ink-3);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.18em;
+}
+
+a:hover {
+  color: var(--accent);
+  text-decoration-color: currentColor;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* Site navigation */
+
+.site-nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.25rem 1.5rem;
+  margin-bottom: 3rem;
+  font-family: var(--sans);
+  font-size: 0.9375rem;
+}
+
+.site-nav a {
+  color: var(--ink-2);
+  text-decoration: none;
+}
+
+.site-nav a:hover,
+.site-nav a[aria-current="page"] {
+  color: var(--ink);
+}
+
+.site-nav a[aria-current="page"] {
+  text-decoration: underline;
+  text-decoration-color: var(--accent);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.4em;
+}
+
+.site-nav .site-title {
+  margin-right: auto;
+  font-weight: 700;
+  font-size: 1.125rem;
+  color: var(--ink);
+}
+
+/* Light/dark toggle (js/theme.js). It shows the mode it switches to. */
+.theme-toggle {
+  align-self: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  margin: -0.25rem -0.5rem -0.25rem -0.5rem;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: var(--ink-2);
+  cursor: pointer;
+}
+
+.theme-toggle[hidden] {
+  display: none;
+}
+
+.theme-toggle:hover {
+  color: var(--ink);
+  background: color-mix(in srgb, var(--ink) 8%, transparent);
+}
+
+.theme-toggle svg {
+  width: 1.1rem;
+  height: 1.1rem;
+}
+
+.theme-toggle[data-current="dark"] .icon-moon,
+.theme-toggle[data-current="light"] .icon-sun {
+  display: none;
+}
+
+/* Posts and pages */
+
+article header {
+  margin-bottom: 1.75rem;
+}
+
+article h1 {
+  font-size: 2.25rem;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  margin-bottom: 0.5rem;
+}
+
+/* A page title directly above its body (no date header below it). */
+article > h1 {
+  margin-bottom: 1.75rem;
+}
+
+article header time {
+  font-family: var(--sans);
+  color: var(--ink-2);
+  font-size: 0.875rem;
+}
+
+.tags {
+  margin-top: 0.5rem;
+  font-family: var(--sans);
+}
+
+.tag {
+  display: inline-block;
+  background: var(--code-bg);
+  padding: 0.15rem 0.5rem;
+  border-radius: 3px;
+  font-size: 0.8125rem;
+  margin-right: 0.25rem;
+}
+
+.post-list {
+  list-style: none;
+}
+
+.post-list li + li {
+  margin-top: 1.25rem;
+}
+
+.post-list time {
+  display: block;
+  font-family: var(--sans);
+  font-size: 0.875rem;
+  color: var(--ink-2);
+}
+
+.post-body h1,
+.post-body h2,
+.post-body h3,
+.page-body h2,
+.page-body h3 {
+  margin-top: 1.5em;
+  margin-bottom: 0.5em;
+  line-height: 1.3;
+}
+
+/* Prose keeps a comfortable measure; link rows can use the full width. */
+.post-body :is(p, ul, ol, blockquote):not(.links),
+.page-body :is(p, ul, ol, blockquote):not(.links) {
+  max-width: var(--prose);
+}
+
+.post-body p,
+.page-body p {
+  margin-bottom: 1em;
+}
+
+.page-body > p:first-child {
+  font-size: 1.1875rem;
+  line-height: 1.6;
+}
+
+.post-body ul,
+.post-body ol,
+.page-body ul,
+.page-body ol {
+  margin-bottom: 1em;
+  padding-left: 1.5rem;
+}
+
+.post-body li {
+  margin-bottom: 0.25em;
+}
+
+code {
+  font-family: var(--mono);
+  background: var(--code-bg);
+  padding: 0.1em 0.3em;
+  border-radius: 3px;
+  font-size: 0.85em;
+}
+
+pre {
+  background: #2b303b;
+  color: #c0c5ce;
+  padding: 1rem;
+  border-radius: 6px;
+  overflow-x: auto;
+  margin-bottom: 1em;
+}
+
+pre code {
+  background: none;
+  padding: 0;
+}
+
+footer {
+  margin-top: 4rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--rule);
+  font-family: var(--sans);
+  font-size: 0.9375rem;
+  color: var(--ink-3);
+}
+
+.site-footer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.25rem 1.25rem;
+  letter-spacing: normal;
+}
+
+.site-footer a,
+.site-footer .contact-email {
+  color: var(--ink-2);
+  text-decoration: none;
+}
+
+.site-footer a:hover,
+.site-footer .contact-email:hover {
+  color: var(--accent);
+  text-decoration: underline;
+}
+
+/* Standalone links (rows marked class="links" or {.links}, the CV's contact
+   and paper links): one sans size, accent color, set as a row on a line of
+   its own. Links inside sentences keep the underlined prose style. A row
+   that closes a page gets extra space above it. */
+.links,
+.cv-links,
+.cv-contact {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1.25rem;
+  font-family: var(--sans);
+  font-size: 0.9375rem;
+  letter-spacing: normal;
+}
+
+.links a,
+.cv-links a,
+.cv-contact a,
+.cv-contact .contact-email {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.links a:hover,
+.cv-links a:hover,
+.cv-contact a:hover,
+.cv-contact .contact-email:hover {
+  text-decoration: underline;
+}
+
+.page-body > .links:last-child,
+.post-body > .links:last-child {
+  margin-top: 2.5rem;
+}
+
+/* "Contact me" reveals the email address (js/contact.js), so it is a button
+   styled to match the links around it. */
+.contact-email {
+  font: inherit;
+  letter-spacing: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-color: var(--ink-3);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.18em;
+}
+
+.contact-email:hover {
+  color: var(--accent);
+  text-decoration-color: currentColor;
+}
+
+/* CV (templates/cv.html, data/cv.toml, js/cv.js) */
+
+.cv {
+  position: relative;
+}
+
+.cv-header h1 {
+  font-size: 2.75rem;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.5rem;
+}
+
+.cv-headline {
+  font-size: 1.25rem;
+  line-height: 1.4;
+  color: var(--ink-2);
+}
+
+/* Full width: justified, its right edge must meet the rule and text below. */
+.cv-lede {
+  margin-top: 1.25rem;
+  font-size: 1.125rem;
+}
+
+.cv-contact {
+  margin-top: 1rem;
+}
+
+/* Each section opens with a rule so the long page reads as chapters. */
+.cv-section {
+  margin-top: 3rem;
+  padding-top: 1.75rem;
+  border-top: 1px solid var(--rule);
+  scroll-margin-top: 0.5rem;
+}
+
+.cv-section > h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  margin-bottom: 1.25rem;
+}
+
+.cv-entry + .cv-entry {
+  margin-top: 1.5rem;
+}
+
+.cv-citations .cv-entry + .cv-entry {
+  margin-top: 1.1rem;
+}
+
+.cv-head {
+  display: flex;
+  flex-direction: column;
+}
+
+.cv-head + .cv-head {
+  margin-top: 0.15rem;
+}
+
+.cv-head h3 {
+  font-size: 1.0625rem;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+/* Works (papers, patents, talks) in regular weight; roles and degrees bold. */
+.cv-citations .cv-head h3 {
+  font-weight: 400;
+}
+
+.cv-head h3 a {
+  text-decoration-color: color-mix(in srgb, currentColor 25%, transparent);
+}
+
+.cv-head h3 a:hover {
+  text-decoration-color: currentColor;
+}
+
+.cv-date {
+  flex-shrink: 0;
+  font-family: var(--sans);
+  font-size: 0.8125rem;
+  letter-spacing: normal;
+  color: var(--ink-2);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.cv-meta {
+  color: var(--ink-2);
+}
+
+/* Co-authors and venue each get a line. */
+.cv-with,
+.cv-venue {
+  display: block;
+}
+
+.cv-meta,
+.cv-note,
+.cv-entry li {
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+/* In lists of works the description is supporting detail; keep titles forward. */
+.cv-citations .cv-note {
+  color: var(--ink-2);
+}
+
+.cv-note {
+  margin-top: 0.15rem;
+}
+
+.cv-links {
+  margin-top: 0.15rem;
+}
+
+.cv-entry ul {
+  list-style: none;
+  margin-top: 0.5rem;
+}
+
+.cv-entry li {
+  position: relative;
+  padding-left: 1.1rem;
+}
+
+.cv-entry li + li {
+  margin-top: 0.3rem;
+}
+
+.cv-entry li::before {
+  content: "";
+  position: absolute;
+  left: 0.1rem;
+  top: 0.8em;
+  width: 0.45rem;
+  height: 1px;
+  background: var(--ink-3);
+}
+
+.cv-compact {
+  display: grid;
+  grid-template-columns: 8rem 1fr;
+  align-items: baseline;
+  gap: 0.6rem 1.5rem;
+}
+
+.cv-compact dt {
+  font-family: var(--sans);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: normal;
+  color: var(--ink-2);
+}
+
+/* Timeline. From tablet width up, CV entries are a two-column grid: years
+   in a left column, right-aligned against a rule that runs down each
+   section with a dot at each date, and everything else in the text column.
+   Narrower screens keep one column with each date above its title. */
+@media (min-width: 46rem) {
+  .cv-entry {
+    position: relative;
+    display: grid;
+    grid-template-columns: var(--gutter) minmax(0, 1fr);
+    column-gap: var(--gap);
+    align-items: baseline;
+  }
+
+  .cv-head {
+    display: contents;
+  }
+
+  .cv-entry > :not(.cv-head),
+  .cv-head h3 {
+    grid-column: 2;
+  }
+
+  /* Every date gets the width of "2018-2022" and starts at the same point,
+     so start years, end years, and single years each line up in a column. */
+  .cv-date {
+    grid-column: 1;
+    justify-self: end;
+    position: relative;
+    min-width: 9ch;
+    white-space: nowrap;
+  }
+
+  /* A year already labelled above keeps only its dot. */
+  .cv-date--repeat {
+    color: transparent;
+  }
+
+  /* Padding, not margin, separates entries so the rule runs unbroken. */
+  .cv-entry + .cv-entry,
+  .cv-citations .cv-entry + .cv-entry {
+    margin-top: 0;
+    padding-top: 1.5rem;
+  }
+
+  .cv-citations .cv-entry + .cv-entry {
+    padding-top: 1.1rem;
+  }
+
+  .cv-entry::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: calc(var(--gutter) + var(--gap) / 2 - 0.5px);
+    width: 1px;
+    background: var(--rule);
+  }
+
+  .cv-entry:first-of-type::before {
+    top: 0.75rem;
+  }
+
+  .cv-date::before {
+    content: "";
+    position: absolute;
+    right: calc(var(--gap) / -2 - 3.5px);
+    top: calc(0.5lh - 3.5px);
+    width: 7px;
+    height: 7px;
+    border: 1.5px solid var(--accent);
+    border-radius: 50%;
+    background: var(--paper);
+  }
+
+  /* Technologies: labels sit in the date column. */
+  .cv-compact {
+    grid-template-columns: var(--gutter) minmax(0, 1fr);
+    column-gap: var(--gap);
+  }
+
+  .cv-compact dt {
+    text-align: right;
+  }
+
+  .cv-section > p {
+    margin-left: calc(var(--gutter) + var(--gap));
+  }
+}
+
+/* Contents panel. In the left margin on wide screens, a slide-in panel on
+   narrow ones (with JS), and a plain list under the header without JS. */
+
+.cv-rail {
+  margin-top: 2.5rem;
+  font-family: var(--sans);
+  letter-spacing: normal;
+}
+
+.cv-rail-title {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+}
+
+.cv-toc {
+  list-style: none;
+}
+
+.cv-toc a {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.75rem;
+  padding: 0.3rem 0 0.3rem 1rem;
+  font-size: 0.875rem;
+  line-height: 1.35;
+  color: var(--ink-2);
+  text-decoration: none;
+}
+
+/* Rail segment: a track, and a fill scaled by reading progress (--p). */
+.cv-toc a::before,
+.cv-toc a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--rule);
+}
+
+.cv-toc a::after {
+  background: var(--accent);
+  transform-origin: top;
+  transform: scaleY(var(--p, 0));
+}
+
+.cv-toc a:hover {
+  color: var(--ink);
+}
+
+.cv-toc a.is-active,
+.cv-toc a.is-active .cv-toc-count {
+  color: var(--accent);
+}
+
+.cv-toc-count {
+  font-size: 0.75rem;
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+}
+
+.cv-toc-toggle,
+.cv-backdrop {
+  display: none;
+}
+
+@media (min-width: 75rem) {
+  .cv-rail {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: calc(100% + 2rem);
+    width: 11rem;
+    margin-top: 0;
+  }
+
+  .cv-rail-title {
+    display: none;
+  }
+
+  .cv-toc {
+    position: sticky;
+    top: 2rem;
+  }
+}
+
+@media (max-width: 74.99rem) {
+  .js .cv-rail {
+    position: fixed;
+    z-index: 20;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: min(19rem, 86vw);
+    margin: 0;
+    padding: 1.5rem 1.5rem 2rem;
+    overflow-y: auto;
+    background: var(--paper);
+    border-left: 1px solid var(--rule);
+    box-shadow: -12px 0 32px rgb(0 0 0 / 0.12);
+    transform: translateX(100%);
+    visibility: hidden;
+    transition: transform 0.25s ease, visibility 0s linear 0.25s;
+  }
+
+  .js .cv-rail.is-open {
+    transform: none;
+    visibility: visible;
+    transition: transform 0.25s ease;
+  }
+
+  .js .cv-toc a {
+    padding-top: 0.45rem;
+    padding-bottom: 0.45rem;
+    font-size: 0.9375rem;
+  }
+
+  .js .cv-toc-toggle {
+    position: fixed;
+    z-index: 10;
+    right: 1rem;
+    bottom: 1rem;
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    max-width: calc(100vw - 2rem);
+    padding: 0.6rem 1rem 0.7rem;
+    overflow: hidden;
+    border: none;
+    border-radius: 999px;
+    font: 600 0.875rem/1.2 var(--sans);
+    color: var(--paper);
+    background: var(--ink);
+    box-shadow: 0 4px 16px rgb(0 0 0 / 0.18);
+    cursor: pointer;
+  }
+
+  .cv-toc-toggle-current {
+    font-weight: 400;
+    opacity: 0.75;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .cv-toc-toggle-current:empty {
+    display: none;
+  }
+
+  /* Overall reading progress along the bottom edge of the button. */
+  .cv-toc-toggle::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 3px;
+    background: var(--accent);
+    transform-origin: left;
+    transform: scaleX(var(--progress, 0));
+  }
+
+  .js .cv-backdrop {
+    display: block;
+    position: fixed;
+    z-index: 15;
+    inset: 0;
+    background: rgb(0 0 0 / 0.3);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+  }
+
+  .js .cv-backdrop.is-open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
+
+/* Justified paragraphs with hyphenation. The CV lede is included; page
+   templates can include theirs with page-body--justified. Other ledes and narrow screens
+   keep a ragged right edge. Citations stay ragged too: titles and DOIs are
+   long unbreakable runs that open wide gaps when justified. */
+@media (min-width: 36rem) {
+  .page-body p:not(:first-child, :has(cite), .links),
+  .page-body--justified p:not(:has(cite), .links),
+  .post-body p:not(:has(cite), .links),
+  .cv-lede,
+  .cv-note,
+  .cv-entry li {
+    text-align: justify;
+    -webkit-hyphens: auto;
+    hyphens: auto;
+    hyphenate-limit-chars: 6 3 2;
+    text-wrap: pretty;
+  }
+}
+
+@media (max-width: 36rem) {
+  .cv-header h1 {
+    font-size: 2.125rem;
+  }
+
+  .cv-head {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .cv-date {
+    white-space: normal;
+  }
+
+  .cv-compact {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .cv-compact dd {
+    margin-bottom: 0.6rem;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html:has(.cv) {
+    scroll-behavior: smooth;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .js .cv-rail,
+  .js .cv-rail.is-open,
+  .js .cv-backdrop {
+    transition: none;
+  }
+}
+
+@media print {
+  body {
+    max-width: none;
+    padding: 0;
+    font-size: 10pt;
+    color: #000;
+    background: none;
+  }
+
+  .site-nav,
+  footer,
+  .cv-rail,
+  .cv-toc-toggle,
+  .cv-backdrop {
+    display: none !important;
+  }
+
+  .cv a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .cv-section {
+    margin-top: 1.5rem;
+  }
+
+  .cv-entry {
+    break-inside: avoid;
+  }
+}

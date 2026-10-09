@@ -1,0 +1,4 @@
+# The image needs only the built site and its Caddyfile.
+*
+!dist
+!deploy/serve.Caddyfile

@@ -1,0 +1,21 @@
+{#- Shared template macros. -#}
+
+{#- The timeline label for a CV date: years only, so every entry uses the
+    same unit. A range keeps both years ("2018 - 2022") unless they match;
+    a single date ("May 28, 2020", "Fall 2007") becomes its last word. -#}
+{% macro year_label(text) -%}
+{%- set ends = text | split(pat=" - ") -%}
+{%- set start = ends | first | trim | split(pat=" ") | last -%}
+{%- set end = ends | last | trim | split(pat=" ") | last -%}
+{%- if start == end %}{{ start }}{% else %}{{ start }} - {{ end }}{% endif -%}
+{%- endmacro year_label %}
+
+{#- A CV date in the timeline column, with the full date on hover. Ranges
+    are compact ("2018-2022", "2022-now") so they fit on one line. `repeat`
+    marks a year already shown above in the section: it stays in the text
+    (for copying and screen readers) but the timeline shows only its dot. -#}
+{% macro date(label, full, repeat) -%}
+<span class="cv-date{% if repeat %} cv-date--repeat{% endif %}" title="{{ full }}">
+  {{- label | replace(from=" - ", to="-") | replace(from="Present", to="now") -}}
+</span>
+{%- endmacro date %}

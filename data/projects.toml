@@ -1,0 +1,19 @@
+# Each key matches a page directory under content/projects/.
+# The index and individual project templates share this metadata.
+
+[parajudica]
+title = "Parajudica"
+website = "https://parajudica.org/"
+summary = "A reasoning system for assessing how data is classified across legal and organizational frameworks. Joint work with Luc Moreau and Sophie Stalla-Bourdillon."
+source = "https://github.com/alfredr/parajudica"
+archive = "https://doi.org/10.5281/zenodo.17825090"
+bibtex = "citation.bib"
+
+[parajudica.paper]
+title = "Parajudica: An RDF-Based Reasoner and Metamodel for Multi-Framework Context-Dependent Data Compliance Assessments."
+authors = "Luc Moreau, Alfred Rossi, and Sophie Stalla-Bourdillon"
+year = 2025
+arxiv = "2512.05453"
+doi = "10.48550/arXiv.2512.05453"
+url = "https://arxiv.org/abs/2512.05453"
+pdf = "https://arxiv.org/pdf/2512.05453"

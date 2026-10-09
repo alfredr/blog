@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% import "macros.html" as macros %}
+
+{% block title %}{{ title }} — {{ site_title }}{% endblock %}
+
+{% block head %}
+  <script>document.documentElement.classList.add("js")</script>
+  <script src="{{ asset_url(path="js/cv.js") }}" defer></script>
+{% endblock %}
+
+{% block content %}
+{% set cv = load_data(path="cv.toml") %}
+<article class="cv">
+  <header class="cv-header">
+    <h1>{{ cv.name }}</h1>
+    {% if cv.headline %}<p class="cv-headline">{{ cv.headline }}</p>{% endif %}
+    {% if cv.interests %}<p class="cv-lede">Research interests: {{ cv.interests | markdown(inline=true) | safe }}</p>{% endif %}
+    <p class="cv-contact">
+      {% include "contact.html" %}
+    </p>
+  </header>
+  {% if body %}<div class="page-body">{{ body | safe }}</div>{% endif %}
+
+  <aside class="cv-rail" id="cv-rail" aria-labelledby="cv-rail-title">
+    <p class="cv-rail-title" id="cv-rail-title">Contents</p>
+    <ol class="cv-toc">
+      {% for section in cv.sections %}
+      <li>
+        <a href="#{{ section.title | slugify }}">
+          <span class="cv-toc-label">{{ section.toc | default(value=section.title) }}</span>
+          {% if section.entries and section.layout | default(value="") != "compact" %}<span class="cv-toc-count">{{ section.entries | length }}</span>{% endif %}
+        </a>
+      </li>
+      {% endfor %}
+    </ol>
+  </aside>
+  <button class="cv-toc-toggle" type="button" aria-controls="cv-rail" aria-expanded="false">
+    <span>Contents</span>
+    <span class="cv-toc-toggle-current"></span>
+  </button>
+  <div class="cv-backdrop"></div>
+
+  {% for section in cv.sections %}
+  <section class="cv-section{% if section.style | default(value="") == "citations" %} cv-citations{% endif %}" id="{{ section.title | slugify }}">
+    <h2>{{ section.title }}</h2>
+    {% if section.text %}<p>{{ section.text | markdown(inline=true) | safe }}</p>{% endif %}
+
+    {% if section.layout | default(value="") == "compact" %}
+    <dl class="cv-compact">
+      {% for e in section.entries %}
+      <dt>{{ e.title }}</dt>
+      <dd>{{ e.text | markdown(inline=true) | safe }}</dd>
+      {% endfor %}
+    </dl>
+    {% elif section.entries %}
+    {#- Each year is labelled once per section; later entries in the same
+        year show only their dot on the timeline. #}
+    {% set_global prev_year = "" %}
+    {% for e in section.entries %}
+    <div class="cv-entry">
+      {% if e.roles %}
+      {% for r in e.roles %}
+      <div class="cv-head">
+        {% if r.date %}{% set label = macros::year_label(text=r.date) %}{{ macros::date(label=label, full=r.date, repeat=label == prev_year) }}{% set_global prev_year = label %}{% endif %}
+        <h3>{{ r.title | markdown(inline=true) | safe }}</h3>
+      </div>
+      {% endfor %}
+      {% else %}
+      <div class="cv-head">
+        {% if e.date %}{% set label = macros::year_label(text=e.date) %}{{ macros::date(label=label, full=e.date, repeat=label == prev_year) }}{% set_global prev_year = label %}{% endif %}
+        <h3>{% if e.url %}<a href="{{ e.url }}">{% endif %}{{ e.title | markdown(inline=true) | safe }}{% if e.url %}</a>{% endif %}</h3>
+      </div>
+      {% endif %}
+      {% if e.with or e.venue or e.place %}
+      <p class="cv-meta">
+        {%- if e.with %}<span class="cv-with">with {% for name in e.with %}{% if not loop.first %}{% if loop.last %}{% if e.with | length > 2 %},{% endif %} and {% else %}, {% endif %}{% endif %}{{ name }}{% endfor %}</span>{% endif -%}
+        {%- if e.venue or e.place %}<span class="cv-venue">
+          {%- if e.venue %}{{ e.venue | markdown(inline=true) | safe }}{% if e.place %} {% endif %}{% endif -%}
+          {%- if e.place %}{{ e.place | markdown(inline=true) | safe }}{% endif -%}
+        </span>{% endif -%}
+      </p>
+      {% endif %}
+      {% if e.note %}<p class="cv-note">{{ e.note | markdown(inline=true) | safe }}</p>{% endif %}
+      {% if e.links %}
+      <p class="cv-links">{% for link in e.links %}<a href="{{ link.url }}">{{ link.label }}</a> {% endfor %}</p>
+      {% endif %}
+      {% if e.bullets %}
+      <ul>
+        {% for bullet in e.bullets %}<li>{{ bullet | markdown(inline=true) | safe }}</li>{% endfor %}
+      </ul>
+      {% endif %}
+    </div>
+    {% endfor %}
+    {% endif %}
+  </section>
+  {% endfor %}
+</article>
+{% endblock %}
