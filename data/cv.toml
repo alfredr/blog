@@ -7,7 +7,8 @@
 # Entry fields (all optional, but give each entry a title or roles):
 #   title    entry heading (markdown)
 #   url      makes the title a link
-#   date     shown right-aligned
+#   date     when it happened, or a list of dates (see Dates below)
+#   start, end   a span of time instead of `date`; end = "present" if ongoing
 #   roles    several title/date rows sharing one entry, e.g. promotions
 #   with     co-authors or collaborators
 #   venue    publication venue or patent number (markdown)
@@ -16,6 +17,16 @@
 #   links    [{ label, url }] shown after the details
 #   bullets  list of highlights (markdown)
 # Sections with layout = "compact" render entries as a label/text list.
+#
+# Dates: "2017", "2020-05", "2020-05-28", or an academic term like
+# "2017-fall". A section can set how its dates print with strftime-style codes
+# (%Y year, %B month or term, %b short month, %m month number, %-d day):
+#   date_format         timeline label, default "%Y"
+#   date_detail_format  full date shown on hover, default "%B %-d, %Y"
+#   date_prefix         word before the hover date, e.g. "Filed"
+# Codes a date doesn't have are skipped, so "%B %-d, %Y" prints "May 2020"
+# for "2020-05" and "Fall 2017" for "2017-fall".
+# The ISO 8601-2 forms "2017-23" (Autumn 2017) and ".." (present) also work.
 
 name = "Alfred Rossi"
 headline = "Distinguished Scientist and Engineer at Immuta"
@@ -51,25 +62,38 @@ place = "The Ohio State University, Columbus, Ohio"
 
 [[sections]]
 title = "Academic Employment"
+date_detail_format = "%Y"
+
+[[sections.entries]]
+title = "Senior Fellow, Privacy Enhancing Technologies (PETs)"
+start = "2026-10"
+end = "present"
+place = "Brussels Privacy Hub, Vrije Universiteit Brussel"
+# Link the title (url = "...") once the Hub's profile page has its own address;
+# for now it reuses someone else's page.
 
 [[sections.entries]]
 title = "Visiting Fellow"
-date = "June 2025 - August 2025"
+start = "2025-06"
+end = "2025-08"
 place = "Dept. of Computer Science & Engineering, The Ohio State University"
 
 [[sections.entries]]
 title = "Senior Lecturer"
-date = "February 2018 - June 2025"
+start = "2018-02"
+end = "2025-06"
 place = "Dept. of Computer Science & Engineering, The Ohio State University"
 
 [[sections.entries]]
 title = "Postdoctoral Researcher"
-date = "Fall 2017 - January 2018"
+start = "2017-fall"
+end = "2018-01"
 place = "Dept. of Computer Science & Engineering, The Ohio State University"
 
 [[sections.entries]]
 title = "Research Assistant"
-date = "Fall 2013 - Summer 2017"
+start = "2013-fall"
+end = "2017-summer"
 place = "Dept. of Computer Science & Engineering, The Ohio State University"
 
 [[sections]]
@@ -80,13 +104,13 @@ style = "citations"
 title = "Anonymisation in motion: from data protection to digital markets law."
 with = ["Sophie Stalla-Bourdillon"]
 venue = "*Privacy and Data Protection*, Volume 26, Issue 7, pp. 16-23."
-date = "July 2026"
+date = "2026-07"
 
 [[sections.entries]]
 title = "Parajudica: An RDF-Based Reasoner and Metamodel for Multi-Framework Context-Dependent Data Compliance Assessments."
 with = ["Luc Moreau", "Sophie Stalla-Bourdillon"]
 venue = "Preprint, arXiv:2512.05453."
-date = "December 2025"
+date = "2025-12"
 links = [
   { label = "Project", url = "/projects/parajudica/" },
   { label = "arXiv", url = "https://arxiv.org/abs/2512.05453" },
@@ -104,7 +128,7 @@ date = "2025"
 title = "Pseudonymous Data."
 with = ["Sophie Stalla-Bourdillon"]
 venue = "*Oxford Encyclopedia of EU Law*."
-date = "March 2023"
+date = "2023-03"
 
 [[sections.entries]]
 title = "What are Trusted Third Parties? (Part 2)"
@@ -116,19 +140,19 @@ date = "2022"
 title = "What are Trusted Third Parties? (Part 1)"
 with = ["Hamsa Hassan", "Sophie Stalla-Bourdillon"]
 venue = "*Privacy and Data Protection*, Volume 21, Issue 8."
-date = "September 2021"
+date = "2021-09"
 
 [[sections.entries]]
 title = "The technical fix for international data transfers - a word of caution."
 with = ["Sophie Stalla-Bourdillon"]
 venue = "*Privacy and Data Protection*, Volume 21, Issue 4."
-date = "March 2021"
+date = "2021-03"
 
 [[sections.entries]]
 title = "Aggregation, synthesization and anonymization: a call for a risk-based assessment of anonymization approaches."
 with = ["Sophie Stalla-Bourdillon"]
 venue = "*Data Protection and Artificial Intelligence (CPDP 2020)*. Hart Publishing."
-date = "February 2021"
+date = "2021-02"
 
 [[sections.entries]]
 title = "Spectral Concentration and Greedy *k*-Clustering."
@@ -162,53 +186,54 @@ style = "citations"
 title = "Systems and Methods for Reduction of Privacy Risk in Data."
 with = ["Joseph J. Regensburger", "Sophie Stalla-Bourdillon"]
 venue = "US Patent 12,271,364."
-date = "April 8, 2025"
+date = "2025-04-08"
 
 [[sections.entries]]
 title = "Systems and Methods to Enhance Privacy through Decision Tree Based Suppression Rules on Relational Databases."
 with = ["John R. Murray", "Joseph J. Regensburger", "Mason Sharp"]
 venue = "US Patent 11,960,624."
-date = "April 16, 2024"
+date = "2024-04-16"
 
 [[sections.entries]]
 title = "Systems and Methods for Privacy-Enhancing Modification of a Database Query."
 with = ["Kyle Thomas Lilly", "Joseph J. Regensburger", "Mason Sharp"]
 venue = "US Patent 11,783,077."
-date = "October 10, 2023"
+date = "2023-10-10"
 
 [[sections.entries]]
 title = "Systems and Methods for Obscuring Data from a Data Source. (Continuation.)"
 with = ["Joseph J. Regensburger", "Andrew D. Burt", "Barry R. Hammen"]
 venue = "US Patent 11,734,452."
-date = "August 22, 2023"
+date = "2023-08-22"
 
 [[sections.entries]]
 title = "Systems and Methods for Privacy-Enhancing Transformation of a SQL Query."
 with = ["Kyle Thomas Lilly", "Joseph J. Regensburger", "Mason Sharp"]
 venue = "US Patent 11,593,506."
-date = "February 28, 2023"
+date = "2023-02-28"
 
 [[sections.entries]]
 title = "Systems and Methods for Obscuring Data from a Data Source."
 with = ["Joseph J. Regensburger", "Andrew D. Burt", "Barry R. Hammen"]
 venue = "US Patent 11,443,065."
-date = "September 13, 2022"
+date = "2022-09-13"
 
 [[sections]]
 title = "Patent Applications"
+date_prefix = "Filed"
 style = "citations"
 
 [[sections.entries]]
 title = "Systems and Methods for Classifying a Data Source Containing String Values."
 with = ["Arthur J. Neuman III", "Joseph J. Regensburger"]
 venue = "US Patent Application Publication 2026/0252666. Pending."
-date = "Filed February 24, 2026"
+date = "2026-02-24"
 
 [[sections.entries]]
 title = "Systems and Methods for Determining a Risk Level of Data in a Response to Queries to a Database."
 with = ["Joseph J. Regensburger", "Sophie Stalla-Bourdillon"]
 venue = "US Patent Application Publication 2024/0249014. Pending."
-date = "Filed January 19, 2024"
+date = "2024-01-19"
 
 [[sections]]
 title = "Advisory Activities"
@@ -216,7 +241,7 @@ style = "citations"
 
 [[sections.entries]]
 title = "The Battle for Data Availability under EU Digital Regulation: Anonymisation, Reuse, and the Future of Personal Data."
-date = "September 25, 2026"
+date = "2026-09-25"
 place = "Expert Workshop. Brussels Privacy Hub, Vrije Universiteit Brussel."
 note = "Invited participant."
 
@@ -229,13 +254,13 @@ note = "Consultation response, and invited expert at the follow-up roundtable (O
 
 [[sections.entries]]
 title = "PETs for Health Data."
-date = "March 2, 2022"
+date = "2022-03-02"
 place = "Solution Development Workshop. Pets for Public Good. The Information Commissioner's Office (ICO) of the United Kingdom."
 note = "Workshop panelist discussing the use of PETs in the context of health data."
 
 [[sections.entries]]
 title = "PETs Experts Forum."
-date = "February 2022"
+date = "2022-02"
 place = "The Information Commissioner's Office (ICO) of the United Kingdom."
 
 [[sections.entries]]
@@ -247,19 +272,19 @@ note = "Comments on European Data Protection Board (EDPB) draft recommendations 
 
 [[sections.entries]]
 title = "Technologies for the Ethical Deployment of Algorithms."
-date = "September 16, 2020"
+date = "2020-09-16"
 place = "Business Data Ethics Forum, The Moritz College of Law Program on Data and Governance."
 note = "Workshop panelist discussing the ethical use of AI in decision making processes."
 
 [[sections.entries]]
 title = "Private Set Intersection."
-date = "June 26, 2020"
+date = "2020-06-26"
 place = "The Information Commissioner's Office (ICO) of the United Kingdom."
 note = "Met with the ICO to discuss legal and technical aspects of data sharing using PSI."
 
 [[sections.entries]]
 title = "PETs Expert Roundtable."
-date = "September 9, 2019"
+date = "2019-09-09"
 place = "The Information Commissioner's Office (ICO) of the United Kingdom."
 
 [[sections]]
@@ -269,73 +294,73 @@ toc = "Presentations"
 
 [[sections.entries]]
 title = "De-Identification at the Intersection of Law and Technology."
-date = "January 26, 2026"
+date = "2026-01-26"
 with = ["Sophie Stalla-Bourdillon"]
 note = "Level-setting workshop at the invitation-only Regulatory Strategy Roundtable *Notions of Personal Data in the Digital Omnibus: How to Uphold a Principles-Based Approach?* Future of Privacy Forum and Brussels Privacy Hub, in collaboration with the LSTS Research Group, Vrije Universiteit Brussel. FARI, Brussels. (Presented online.)"
 
 [[sections.entries]]
 title = "On Unconditional PET love & a few inconsistencies."
-date = "June 23, 2023"
+date = "2023-06-23"
 with = ["Sophie Stalla-Bourdillon"]
 note = "Summer Academy For Global Privacy Law 2023. Brussels Privacy Hub. Vrije Universiteit Brussel."
 
 [[sections.entries]]
 title = "Designing a Private Approach."
-date = "June 23, 2023"
+date = "2023-06-23"
 note = "Summer Academy For Global Privacy Law 2023. Brussels Privacy Hub. Vrije Universiteit Brussel."
 
 [[sections.entries]]
 title = "Homomorphic Encryption."
 url = "https://www.youtube.com/watch?v=r1J93rTeeaY&t=440s"
-date = "May 25, 2022"
+date = "2022-05-25"
 with = ["Sophie Stalla-Bourdillon"]
 note = "State of Play of De-identification Techniques. *Future of Privacy Forum Master Class* at *Computers, Privacy & Data Protection (CPDP2022)* in Brussels, Belgium."
 
 [[sections.entries]]
 title = "Your Guide to Understanding and Operationalizing the Privacy by Design Framework."
-date = "July 26, 2019"
+date = "2019-07-26"
 with = ["Sophie Stalla-Bourdillon"]
 note = "Explained the role of privacy enhancing technologies in a technical/legal talk on Privacy by Design. Talk hosted by the International Association of Privacy Professionals and offered for Continuing-Privacy Education (CPE) credit."
 
 [[sections.entries]]
 title = "A Data Scientist's Guide to Preserving Privacy."
-date = "March 20, 2019"
+date = "2019-03-20"
 with = ["Stephen Bailey"]
 note = "Explained the use of privacy-enhancing technologies such as *k*-anonymization, differential privacy in data science and machine learning."
 
 [[sections.entries]]
 title = "Temporal Clustering."
-date = "March 29, 2017"
+date = "2017-03-29"
 note = "Presentation to [CSE Industrial Advisory Board](https://cse.osu.edu/department/industrial-advisory-board). Dept. of Computer Science & Engineering, The Ohio State University."
 
 [[sections.entries]]
 title = "Temporal Clustering."
-date = "February 24, 2017"
+date = "2017-02-24"
 note = "CSE Student Research Poster Exhibition. Dept. of Computer Science & Engineering, The Ohio State University."
 
 [[sections.entries]]
 title = "Spectral concentration and greedy *k*-clustering."
-date = "February 10, 2016"
+date = "2016-02-10"
 note = "CSE Student Research Poster Exhibition. Dept. of Computer Science & Engineering, The Ohio State University."
 
 [[sections.entries]]
 title = "Spectral concentration and greedy *k*-clustering."
-date = "April 10, 2015"
+date = "2015-04-10"
 note = "Presentation to CSE Industrial Advisory Board. Dept. of Computer Science & Engineering, The Ohio State University."
 
 [[sections.entries]]
 title = "Spectral concentration and greedy *k*-clustering."
-date = "February 20, 2015"
+date = "2015-02-20"
 note = "CSE Student Research Poster Exhibition. Dept. of Computer Science & Engineering, The Ohio State University."
 
 [[sections.entries]]
 title = "Constructive Generation of Arrow Diagram Formulas for the Coefficients of the Conway Polynomial"
-date = "Fall 2007"
+date = "2007-fall"
 note = "Young Mathematicians Conference, The Ohio State University."
 
 [[sections.entries]]
 title = "An Algorithm for Producing Arrow Diagram Formulas for the Coefficients of the Conway Polynomial"
-date = "Fall 2006"
+date = "2006-fall"
 note = "SUMs, James Madison University, Harrisonburg, VA."
 
 [[sections]]
@@ -343,8 +368,8 @@ title = "Professional Experience"
 
 [[sections.entries]]
 roles = [
-  { title = "Distinguished Scientist and Engineer", date = "August 2022 - Present" },
-  { title = "Research Scientist", date = "September 2018 - August 2022" },
+  { title = "Distinguished Scientist and Engineer", start = "2022-08", end = "present" },
+  { title = "Research Scientist", start = "2018-09", end = "2022-08" },
 ]
 place = "Immuta, Columbus, OH"
 bullets = [
@@ -363,7 +388,8 @@ bullets = [
 
 [[sections.entries]]
 title = "Founder and CTO"
-date = "2017 - September 2018"
+start = "2017"
+end = "2018-09"
 place = "VentureTech Group, LLC. Columbus, OH"
 bullets = [
   "Advise company technical direction in accordance with best current practice, specifically in the areas of data model design, disaster recovery, internationalization, operations, scalability, security, software development methodology, system architecture, and user data privacy.",
@@ -374,7 +400,8 @@ bullets = [
 
 [[sections.entries]]
 title = "Founder and Developer"
-date = "June 2014 - March 2019"
+start = "2014-06"
+end = "2019-03"
 place = "Alder Analytics, LLC. Columbus, OH"
 bullets = [
   "Developed novel cryptographic services to facilitate digital document signing.",
@@ -392,7 +419,8 @@ bullets = [
 
 [[sections.entries]]
 title = "Consultant"
-date = "December 2012 - September 2015"
+start = "2012-12"
+end = "2015-09"
 place = "Battelle Memorial Institute, Columbus, OH"
 bullets = [
   "Provided consulting to Battelle, as needed, on a variety of topics in the realms of scientific computing and systems administration.",
@@ -404,7 +432,8 @@ bullets = [
 
 [[sections.entries]]
 title = "Operations Manager and Lead DevOps Engineer"
-date = "March 2012 - June 2014"
+start = "2012-03"
+end = "2014-06"
 place = "Action Verb, LLC. Las Vegas, NV"
 bullets = [
   "Responsible for designing, implementing, monitoring, and maintaining efficient and fault-tolerant infrastructure for highly available web applications.",
@@ -419,7 +448,8 @@ bullets = [
 
 [[sections.entries]]
 title = "Researcher"
-date = "October 2007 - March 2012"
+start = "2007-10"
+end = "2012-03"
 place = "Energetic Systems & Security Technology, Battelle Memorial Institute"
 bullets = [
   "Aided in the design of physical test articles and developed computer-vision based analysis software for performing diagnostic evaluation of multi-view, multi-energy transmission x-ray systems.",
@@ -437,7 +467,8 @@ title = "Teaching"
 
 [[sections.entries]]
 title = "Foundations I: Discrete Structures (CSE 2321)"
-date = "Fall 2017 - Spring 2023"
+start = "2017-fall"
+end = "2023-spring"
 place = "Dept. of Computer Science & Engineering, The Ohio State University"
 note = "Taught Fall 2017, Spring 2018, Fall 2018, Spring 2019, Spring 2020, Fall 2022, and Spring 2023."
 bullets = [
@@ -446,7 +477,7 @@ bullets = [
 
 [[sections.entries]]
 title = "Machine Learning and Statistical Pattern Recognition (CSE 5523)"
-date = "Spring 2022"
+date = "2022-spring"
 place = "Dept. of Computer Science & Engineering, The Ohio State University"
 bullets = [
   "Topics include concentration inequalities, probability theory, formal learning models (including the PAC, mistake-bound, consistency, and agnostic PAC models), VC dimension, formal models of privacy and their use in machine learning.",
@@ -454,7 +485,7 @@ bullets = [
 
 [[sections.entries]]
 title = "Foundations II: Data Structures and Algorithms (CSE 2331)"
-date = "Spring 2021, Fall 2021"
+date = ["2021-spring", "2021-fall"]
 place = "Dept. of Computer Science & Engineering, The Ohio State University"
 bullets = [
   "Topics include design and analysis of algorithms and data structures, divide-and-conquer, sorting and selection, search trees, hashing, graph algorithms, string matching, probabilistic analysis, randomized algorithms, and NP-completeness.",
@@ -469,7 +500,7 @@ title = "A guide to the EU's unclear anonymization standards."
 url = "https://iapp.org/news/a/a-guide-to-the-eus-unclear-anonymization-standards/"
 with = ["Andrew Burt", "Sophie Stalla-Bourdillon"]
 venue = "*The Privacy Advisor*, IAPP."
-date = "July 15, 2021"
+date = "2021-07-15"
 
 [[sections.entries]]
 title = "Differential Privacy: An Introduction for First Graders."
@@ -481,14 +512,14 @@ title = "Deidentification 201: A lawyer's guide to pseudonymization and anonymiz
 url = "https://iapp.org/news/a/de-identification-201-a-lawyers-guide-to-pseudonymization-and-anonymization/"
 with = ["Andrew Burt", "Sophie Stalla-Bourdillon"]
 venue = "*The Privacy Advisor*, IAPP."
-date = "May 28, 2020"
+date = "2020-05-28"
 
 [[sections.entries]]
 title = "Deidentification 101: A lawyer's guide to masking, encryption and everything in between."
 url = "https://iapp.org/news/a/de-identification-101-a-lawyers-guide-to-masking-encryption-and-everything-in-between/"
 with = ["Andrew Burt", "Sophie Stalla-Bourdillon"]
 venue = "*The Privacy Advisor*, IAPP."
-date = "April 30, 2020"
+date = "2020-04-30"
 
 [[sections]]
 title = "Other Academic & Professional Experience"
@@ -496,7 +527,8 @@ toc = "Other experience"
 
 [[sections.entries]]
 title = "Teaching Assistant"
-date = "Fall 2008 - Fall 2009"
+start = "2008-fall"
+end = "2009-fall"
 place = "Dept. of Physics, The Ohio State University"
 bullets = [
   "Taught recitation courses and labs corresponding to calculus-based mechanics (Physics 131 Autumn 2008), and calculus-based electrostatics (Physics 132).",
@@ -504,7 +536,7 @@ bullets = [
 
 [[sections.entries]]
 title = "Instructor"
-date = "Fall 2007"
+date = "2007-fall"
 place = "Dept. of Mathematics, The Ohio State University"
 bullets = [
   "Responsible for teaching the recitation course corresponding to Math 150 (Autumn 2007), grading, holding office hours, and working one-on-one to tutor and enhance student's understanding of pre-calculus mathematics.",
@@ -512,7 +544,8 @@ bullets = [
 
 [[sections.entries]]
 title = "Proprietor"
-date = "January 2006 - October 2007"
+start = "2006-01"
+end = "2007-10"
 place = "thatvideogamesite.com"
 bullets = [
   "Developed several websites for the purpose of selling online advertising.",
@@ -522,7 +555,8 @@ bullets = [
 
 [[sections.entries]]
 title = "Programmer"
-date = "August 2004 - August 2007"
+start = "2004-08"
+end = "2007-08"
 place = "Condensed Matter Physics Group, Dept. of Physics, The Ohio State University"
 bullets = [
   "Implemented numerous custom software packages including a web based system for submitting molecular dynamics simulation jobs to a supercomputer, and custom visualization software in C++ for displaying and animating the results of such a simulation.",
@@ -531,7 +565,8 @@ bullets = [
 
 [[sections.entries]]
 title = "Student Researcher"
-date = "January 2003 - August 2004"
+start = "2003-01"
+end = "2004-08"
 place = "High Energy Physics Group, Dept. of Physics, The Ohio State University"
 bullets = [
   "Conceived, designed, and implemented a custom software package to help oversee the manufacturing, testing, and shipment of components for the Stanford Linear Accelerator.",

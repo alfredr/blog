@@ -53,21 +53,25 @@
       {% endfor %}
     </dl>
     {% elif section.entries %}
-    {#- Each year is labelled once per section; later entries in the same
-        year show only their dot on the timeline. #}
+    {#- Timeline labels are compact ("2018-2022", "2022-now") so they fit on
+        one line. Each is shown once per section; later entries with the same
+        label show only their dot. #}
+    {% set label_format = section.date_format | default(value="%Y") %}
+    {% set detail_format = section.date_detail_format | default(value="%B %-d, %Y") %}
+    {% set date_prefix = section.date_prefix | default(value="") %}
     {% set_global prev_year = "" %}
     {% for e in section.entries %}
     <div class="cv-entry">
       {% if e.roles %}
       {% for r in e.roles %}
       <div class="cv-head">
-        {% if r.date %}{% set label = macros::year_label(text=r.date) %}{{ macros::date(label=label, full=r.date, repeat=label == prev_year) }}{% set_global prev_year = label %}{% endif %}
+        {% if r.date or r.start %}{% set label = macros::dates(item=r, format=label_format, sep="-", present="now") %}{% set full = macros::dates(item=r, format=detail_format) %}{{ macros::date(label=label, full=full, prefix=date_prefix, repeat=label == prev_year) }}{% set_global prev_year = label %}{% endif %}
         <h3>{{ r.title | markdown(inline=true) | safe }}</h3>
       </div>
       {% endfor %}
       {% else %}
       <div class="cv-head">
-        {% if e.date %}{% set label = macros::year_label(text=e.date) %}{{ macros::date(label=label, full=e.date, repeat=label == prev_year) }}{% set_global prev_year = label %}{% endif %}
+        {% if e.date or e.start %}{% set label = macros::dates(item=e, format=label_format, sep="-", present="now") %}{% set full = macros::dates(item=e, format=detail_format) %}{{ macros::date(label=label, full=full, prefix=date_prefix, repeat=label == prev_year) }}{% set_global prev_year = label %}{% endif %}
         <h3>{% if e.url %}<a href="{{ e.url }}">{% endif %}{{ e.title | markdown(inline=true) | safe }}{% if e.url %}</a>{% endif %}</h3>
       </div>
       {% endif %}
