@@ -66,11 +66,10 @@ date_detail_format = "%Y"
 
 [[sections.entries]]
 title = "Senior Fellow, Privacy Enhancing Technologies (PETs)"
+url = "https://brusselsprivacyhub.com/alfred-rossi/"
 start = "2026-10"
 end = "present"
 place = "Brussels Privacy Hub, Vrije Universiteit Brussel"
-# Link the title (url = "...") once the Hub's profile page has its own address;
-# for now it reuses someone else's page.
 
 [[sections.entries]]
 title = "Visiting Fellow"
