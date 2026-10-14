@@ -250,7 +250,9 @@ article header time {
   margin-bottom: 1em;
 }
 
-.page-body > p:first-of-type {
+/* A page's opening paragraph is a lede, except beside the About portrait,
+   where all of the bio is set alike. */
+.page-body > p:first-of-type:not(.portrait + p) {
   font-size: 1.1875rem;
   line-height: 1.6;
 }
@@ -837,8 +839,7 @@ footer {
    keep a ragged right edge. Citations stay ragged too: titles and DOIs are
    long unbreakable runs that open wide gaps when justified. */
 @media (min-width: 36rem) {
-  .page-body > p:not(:first-of-type, :has(cite), .links),
-  .page-body--justified p:not(:has(cite), .links),
+  .page-body:not(.page-body--justified) > p:not(:first-of-type, :has(cite), .links),
   .post-body p:not(:has(cite), .links),
   .cv-lede,
   .cv-note,
@@ -850,11 +851,16 @@ footer {
   }
 }
 
-/* The paragraph beside the portrait stays ragged-right: its lines change
-   length around the circle, and justifying the first full-width line after
-   it opens wide gaps. */
-.page-body .portrait + p {
-  text-align: start;
+/* page-body--justified (About) justifies all of its paragraphs together, and
+   only from 42rem: on narrower screens the lines beside the portrait are too
+   short to justify without wide gaps. */
+@media (min-width: 42rem) {
+  .page-body--justified p:not(:has(cite), .links) {
+    text-align: justify;
+    -webkit-hyphens: auto;
+    hyphens: auto;
+    hyphenate-limit-chars: 6 3 2;
+  }
 }
 
 @media (max-width: 36rem) {
