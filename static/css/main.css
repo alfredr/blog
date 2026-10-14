@@ -155,6 +155,21 @@ a:hover {
   display: none;
 }
 
+/* One row needs about 25rem, more than a phone has, so on phones the name
+   and toggle share the top row and the links move to a second row. The
+   empty ::after item is the line break between them. */
+@media (max-width: 36rem) {
+  .site-nav::after {
+    content: "";
+    order: 1;
+    flex-basis: 100%;
+  }
+
+  .site-nav a:not(.site-title) {
+    order: 2;
+  }
+}
+
 /* Posts and pages */
 
 article header {
