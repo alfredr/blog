@@ -1261,7 +1261,8 @@ function sourceData(src){
   if(src==="dsbProd")return{d:getDsbRx().out,ref:getTx("dsb").ref};
   return{d:getSsbRx().out,ref:getTx("ssb").ref};}
 function buildBuffer(a,src){const{d,ref}=sourceData(src),b=a.createBuffer(1,d.length,FSA),ch=b.getChannelData(0);
-  let pk=1e-9;for(let i=0;i<ref.length;i++)pk=Math.max(pk,Math.abs(ref[i]));const g=0.45/pk,fade=720;
+  const sp=getVoice().span;let pk=1e-9,ms=0;for(let i=sp[0];i<sp[1];i++)pk=Math.max(pk,Math.abs(ref[i]));for(let i=0;i<d.length;i++)ms+=d[i]*d[i];
+  const g=Math.min(0.45/pk,0.32/Math.sqrt(ms/d.length+1e-30)),fade=720;
   for(let i=0;i<d.length;i++){let w=1;if(i<fade)w=i/fade;else if(i>d.length-fade)w=(d.length-i)/fade;ch[i]=Math.tanh(d[i]*g)*w;}
   return b;}
 let shot=null;
