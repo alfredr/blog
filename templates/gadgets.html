@@ -1,0 +1,24 @@
+{% extends "page.html" %}
+
+{% block page_body %}
+  {{ super() }}
+  {% set data = load_data(path="gadgets.toml") %}
+  <div class="gadgets">
+    {% for gadget in data.gadgets %}
+    {% set url = "/gadgets/" ~ gadget.slug ~ "/" %}
+    <section class="gadget">
+      <a class="gadget-preview" href="{{ url }}" tabindex="-1" aria-hidden="true">
+        <img{% if gadget.image_dark %} class="if-light"{% endif %} src="{{ url }}{{ gadget.image }}" alt="" loading="lazy">
+        {% if gadget.image_dark %}<img class="if-dark" src="{{ url }}{{ gadget.image_dark }}" alt="" loading="lazy">{% endif %}
+      </a>
+      <h2><a href="{{ url }}">{{ gadget.title }}</a></h2>
+      <p>{{ gadget.summary }}</p>
+      {% if gadget.by %}
+      <p class="gadget-credit">By {% if gadget.source %}<a href="{{ gadget.source }}">{{ gadget.by }}</a>{% else %}{{ gadget.by }}{% endif %}</p>
+      {% elif gadget.source %}
+      <p class="gadget-credit"><a href="{{ gadget.source }}">Original</a></p>
+      {% endif %}
+    </section>
+    {% endfor %}
+  </div>
+{% endblock %}

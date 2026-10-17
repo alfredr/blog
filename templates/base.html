@@ -18,6 +18,7 @@
     {% set current_path = path | default(value="") %}
     <a href="/about/"{% if current_path == "about" %} aria-current="page"{% endif %}>About</a>
     <a href="/projects/"{% if current_path == "projects" or current_path is starting_with("projects/") %} aria-current="page"{% endif %}>Projects</a>
+    <a href="/gadgets/"{% if current_path == "gadgets" %} aria-current="page"{% endif %}>Gadgets</a>
     <a href="/cv/"{% if current_path == "cv" %} aria-current="page"{% endif %}>CV</a>
     <a href="/blog/"{% if current_path == "blog" or date is defined %} aria-current="page"{% endif %}>Blog</a>
     <button type="button" class="theme-toggle" aria-label="Switch color theme" hidden>

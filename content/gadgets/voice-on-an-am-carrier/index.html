@@ -1,0 +1,1358 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>:root{color-scheme:light}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Voice on an AM Carrier</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Archivo, JetBrains Mono and Source Serif 4 (SIL Open Font License 1.1), self-hosted
+   in place of Google Fonts: the same files, limited to the latin and greek subsets the page uses. */
+@font-face{font-family:'Archivo';font-style:normal;font-weight:700 800;font-stretch:112%;font-display:swap;src:url(fonts/archivo-latin.woff2) format("woff2");unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
+@font-face{font-family:'JetBrains Mono';font-style:normal;font-weight:400 600;font-display:swap;src:url(fonts/jetbrains-mono-greek.woff2) format("woff2");unicode-range:U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF}
+@font-face{font-family:'JetBrains Mono';font-style:normal;font-weight:400 600;font-display:swap;src:url(fonts/jetbrains-mono-latin.woff2) format("woff2");unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
+@font-face{font-family:'Source Serif 4';font-style:italic;font-weight:400;font-display:swap;src:url(fonts/source-serif-4-italic-greek.woff2) format("woff2");unicode-range:U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF}
+@font-face{font-family:'Source Serif 4';font-style:italic;font-weight:400;font-display:swap;src:url(fonts/source-serif-4-italic-latin.woff2) format("woff2");unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
+@font-face{font-family:'Source Serif 4';font-style:normal;font-weight:400 600;font-display:swap;src:url(fonts/source-serif-4-greek.woff2) format("woff2");unicode-range:U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF}
+@font-face{font-family:'Source Serif 4';font-style:normal;font-weight:400 600;font-display:swap;src:url(fonts/source-serif-4-latin.woff2) format("woff2");unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
+</style>
+<style>
+/* Layout: sticky bench of knobs on the left, numbered stages on the right; voice is magenta, carrier teal, USB green, LSB amber everywhere */
+:root{
+  --bg:#eef2f0; --surface:#fafcfb; --ink:#15201c; --muted:#56655f; --rule:#cfd9d4; --grid:#e1e8e4;
+  --m:#b0306a; --c:#1d6e8a; --u:#2f7d34; --l:#9a6200; --warn:#c0392b; --accent:#1d6e8a; --accent-soft:#e1eef2;
+  --f-display:"Archivo","Arial Narrow",system-ui,sans-serif;
+  --f-body:"Source Serif 4",Georgia,"Times New Roman",serif;
+  --f-mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0d1311; --surface:#141c19; --ink:#e1e9e5; --muted:#8fa199; --rule:#28342f; --grid:#1b2521;
+    --m:#f070a8; --c:#5cb8d8; --u:#7cc882; --l:#e3b04c; --warn:#ff6b5b; --accent:#5cb8d8; --accent-soft:#16303a; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0d1311; --surface:#141c19; --ink:#e1e9e5; --muted:#8fa199; --rule:#28342f; --grid:#1b2521;
+  --m:#f070a8; --c:#5cb8d8; --u:#7cc882; --l:#e3b04c; --warn:#ff6b5b; --accent:#5cb8d8; --accent-soft:#16303a; color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:400 17px/1.6 var(--f-body)}
+.page{max-width:1200px;margin:0 auto;padding-block:32px 72px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+header{display:grid;gap:14px;margin-bottom:26px}
+h1{font:800 clamp(2.1rem,4.6vw,3.2rem)/1.02 var(--f-display);font-stretch:112%;letter-spacing:-0.01em;margin:0;text-wrap:balance}
+.lede{max-width:68ch;margin:0;color:var(--muted);font-size:1.08rem}
+.chain{display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center;font:500 13px/1.3 var(--f-mono);margin:4px 0 0;padding:0;list-style:none}
+.chain li{display:flex;align-items:center;gap:8px}
+.chain a{color:var(--ink);text-decoration:none;border:1px solid var(--rule);background:var(--surface);padding:4px 8px;border-radius:6px}
+.chain a:hover{border-color:var(--accent);color:var(--accent)}
+.chain a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.chain li+li::before{content:"\2192";color:var(--muted)}
+.layout{display:grid;grid-template-columns:300px minmax(0,1fr);gap:36px;align-items:start}
+.bench{position:sticky;top:calc(env(safe-area-inset-top,0px) + 16px);max-height:calc(100vh - 32px);overflow:auto;
+  background:var(--surface);border:1px solid var(--rule);border-radius:12px;padding:16px;display:grid;gap:16px}
+.ctl{display:grid;gap:8px;border:0;margin:0;padding:0;min-width:0}
+.lab{font:600 11px/1.2 var(--f-mono);letter-spacing:.09em;text-transform:uppercase;color:var(--muted);padding:0}
+.small{font:400 12px/1.35 var(--f-mono);color:var(--muted)}
+.seg{display:flex;flex-wrap:wrap;gap:3px;padding:3px;border:1px solid var(--rule);border-radius:8px;background:var(--bg)}
+.seg label{flex:1 1 auto;position:relative}
+.seg input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer;width:100%;height:100%}
+.seg span{display:block;text-align:center;padding:6px 6px;border-radius:6px;font:500 12.5px/1.2 var(--f-mono);color:var(--muted)}
+.seg input:checked+span{background:var(--surface);color:var(--accent);box-shadow:0 0 0 1px var(--rule)}
+.seg input:focus-visible+span{outline:2px solid var(--accent);outline-offset:1px}
+.seg input:disabled+span{opacity:.4}
+.slider label{display:flex;justify-content:space-between;gap:8px;font:500 12.5px/1.2 var(--f-mono);color:var(--ink)}
+.slider output{color:var(--accent);font-variant-numeric:tabular-nums}
+input[type=range]{width:100%;accent-color:var(--accent)}
+.row{display:flex;gap:6px;flex-wrap:wrap}
+.btn{font:500 12.5px/1 var(--f-mono);padding:8px 10px;border-radius:6px;border:1px solid var(--rule);background:var(--bg);color:var(--ink);cursor:pointer;flex:1 1 auto}
+.btn:hover{border-color:var(--accent);color:var(--accent)}
+.btn:focus-visible,.play:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--surface)}
+.btn.listen::before{content:"\25B6";font-size:10px;margin-right:7px}
+.btn.listen[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--surface)}
+.btn.listen[aria-pressed="true"]::before{content:"\25A0"}
+.btn.primary:hover{color:var(--surface);filter:brightness(1.08)}
+.filebtn{position:relative;overflow:hidden;display:block;text-align:center}
+.filebtn input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.filebtn:focus-within{outline:2px solid var(--accent);outline-offset:1px}
+.readouts{margin:0;display:grid;grid-template-columns:auto 1fr;gap:6px 12px;font:400 12.5px/1.35 var(--f-mono);border-top:1px solid var(--rule);padding-top:14px}
+.readouts dt{color:var(--muted)}
+.readouts dd{margin:0;text-align:right;font-variant-numeric:tabular-nums}
+.chip{display:inline-block;font:600 11px/1 var(--f-mono);padding:4px 7px;border-radius:999px;letter-spacing:.04em}
+.chip.ok{background:var(--accent-soft);color:var(--accent)}
+.chip.bad{background:var(--warn);color:var(--surface)}
+main{min-width:0}
+.stage{padding-block:28px 34px;border-top:1px solid var(--rule)}
+.stage:first-child{border-top:0;padding-top:0}
+.stage-head{display:flex;align-items:baseline;gap:12px;margin-bottom:10px}
+.num{font:600 13px/1 var(--f-mono);color:var(--accent);border:1px solid var(--accent);border-radius:999px;min-width:26px;height:26px;display:inline-grid;place-items:center;flex:none}
+h2{font:700 1.55rem/1.15 var(--f-display);font-stretch:112%;margin:0;text-wrap:balance}
+.stage p{max-width:68ch;margin:0 0 12px}
+.eq{font:400 14px/1.6 var(--f-mono);background:var(--surface);border:1px solid var(--rule);border-left:3px solid var(--accent);border-radius:6px;padding:10px 14px;margin:6px 0 14px;overflow-x:auto;white-space:nowrap;max-width:100%}
+.cm{color:var(--m);font-weight:600}.cc{color:var(--c);font-weight:600}.cu{color:var(--u);font-weight:600}.cl{color:var(--l);font-weight:600}.cw{color:var(--warn);font-weight:600}
+figure{margin:14px 0 0;background:var(--surface);border:1px solid var(--rule);border-radius:10px;padding:10px 10px 8px;min-width:0}
+canvas{display:block;width:100%}
+figcaption{font:400 12px/1.45 var(--f-mono);color:var(--muted);padding:8px 4px 0}
+.pair{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-start}
+.pair>.fixed{flex:0 1 320px;min-width:0;width:100%}
+.pair>.grow{flex:1 1 320px;min-width:0}
+.sch-wrap{overflow-x:auto;margin-top:14px;background:var(--surface);border:1px solid var(--rule);border-radius:10px;padding:10px}
+.sch{display:block;min-width:600px;width:100%;height:auto;font-family:var(--f-mono)}
+.sch .box{fill:var(--surface);stroke:var(--ink);stroke-width:1.2}
+.sch a .box{transition:stroke .15s}
+.sch a:hover .box,.sch a:focus .box{stroke:var(--accent);stroke-width:2}
+.sch a:focus{outline:none}
+.sch .t{fill:var(--ink);font-size:13px;font-weight:600}
+.sch .s{fill:var(--muted);font-size:11px}
+.sch .w{stroke:var(--ink);stroke-width:1.4;fill:none}
+.sch .wm{stroke:var(--m)}.sch .wc{stroke:var(--c)}
+.sch .lm{fill:var(--m);font-size:11.5px;font-weight:500}.sch .lc{fill:var(--c);font-size:11.5px;font-weight:500}
+.sch .ah-ink{fill:var(--ink)}.sch .ah-m{fill:var(--m)}.sch .ah-c{fill:var(--c)}
+.sch .badge circle{fill:var(--accent)}.sch .badge text{fill:var(--surface);font-size:11px;font-weight:600}
+.sch .sym{fill:var(--ink);font-size:20px}
+.play-row{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 0}
+.play-row .btn{flex:0 1 auto}
+.note{font-size:.95rem;color:var(--muted)}
+.tbl-wrap{overflow-x:auto;margin-top:12px}
+table{border-collapse:collapse;font:400 13px/1.4 var(--f-mono);font-variant-numeric:tabular-nums;min-width:640px;width:100%}
+th,td{padding:8px 12px;text-align:right;border-bottom:1px solid var(--rule)}
+th{font-weight:600;color:var(--muted);font-size:11px;letter-spacing:.06em;text-transform:uppercase}
+th:first-child,td:first-child{text-align:left}
+td b{font-weight:600}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-top:12px}
+.fact{background:var(--surface);border:1px solid var(--rule);border-radius:8px;padding:12px 14px}
+.fact b{display:block;font:600 1.05rem/1.2 var(--f-mono);font-variant-numeric:tabular-nums;margin-bottom:4px}
+.fact span{font-size:.92rem;color:var(--muted)}
+#status{min-height:1em}
+.anim-bar{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;margin:14px 0 0}
+.anim-bar .btn{flex:0 0 auto;min-width:6.5em}
+.anim-bar input[type=range]{flex:1 1 200px;width:auto}
+.stage h3.sub{font:700 1.2rem/1.2 var(--f-display);font-stretch:112%;margin:28px 0 8px;text-wrap:balance}
+[hidden]{display:none!important}
+.txt{font:500 13px/1.2 var(--f-mono);padding:7px 9px;border:1px solid var(--rule);border-radius:6px;background:var(--surface);color:var(--ink);flex:1 1 8em;min-width:0;text-transform:uppercase}
+.txt:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.bitgrid{display:grid;gap:5px;margin:12px 0 0;font:400 12.5px/1.45 var(--f-mono)}
+.bfh{color:var(--muted);margin-bottom:2px}
+.bf{display:grid;grid-template-columns:8.5em 11em minmax(0,1fr);gap:10px;align-items:baseline;padding:6px 10px;border-radius:6px;background:var(--surface);border:1px solid var(--rule);border-left-width:3px}
+.bf code{font:inherit;word-break:break-all;color:var(--ink)}
+.bfn{color:var(--muted)}
+.bf.bm{border-left-color:var(--m)}.bf.bl{border-left-color:var(--l)}.bf.bc{border-left-color:var(--c)}
+tr.sel td{background:var(--accent-soft)}
+@media (max-width:620px){.bf{grid-template-columns:1fr;gap:2px}}
+.step-box{border:1px solid var(--accent);border-radius:10px;padding:10px 12px 12px;background:var(--accent-soft);gap:14px}
+.step-box legend{padding:0 6px;color:var(--accent);text-transform:none;letter-spacing:0;font-size:12px;max-width:100%}
+.step-box .seg{background:var(--surface)}
+.enter{animation:stepIn .28s ease-out}
+@keyframes stepIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion: reduce){.enter{animation:none}}
+.dock-toggle{display:none}
+@media (max-width: 880px){
+  #stepBox{position:fixed;left:0;right:0;bottom:0;z-index:30;margin:0;border-radius:14px 14px 0 0;border-bottom:0;max-height:48vh;overflow:auto;
+    padding:12px max(16px,env(safe-area-inset-right,0px)) calc(12px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));box-shadow:0 -8px 28px rgba(0,0,0,.2)}
+  #stepBox legend{float:left;width:calc(100% - 70px);padding:2px 0 8px}
+  #stepBox legend + .dock-toggle + *{clear:both}
+  #stepBox.collapsed > :not(legend):not(.dock-toggle){display:none}
+  .dock-toggle{display:block;position:absolute;top:8px;right:max(12px,env(safe-area-inset-right,0px));font:600 12px/1 var(--f-mono);padding:7px 10px;border-radius:6px;border:1px solid var(--accent);background:var(--surface);color:var(--accent);cursor:pointer}
+  .dock-toggle:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+  .page{padding-bottom:calc(72px + var(--dockH,0px))}
+  .layout{grid-template-columns:minmax(0,1fr);gap:24px}
+  .bench{position:static;max-height:none}
+}
+</style>
+</head>
+<body>
+
+<div class="page">
+<header>
+  <h1>Voice on an AM Carrier</h1>
+  <p class="lede">Amplitude modulation is the simplest way to put sound on a radio wave: the voice waveform sets the amplitude of a carrier. This page follows one vowel, or a clip you load, from the microphone to the antenna and back through a diode receiver, then removes the carrier and one sideband to arrive at single sideband (SSB). Every plot and sound is computed from the settings on the bench. Switch the message source to <b>FT8 packet</b> to send a digital message through the same chain and decode it at the end.</p>
+  <ol class="chain">
+    <li><a href="#s1">m(t)</a></li>
+    <li><a href="#s2">1 + μm(t)</a></li>
+    <li><a href="#s3">× cos 2πf<sub>c</sub>t</a></li>
+    <li><a href="#s4">sidebands</a></li>
+    <li><a href="#s5">phasors</a></li>
+    <li><a href="#s6">envelope detector</a></li>
+    <li><a href="#s7">DSB-SC</a></li>
+    <li><a href="#s8">SSB</a></li>
+    <li><a href="#s9">product detector</a></li>
+    <li><a href="#s10">compare</a></li>
+    <li><a href="#s11">real numbers</a></li>
+    <li data-track="ft8" hidden><a href="#s12">FT8 decode</a></li>
+  </ol>
+</header>
+
+<div class="layout">
+<aside class="bench" aria-label="Signal settings">
+  <fieldset class="ctl step-box" id="stepBox">
+    <legend class="lab" id="stepLabel">This step</legend>
+    <button type="button" class="dock-toggle" id="dockToggle" aria-expanded="true" aria-controls="stepBox">Hide</button>
+    <div class="ctl" data-sections="s1" data-track="ft8" hidden>
+      <span class="small">Symbols for the g, f, m animation</span>
+      <div class="seg">
+        <label><input type="radio" name="gsrc" id="gs-msg" value="msg"><span>Message</span></label>
+        <label><input type="radio" name="gsrc" id="gs-costas" value="costas"><span>Costas</span></label>
+        <label><input type="radio" name="gsrc" id="gs-stair" value="stair"><span>0→7</span></label>
+        <label><input type="radio" name="gsrc" id="gs-jump" value="jump"><span>0↔7</span></label>
+        <label><input type="radio" name="gsrc" id="gs-custom" value="custom"><span>Bits</span></label>
+      </div>
+      <div class="slider" id="gWinWrap">
+        <label for="gwin">Message window <output id="gwinOut"></output></label>
+        <input type="range" id="gwin" min="0" max="70" step="1">
+        <label class="small" style="display:flex;gap:6px;align-items:center;justify-content:flex-start"><input type="checkbox" id="gall"> Show the whole packet; play at real speed</label>
+      </div>
+      <div class="ctl" id="gBitsWrap">
+      <label class="small" for="gbits">Bits, 3 per symbol, up to 8 symbols</label>
+      <input type="text" id="gbits" class="txt" spellcheck="false" autocomplete="off" maxlength="40" style="text-transform:none">
+      <span class="small" id="gbitsErr"></span>
+      </div>
+    </div>
+    <div class="ctl slider" data-sections="s1" data-track="ft8" hidden>
+      <label for="gbt">Gaussian BT <output id="gbtOut"></output></label>
+      <input type="range" id="gbt" min="0" max="7" step="1">
+      <span class="small">FT8 always uses BT = 2. This knob only changes the g, f, m figures.</span>
+    </div>
+    <div class="ctl" data-sections="s1" data-track="ft8" hidden>
+      <button type="button" class="btn primary" id="gPlay">Play</button>
+      <label class="small" for="gScrub">Scrub the animation</label>
+      <input type="range" id="gScrub" min="0" max="1000" step="1">
+    </div>
+    <div class="ctl" data-sections="s5">
+      <span class="small">Phasor view</span>
+      <div class="seg">
+        <label><input type="radio" name="frame" id="fr-carrier" value="carrier"><span>Carrier frame</span></label>
+        <label><input type="radio" name="frame" id="fr-lab" value="lab"><span>Lab, slowed</span></label>
+      </div>
+      <button type="button" class="btn" id="phPlay">Pause</button>
+    </div>
+    <div class="ctl slider" data-sections="s6 s7 s10 s12">
+      <label for="rc">Detector RC <output id="rcOut"></output></label>
+      <input type="range" id="rc" min="0" max="100" step="1">
+    </div>
+    <div class="ctl slider" data-sections="s6 s7 s9 s10 s12">
+      <label for="noise"><span id="noiseLab">RF noise, C/N in 2W</span> <output id="noiseOut"></output></label>
+      <input type="range" id="noise" min="-5" max="61" step="1">
+      <span class="small">Slide left to add noise at the antenna.</span>
+    </div>
+    <div class="ctl" data-sections="s8 s9 s10 s12">
+      <span class="small">Sideband</span>
+      <div class="seg">
+        <label><input type="radio" name="sb" id="sb-usb" value="usb"><span>USB</span></label>
+        <label><input type="radio" name="sb" id="sb-lsb" value="lsb"><span>LSB</span></label>
+      </div>
+    </div>
+    <div class="ctl slider" data-sections="s7 s12">
+      <label for="phi">LO phase error φ <output id="phiOut"></output></label>
+      <input type="range" id="phi" min="0" max="180" step="5">
+    </div>
+    <div class="ctl" data-sections="s12">
+      <span class="small">Waterfall shows</span>
+      <div class="seg">
+        <label><input type="radio" name="dec" id="dec-am" value="am"><span>AM</span></label>
+        <label><input type="radio" name="dec" id="dec-dsb" value="dsb"><span>DSB-SC</span></label>
+        <label><input type="radio" name="dec" id="dec-ssb" value="ssb"><span>SSB</span></label>
+      </div>
+    </div>
+    <div class="ctl slider" data-sections="s9 s12">
+      <label for="dfo">BFO offset Δf <output id="dfoOut"></output></label>
+      <input type="range" id="dfo" min="-300" max="300" step="5">
+    </div>
+  </fieldset>
+  <fieldset class="ctl">
+    <legend class="lab">Message source</legend>
+    <div class="seg">
+      <label><input type="radio" name="src" id="src-ah" value="ah"><span>“ah”</span></label>
+      <label><input type="radio" name="src" id="src-ee" value="ee"><span>“ee”</span></label>
+      <label><input type="radio" name="src" id="src-oo" value="oo"><span>“oo”</span></label>
+      <label><input type="radio" name="src" id="src-tone" value="tone"><span>1 kHz tone</span></label>
+      <label><input type="radio" name="src" id="src-ft8" value="ft8"><span>FT8 packet</span></label>
+      <label><input type="radio" name="src" id="src-upload" value="upload" disabled><span id="uploadName">your clip</span></label>
+    </div>
+    <label class="btn filebtn">Load an audio file<input type="file" id="file" accept="audio/*"></label>
+    <span class="small" id="status" role="status"></span>
+  </fieldset>
+  <div class="ctl" data-track="ft8" hidden>
+    <label class="small" for="ft8msg">FT8 message</label>
+    <div class="row"><input type="text" id="ft8msg" class="txt" spellcheck="false" autocomplete="off" maxlength="24"><button type="button" class="btn" id="ft8Go" style="flex:0 0 auto">Encode</button></div>
+    <span class="small" id="ft8Err" role="status"></span>
+    <div class="slider">
+      <label for="ft8f0">Audio offset, tone 0 <output id="ft8f0Out"></output></label>
+      <input type="range" id="ft8f0" min="300" max="2600" step="25">
+    </div>
+  </div>
+  <div class="ctl slider" id="f0Wrap">
+    <label for="f0"><span>Voice pitch f<sub>0</sub></span> <output id="f0Out"></output></label>
+    <input type="range" id="f0" min="80" max="260" step="5">
+  </div>
+  <div class="ctl slider">
+    <label for="W">Audio bandwidth W <output id="WOut"></output></label>
+    <input type="range" id="W" min="2000" max="8000" step="500">
+  </div>
+  <div class="ctl slider">
+    <label for="mu">Modulation index μ <output id="muOut"></output></label>
+    <input type="range" id="mu" min="0" max="1.5" step="0.05">
+  </div>
+  <div class="ctl slider">
+    <label for="fc"><span>Carrier f<sub>c</sub></span> <output id="fcOut"></output></label>
+    <input type="range" id="fc" min="40000" max="200000" step="10000">
+  </div>
+  <fieldset class="ctl">
+    <legend class="lab">Radio: live receiver</legend>
+    <div class="seg">
+      <label><input type="radio" name="listen" id="ls-voice" value="voice"><span id="lsVoiceLab">Voice</span></label>
+      <label><input type="radio" name="listen" id="ls-am" value="am"><span>AM</span></label>
+      <label><input type="radio" name="listen" id="ls-dsbEnv" value="dsbEnv"><span>DSB env</span></label>
+      <label><input type="radio" name="listen" id="ls-dsbProd" value="dsbProd"><span>DSB prod</span></label>
+      <label><input type="radio" name="listen" id="ls-ssb" value="ssb"><span>SSB</span></label>
+    </div>
+    <div class="row" style="align-items:center"><button type="button" class="btn listen" id="listenBtn" aria-pressed="false" style="flex:1 1 auto">Play</button>
+      <label class="small" style="display:flex;align-items:center;gap:6px;flex:0 0 auto"><input type="checkbox" id="loopChk"> Loop</label></div>
+    <span class="small" id="listenStatus">Plays the selected receiver once. Knob changes are heard live while it plays.</span>
+  </fieldset>
+  <dl class="readouts" id="readouts"></dl>
+</aside>
+
+<main>
+  <section class="stage" id="s0">
+    <div class="stage-head"><h2>The transmitter as blocks</h2></div>
+    <p>Only three things happen to the voice signal. It is band-limited, raised by a constant so it never goes negative, and multiplied by a sine wave from an oscillator. Click a block to jump to that step.</p>
+    <div class="sch-wrap" id="schTx"></div>
+  </section>
+
+  <section class="stage" id="s1">
+    <div class="stage-head"><span class="num">1</span><h2 id="s1title">The message: a voice</h2></div>
+    <div data-track="voice">
+    <p>A microphone turns air pressure into a voltage, which is the message <i>m</i>(<i>t</i>). A sustained vowel is almost periodic: the vocal folds pulse at the pitch <i>f</i><sub>0</sub>, so the spectrum is a comb of harmonics at multiples of <i>f</i><sub>0</sub>. The shape of the vocal tract emphasizes some harmonics over others, and those peaks (formants) make "ah" sound different from "ee". Before modulation, the audio is low-passed to a bandwidth <i>W</i>, and that number sets how much radio spectrum the station will occupy.</p>
+    <div class="eq"><span class="cm">m(t)</span> = Σ<sub>k</sub> a<sub>k</sub> cos(2π k f<sub>0</sub> t + θ<sub>k</sub>),   k f<sub>0</sub> ≤ W,   scaled so the deepest negative swing is −1</div>
+    </div>
+    <div data-track="ft8" hidden>
+      <p>FT8 replaces the microphone with a short structured message. The text is packed into 77 bits: two 28-bit callsign fields, a 15-bit grid or acknowledgement, three flag bits and a 3-bit message type. A 14-bit CRC follows, then 83 parity bits from FT8's (174,91) LDPC code, for 174 bits in all. Each group of 3 bits picks one of 8 tones through a Gray code, and three 7-tone Costas arrays are added for synchronization, giving 79 symbols of 0.16 s each. Type a different message on the bench to re-encode.</p>
+      <div class="bitgrid" id="ft8Bits"></div>
+      <figure><canvas id="cvTones" data-h="200" role="img" aria-label="FT8 tone sequence"></canvas><figcaption>The 79-symbol tone sequence. Green: the three Costas sync blocks. Magenta: data, 3 coded bits per symbol.</figcaption></figure>
+      <h3 class="sub">From tones to audio: g(t), f(t) and m(t)</h3>
+      <p>Each symbol asks for one frequency, f<sub>a</sub> + 6.25 Hz × tone, held for T = 0.16 s. Jumping between frequencies instantly would splatter energy into neighbouring signals, so FT8 rounds every step with a frequency pulse <i>g</i>(<i>t</i>): a one-symbol rectangle convolved with a Gaussian. The bandwidth-time product BT sets the Gaussian's width. FT8 uses BT = 2, which makes σ about 0.066 T, so each step is smoothed over roughly a quarter of a symbol.</p>
+      <div class="eq">g(t) = rect(t/T) ∗ h(t),   h(t) = exp(−t²/2σ²T²) / (√(2π) σT),   σ = √(ln 2) / (2π·BT)   ⟹   g(t) = ½[erf(κ(t/T + ½)) − erf(κ(t/T − ½))],   κ = π·BT·√(2/ln 2)</div>
+      <figure><canvas id="cvG1" data-h="230" role="img" aria-label="The rectangle, the Gaussian kernel, the frequency pulse g and its integral q"></canvas><figcaption id="g1Cap"></figcaption></figure>
+      <p style="margin-top:14px"><i>g</i> has unit area, so its integral <i>q</i>(<i>t</i>) climbs from 0 to 1. Tone spacing times symbol length is exactly one (6.25 Hz × 0.16 s, a modulation index of 1), so a symbol on tone <i>k</i> adds exactly <i>k</i> extra cycles of phase, however the smoothing spreads them in time. The phase never jumps, so <i>m</i>(<i>t</i>) stays continuous.</p>
+      <div class="eq">f(t) = f<sub>a</sub> + 6.25 Hz · Σ<sub>k</sub> tone<sub>k</sub> · g(t − (k+½)T)     φ(t) = 2π ∫ f dt     <span class="cm">m(t)</span> = sin φ(t)</div>
+      <p>The animation runs a burst of symbols through those three steps: your whole message with a 10-symbol window that follows the cursor (the window slider moves with it, and dragging it moves the view), the whole 79-symbol packet at real speed, a preset, or your own bits. Choose them and BT on the bench, then press Play under this paragraph or click the plot. The faint curves are the individual pulses tone<sub>k</sub>·<i>g</i>, and their sum is <i>f</i>(<i>t</i>). Where neighbouring tones differ, the pulses overlap and the frequency glides from one to the next. Neighbouring symbols outside a message window are drawn grey; beyond the ends of the packet the first and last tones are held, as FT8 does. <i>m</i>(<i>t</i>) is drawn with a slowed audio offset of 2 cycles per symbol so its cycles stay visible; at FT8's usual 1500 Hz there would be 240 cycles per symbol.</p>
+      <div class="anim-bar">
+        <button type="button" class="btn primary" id="gPlay2">Play</button>
+        <label class="small" for="gScrub2">Scrub</label>
+        <input type="range" id="gScrub2" min="0" max="1000" step="1" aria-label="Animation position">
+      </div>
+      <figure><canvas id="cvGAnim" data-h="560" style="cursor:pointer" title="Click to play or pause" role="img" aria-label="Animated build-up of frequency pulses, frequency, phase and audio for a short symbol burst"></canvas><figcaption id="gRead"></figcaption></figure>
+      <p style="margin-top:14px">Smoothing is about the skirts, not the main width. The eight tones span 43.75 Hz whatever BT is, so the 99% bandwidth barely moves. What BT = 2 removes is the energy that abrupt frequency steps throw tens of hertz away, onto neighbouring FT8 signals. The spectrum below comes from a long run of random symbols at the BT on the bench, set against unsmoothed FSK (BT = ∞).</p>
+      <figure><canvas id="cvGSpec" data-h="240" role="img" aria-label="Spectrum of 8-GFSK at the chosen BT compared with unsmoothed FSK"></canvas><figcaption id="gSpecCap"></figcaption></figure>
+      <p style="margin-top:14px">WSJT-X turns the full 79-tone sequence into audio this way, starting at the audio offset set on the bench. That audio is <i>m</i>(<i>t</i>) for the rest of this page: 12.64 s of one tone at a time, at constant amplitude, always with BT = 2.</p>
+    </div>
+    <div class="pair">
+      <figure class="grow"><canvas id="cvVoice" data-h="220" role="img" aria-label="Voice waveform over 20 milliseconds"></canvas><figcaption id="voiceCap"></figcaption></figure>
+      <figure class="grow"><canvas id="cvVoiceSpec" data-h="220" role="img" aria-label="Voice spectrum"></canvas><figcaption id="voiceSpecCap"></figcaption></figure>
+    </div>
+    <div class="play-row"><button type="button" class="btn listen" data-listen="voice" aria-pressed="false">Play the voice</button></div>
+  </section>
+
+  <section class="stage" id="s2">
+    <div class="stage-head"><span class="num">2</span><h2>Raise it above zero</h2></div>
+    <p>An amplitude can't be negative, but the voice swings both ways. So scale it by the modulation index μ and add 1. The result, 1 + μ<i>m</i>(<i>t</i>), becomes the carrier's amplitude, called the envelope. As long as μ ≤ 1 it stays non-negative, and the shape of the voice is copied exactly into the envelope. Above 1, the envelope would need to go negative, which isn't possible; the receiver instead sees |1 + μ<i>m</i>|, and that folding distorts the sound. Try μ = 1.3 and listen.</p>
+    <div class="eq">envelope = 1 + μ·<span class="cm">m(t)</span>    must stay ≥ 0, so μ ≤ 1</div>
+    <p class="note" data-track="ft8" hidden>FT8 sends one tone at a time at constant amplitude, so here <i>m</i>(<i>t</i>) is a plain sinusoid and 1 + μ<i>m</i>(<i>t</i>) swings evenly between 1 − μ and 1 + μ. The envelope carries the tone, and the tone's frequency carries the data.</p>
+    <figure><canvas id="cvOffset" data-h="300" role="img" aria-label="Scaled message and the raised envelope"></canvas><figcaption id="offsetCap"></figcaption></figure>
+  </section>
+
+  <section class="stage" id="s3">
+    <div class="stage-head"><span class="num">3</span><h2>Multiply by the carrier</h2></div>
+    <p>The oscillator produces a carrier, cos 2π<i>f</i><sub>c</sub><i>t</i>, at a frequency far above audio. The modulator multiplies it by the envelope. In the 20 ms view the carrier oscillates too fast to resolve, so it appears as a solid band whose outline is the voice. The zoomed view shows the individual cycles: they all have the same frequency and phase, and only their height follows 1 + μ<i>m</i>(<i>t</i>).</p>
+    <div class="eq">x(t) = A<sub>c</sub> [1 + μ<span class="cm">m(t)</span>] · <span class="cc">cos 2πf<sub>c</sub>t</span></div>
+    <figure><canvas id="cvAM" data-h="230" role="img" aria-label="AM signal over 20 milliseconds with its envelope"></canvas><figcaption id="amCap"></figcaption></figure>
+    <figure><canvas id="cvAMzoom" data-h="200" role="img" aria-label="Zoom showing individual carrier cycles"></canvas><figcaption id="amZoomCap"></figcaption></figure>
+  </section>
+
+  <section class="stage" id="s4">
+    <div class="stage-head"><span class="num">4</span><h2>Where the voice ends up in frequency</h2></div>
+    <p>Expanding the product reveals the spectrum. The constant 1 times the carrier is a single line at <i>f</i><sub>c</sub>. The term μ<i>m</i>(<i>t</i>)·cos 2π<i>f</i><sub>c</sub><i>t</i> places two copies of the voice spectrum next to it: an upper sideband, which is the voice shifted up by <i>f</i><sub>c</sub>, and a lower sideband, which is the same shift but mirrored. A component at 720 Hz in the voice shows up at <i>f</i><sub>c</sub> + 720 Hz and <i>f</i><sub>c</sub> − 720 Hz. As a result, the station occupies 2<i>W</i> of spectrum.</p>
+    <p data-track="ft8" hidden>With FT8 as the message, each sideband is the whole FT8 signal: 50 Hz wide, one audio offset above and below the carrier. The rest of the 2<i>W</i> channel is empty, which is why a single 2.5 kHz SSB passband can hold dozens of FT8 signals side by side.</p>
+    <div class="eq">x(t) = <span class="cc">cos 2πf<sub>c</sub>t</span> + ½μ·<span class="cm">m(t)</span>·[ e<sup>j2πf<sub>c</sub>t</sup> + e<sup>−j2πf<sub>c</sub>t</sup> ]  ⟹  X(f) ⊃ <span class="cc">½δ(f−f<sub>c</sub>)</span> + ½μ·[<span class="cu">M(f−f<sub>c</sub>)</span> + <span class="cl">M(f+f<sub>c</sub>)</span>]</div>
+    <figure><canvas id="cvRF" data-h="280" role="img" aria-label="Spectrum around the carrier showing both sidebands"></canvas><figcaption id="rfCap"></figcaption></figure>
+    <p id="powerNote" style="margin-top:14px"></p>
+  </section>
+
+  <section class="stage" id="s5">
+    <div class="stage-head"><span class="num">5</span><h2>Why two sidebands: phasors</h2></div>
+    <p>Take a single tone, <i>m</i> = cos ω<sub>m</sub><i>t</i>, and write the cosine as two counter-rotating exponentials. The AM signal then becomes three rotating arrows: the carrier, plus two arrows of length μ/2 turning at ω<sub>c</sub> + ω<sub>m</sub> and ω<sub>c</sub> − ω<sub>m</sub>. Relative to the carrier, the sidebands rotate in opposite directions, so their sideways components cancel. The sum therefore always points along the carrier, and only its length changes. That length is the envelope. A voice is many tones at once, so its sidebands are many such pairs.</p>
+    <div class="eq">[1 + μ cos ω<sub>m</sub>t]·e<sup>jω<sub>c</sub>t</sup> = <span class="cc">e<sup>jω<sub>c</sub>t</sup></span> + <span class="cu">(μ/2)e<sup>j(ω<sub>c</sub>+ω<sub>m</sub>)t</sup></span> + <span class="cl">(μ/2)e<sup>j(ω<sub>c</sub>−ω<sub>m</sub>)t</sup></span></div>
+    <p class="note">The view and pause controls are in the bench panel.</p>
+    <div class="pair">
+      <figure class="fixed"><canvas id="cvPh" role="img" aria-label="Rotating phasors for carrier and both sidebands"></canvas><figcaption id="phCap"></figcaption></figure>
+      <figure class="grow">
+        <canvas id="cvPhTrace" data-h="200" role="img" aria-label="Length of the resultant over time"></canvas>
+        <canvas id="cvLines" data-h="120" role="img" aria-label="Line spectrum of carrier and two sidebands" style="margin-top:10px"></canvas>
+        <figcaption id="phTraceCap"></figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="stage" id="s6">
+    <div class="stage-head"><span class="num">6</span><h2>Getting the voice back: the envelope detector</h2></div>
+    <p>A crystal-set receiver needs no oscillator. A tuned circuit selects the station, and a diode conducts only near each positive carrier peak, charging a capacitor up to that peak. Between peaks, the capacitor discharges through a resistor. The voltage across it follows the peaks, which trace the envelope. A series capacitor then blocks the constant 1, leaving μ<i>m</i>(<i>t</i>).</p>
+    <p>The RC time constant must satisfy two limits. It has to be much longer than one carrier period, or the output ripples at <i>f</i><sub>c</sub>. It also has to be short enough to follow the envelope as it falls, or the output lags along an exponential (diagonal clipping). For a tone at <i>W</i>, the limit is RC ≤ √(1−μ²) / (2πWμ).</p>
+    <div class="eq">1/f<sub>c</sub> ≪ RC ≤ √(1 − μ²) / (2πWμ)</div>
+    <div data-track="voice">
+    <p>Noise enters at the antenna. Its level is set by the carrier-to-noise ratio C/N, measured over the 2<i>W</i> the station occupies. The tuned circuit, here a single resonator with bandwidth 3<i>W</i>, passes the station along with the noise inside its passband. Above threshold, the detector output is the voice plus hiss, with SNR<sub>out</sub> ≈ 2μ²⟨m²⟩·C/N. Once the noise envelope inside the tuned circuit regularly exceeds the carrier, the output falls away faster than that formula: the threshold effect, specific to envelope detection. Where it starts depends on the predetection bandwidth. With this narrow 3<i>W</i> resonator the simulation follows the formula down to about 0 dB C/N in 2<i>W</i>; a wider front end reaches threshold sooner. The note below flags it when the measured SNR falls more than 1.5 dB under the formula.</p>
+    <div class="eq">received = x(t) + n(t)  →  tuned circuit  →  detector     SNR<sub>out</sub> ≈ 2μ²⟨m²⟩ · C/N   (above threshold)</div>
+    </div>
+    <p data-track="ft8" hidden>In FT8 mode the noise slider sets the SNR in 2500 Hz, the figure WSJT-X reports: transmitter power divided by the noise power in a 2.5 kHz bandwidth. Every transmitter on this page sends the same power, so the same setting is a fair comparison from here to step 12. The tuned circuit and envelope detector recover FT8's tone as well as they recover a voice, but the carrier takes most of the power and the threshold effect arrives early. Step 12 runs an FT8 decoder on this receiver's output.</p>
+    <div class="sch-wrap" id="schRx"></div>
+    <figure><canvas id="cvRxSpec" data-h="240" role="img" aria-label="Spectrum of the received signal after the tuned circuit"></canvas><figcaption id="rxSpecCap"></figcaption></figure>
+    <figure><canvas id="cvRx" data-h="330" role="img" aria-label="Detector output against the ideal envelope, and recovered audio against the original"></canvas><figcaption id="rxCap"></figcaption></figure>
+    <figure><canvas id="cvRxZoom" data-h="200" role="img" aria-label="Zoom showing diode charging and RC discharge ripple"></canvas><figcaption id="rxZoomCap"></figcaption></figure>
+    <p id="rxNote" style="margin-top:14px"></p>
+    <div class="play-row">
+      <button type="button" class="btn listen" data-listen="voice" aria-pressed="false">Play the voice in</button>
+      <button type="button" class="btn listen" data-listen="am" aria-pressed="false">Play the AM receiver out</button>
+    </div>
+  </section>
+
+  <section class="stage" id="s7">
+    <div class="stage-head"><span class="num">7</span><h2>Drop the carrier: DSB-SC</h2></div>
+    <p>Step 4 showed that the carrier line holds most of the power and none of the voice. Removing the 1 from 1 + μ<i>m</i>(<i>t</i>) and multiplying the voice directly by the carrier gives double-sideband suppressed-carrier (DSB-SC). The spectrum keeps both sidebands and loses the line at <i>f</i><sub>c</sub>. In hardware this is a balanced modulator: two mixers wired so the carrier cancels and only the products remain.</p>
+    <div class="eq">x(t) = <span class="cm">m(t)</span> · <span class="cc">cos 2πf<sub>c</sub>t</span></div>
+    <figure><canvas id="cvDsbT" data-h="220" role="img" aria-label="DSB-SC signal over 20 milliseconds"></canvas><figcaption id="dsbTCap"></figcaption></figure>
+    <div class="pair">
+      <figure class="grow"><canvas id="cvDsbZoom" data-h="200" role="img" aria-label="Zoom on a zero crossing of the voice showing the carrier phase flip"></canvas><figcaption>Zoom on a zero crossing of m(t). The carrier flips by 180°; the envelope touches zero and bounces back.</figcaption></figure>
+      <figure class="grow"><canvas id="cvDsbF" data-h="200" role="img" aria-label="DSB-SC spectrum with no carrier line"></canvas><figcaption>Both sidebands, no line at f_c.</figcaption></figure>
+    </div>
+    <p style="margin-top:16px">The cost appears at the receiver. The envelope is now |<i>m</i>(<i>t</i>)|, so the diode detector from step 6 outputs a rectified voice. The receiver must instead multiply by its own copy of the carrier and low-pass filter, which is a product detector. The two sidebands then fold onto the same audio frequencies and add with weight cos φ, where φ is the phase error of the local oscillator. At φ = 90° they cancel completely.</p>
+    <div class="eq">LPF{ x(t) · 2cos(2πf<sub>c</sub>t + φ) } = <span class="cm">m(t)</span> · cos φ</div>
+    <p class="note">The φ slider is in the bench panel.</p>
+    <figure><canvas id="cvDsbRx" data-h="300" role="img" aria-label="Envelope detector output and product detector output compared with the voice"></canvas><figcaption id="dsbRxCap"></figcaption></figure>
+    <div class="play-row">
+      <button type="button" class="btn listen" data-listen="dsbEnv" aria-pressed="false">Envelope detector on DSB-SC</button>
+      <button type="button" class="btn listen" data-listen="dsbProd" aria-pressed="false">Product detector</button>
+    </div>
+  </section>
+
+  <section class="stage" id="s8">
+    <div class="stage-head"><span class="num">8</span><h2>Drop a sideband: SSB</h2></div>
+    <p>The lower sideband is the upper sideband mirrored, so it carries no additional information. Removing it fits the voice into <i>W</i> of spectrum instead of 2<i>W</i>. One way to do this is to follow a balanced modulator with a sharp filter (the filter method, which used crystal filters in classic rigs). The other is the phasing method below, which builds the one-sided spectrum directly.</p>
+    <div class="eq">x<sub>USB</sub>(t) = <span class="cm">m(t)</span> cos 2πf<sub>c</sub>t − <span class="cl">m̂(t)</span> sin 2πf<sub>c</sub>t = Re{ [<span class="cm">m</span> + j<span class="cl">m̂</span>] · e<sup>j2πf<sub>c</sub>t</sup> }</div>
+    <p><i>m̂</i> is the Hilbert transform of <i>m</i>: every frequency component of the voice shifted by −90°. Its magnitude spectrum is unchanged, so it sounds the same, but the waveform looks different. The pair <i>m</i> + j<i>m̂</i> is the analytic signal, whose spectrum is zero at negative frequencies. This is an I/Q modulator with I = <i>m</i> and Q = <i>m̂</i>, the same structure as the digital chain. Because the complex envelope has nothing at negative frequencies, nothing lands below <i>f</i><sub>c</sub>. Flipping the sign of the Q branch gives the lower sideband.</p>
+    <div class="sch-wrap" id="schSsb"></div>
+    <p class="note" style="margin-top:12px">The USB / LSB switch is in the bench panel.</p>
+    <figure><canvas id="cvHilb" data-h="260" role="img" aria-label="Voice and its Hilbert transform"></canvas><figcaption>Same harmonics, each shifted by a quarter cycle. Peaks of m(t) sit near zero crossings of m̂(t).</figcaption></figure>
+    <div class="pair">
+      <figure class="grow"><canvas id="cvSsbT" data-h="220" role="img" aria-label="SSB signal over 20 milliseconds with its envelope"></canvas><figcaption>The SSB envelope is |m + jm̂|, a smoothed outline that is not the voice waveform. An envelope detector cannot recover m from it.</figcaption></figure>
+      <figure class="grow"><canvas id="cvSsbF" data-h="220" role="img" aria-label="SSB spectrum with one sideband"></canvas><figcaption id="ssbFCap"></figcaption></figure>
+    </div>
+  </section>
+
+  <section class="stage" id="s9">
+    <div class="stage-head"><span class="num">9</span><h2>Receiving SSB: filter, then beat</h2></div>
+    <p>The receiver selects the sideband with a filter <i>W</i> wide and multiplies by a local oscillator, historically called the beat-frequency oscillator (BFO), then low-pass filters. With DSB-SC, an LO error appeared as a loss of amplitude. With SSB, a phase error only rotates every audio component by the same angle, which the ear barely notices. A frequency error matters instead: an LO that is off by Δ<i>f</i> shifts every component of the voice by Δ<i>f</i>. Harmonics at <i>k</i>·<i>f</i><sub>0</sub> move to <i>k</i>·<i>f</i><sub>0</sub> − Δ<i>f</i> and stop being harmonics. That produces the familiar "Donald Duck" sound of a mistuned SSB signal. Operators tune until the voice sounds natural, typically to within a few tens of hertz. The simulation implements this filter-and-beat receiver in its Weaver form: mix with an oscillator at the middle of the sideband, low-pass at <i>W</i>/2, and mix back up. The result is the same, apart from a fraction of a dB lost at the lowest audio frequencies.</p>
+    <p data-track="ft8" hidden>For FT8, a BFO error does not damage anything the decoder needs. All eight tones move by the same Δ<i>f</i>, so their 6.25 Hz spacing is unchanged, and the decoder searches in frequency anyway; it simply finds the signal Δ<i>f</i> away. That is why FT8 works through any SSB rig without fine tuning.</p>
+    <div class="eq">USB in, LO at f<sub>c</sub> + Δf  ⟹  audio component f → f − Δf   (all shifted by the same Δf, not scaled)</div>
+    <p class="note">The Δf slider is in the bench panel.</p>
+    <div class="pair">
+      <figure class="grow"><canvas id="cvSsbRx" data-h="220" role="img" aria-label="SSB receiver output compared with the voice"></canvas><figcaption id="ssbRxCap"></figcaption></figure>
+      <figure class="grow"><canvas id="cvSsbRxF" data-h="220" role="img" aria-label="Spectrum of the SSB receiver output compared with the voice"></canvas><figcaption id="ssbRxFCap"></figcaption></figure>
+    </div>
+    <div class="play-row">
+      <button type="button" class="btn listen" data-listen="voice" aria-pressed="false">Play the voice in</button>
+      <button type="button" class="btn listen" data-listen="ssb" aria-pressed="false">Play the SSB receiver out</button>
+    </div>
+  </section>
+
+  <section class="stage" id="s10">
+    <div class="stage-head"><span class="num">10</span><h2>Same power, same noise, three systems</h2></div>
+    <p>Each transmitter below has the same average power and is received through the RF noise set on the bench. Write γ = P/(N<sub>0</sub>W) for the ratio of transmitted power to the noise power in one audio bandwidth. AM with an envelope detector reaches η·γ, where η is the voice's share of the power from step 4. DSB-SC and SSB with product detectors both reach γ. In DSB-SC the two sidebands add coherently, but its receiver also passes twice the noise bandwidth, so the two effects cancel. SSB therefore matches DSB-SC in SNR while using half the spectrum, and it beats AM by 1/η.</p>
+    <p data-track="ft8" hidden>With FT8 as the message, the same arithmetic decides which receivers can still decode. Step 12 runs the decoder on all three.</p>
+    <div class="tbl-wrap"><table id="cmpTable"></table></div>
+    <p class="note" id="cmpNote" style="margin-top:12px"></p>
+  </section>
+
+  <section class="stage" id="s11">
+    <div class="stage-head"><span class="num">11</span><h2>Real numbers</h2></div>
+    <p data-track="ft8" hidden>For FT8 this page simulates 13.6 s of signal on a 20 to 50 kHz carrier sampled at 120 kHz, with the audio at 12 kHz as in WSJT-X.</p>
+    <p data-track="voice">This page simulates a 100 kHz-range carrier sampled at 480 kHz so that every cycle can be computed and drawn. A broadcast transmitter behaves the same way, only with many more carrier cycles under each voice cycle (about ten times the default here), which makes the detector's job easier.</p>
+    <div class="facts">
+      <div class="fact"><b>540–1700 kHz</b><span>US AM broadcast band, with stations on a 10 kHz channel grid.</span></div>
+      <div class="fact"><b id="factBW"></b><span>Occupied bandwidth at your W. Twice the audio bandwidth, because both sidebands are transmitted.</span></div>
+      <div class="fact"><b id="factEta"></b><span>Share of transmitted power carrying the voice with your settings. The carrier line carries the rest and no information.</span></div>
+      <div class="fact"><b>~1 µs per cycle</b><span>At 1 MHz. An RC of about 20 µs smooths that easily and still follows full-scale 5 kHz content at μ = 0.8.</span></div>
+    </div>
+    <p style="margin-top:16px">Amateur HF voice, marine and aviation HF, and the rigs that carry FT8 all use SSB. FT8 in particular is an audio signal fed into the phasing or filter path of step 8. Its single tone at a time comes out of the transmitter as a single RF line, exactly <i>f</i><sub>c</sub> above its audio frequency.</p>
+  </section>
+  <section class="stage" id="s12" data-track="ft8" hidden>
+    <div class="stage-head"><span class="num">12</span><h2>Decoding the FT8 packet</h2></div>
+    <p>An FT8 decoder works on the receiver's audio output. It builds a spectrogram with bins half a tone spacing wide (3.125 Hz) and rows an eighth of a symbol apart, then searches 200 to 3000 Hz, and timing offsets up to about 0.6 s, for the three Costas sync blocks. The waterfall shows the 850 Hz around what it found. At the best match it reads the power in the eight tone bins for each of the 58 data symbols and turns those powers into a confidence for each of the 174 coded bits. A parity decoder (belief propagation) then corrects errors, and the result counts only if the CRC matches.</p>
+    <p>All three receivers feed the same decoder. Pick which one the waterfall shows on the bench, then lower the SNR, detune the BFO, or rotate the DSB-SC phase to see where each one stops decoding.</p>
+    <figure><canvas id="cvWf" data-h="300" role="img" aria-label="Waterfall spectrogram of the receiver audio with the detected FT8 signal boxed"></canvas><figcaption id="wfCap"></figcaption></figure>
+    <figure><canvas id="cvSym" data-h="60" role="img" aria-label="Per-symbol decision strip"></canvas><figcaption id="symCap"></figcaption></figure>
+    <div class="tbl-wrap"><table id="ft8Table"></table></div>
+    <p class="note" id="ft8Note" style="margin-top:12px"></p>
+    <p class="note">Everything here follows the FT8 protocol: message packing, the CRC-14, the (174,91) LDPC code from WSJT-X (as tabulated in the open-source ft8_lib), the Gray map, Costas arrays, tone spacing, Gaussian shaping and timing. The tone sequence matches ft8_lib's encoder symbol for symbol, and ft8_lib's decoder decodes this page's audio. With the default settings, both this page's decoder and ft8_lib's decode the SSB receiver output down to −19 dB and fail at −20 dB on the same noise. That is one fixed noise realization, so treat the threshold as ±1 dB.</p>
+  </section>
+</main>
+</div>
+</div>
+
+<script>
+(function(){
+"use strict";
+const $=s=>document.querySelector(s);
+let FSA=48000,FSR=480000;const UP=10;
+const isFT8=()=>state.src==="ft8";
+function setRates(){FSA=isFT8()?12000:48000;FSR=FSA*UP;}
+const WIN=()=>Math.round(0.02*FSA);
+const SPN=()=>isFT8()?262144:65536;
+const FORM={ah:[[730,70],[1090,90],[2440,120],[3400,160]],ee:[[270,60],[2290,100],[3010,140],[3700,180]],oo:[[300,60],[870,80],[2240,120],[3300,160]]};
+const VOWEL={ah:"“ah”",ee:"“ee”",oo:"“oo”"};
+const state={src:"ah",f0:120,W:4500,mu:0.8,fc:100000,rcIdx:26,noise:61,frame:"carrier",phi:0,sb:"usb",dfo:0,msg:"CQ K1ABC FN42",ft8f0:1500,dec:"ssb",gsrc:"msg",gwin:7,gall:false,gbits:"011 101 000 110 111 001 100 010",gbtIdx:4};
+let upload=null;
+const RC=()=>5e-6*Math.pow(200,state.rcIdx/100);
+const reduceMotion=(()=>{try{return matchMedia("(prefers-reduced-motion: reduce)").matches;}catch(e){return false;}})();
+
+/* ---------- DSP ---------- */
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+function biquadLP(x,fs,f,Q){const w=2*Math.PI*f/fs,c=Math.cos(w),s=Math.sin(w),a=s/(2*Q),a0=1+a;
+  const b0=(1-c)/2/a0,b1=(1-c)/a0,b2=b0,a1=-2*c/a0,a2=(1-a)/a0,y=new Float32Array(x.length);
+  let x1=0,x2=0,y1=0,y2=0;for(let i=0;i<x.length;i++){const xi=x[i],yi=b0*xi+b1*x1+b2*x2-a1*y1-a2*y2;x2=x1;x1=xi;y2=y1;y1=yi;y[i]=yi;}return y;}
+const butter4=(x,fs,f)=>biquadLP(biquadLP(x,fs,f,0.5412),fs,f,1.3066);
+function fft(re,im){const n=re.length;
+  for(let i=1,j=0;i<n;i++){let bit=n>>1;for(;j&bit;bit>>=1)j^=bit;j^=bit;if(i<j){let t=re[i];re[i]=re[j];re[j]=t;t=im[i];im[i]=im[j];im[j]=t;}}
+  for(let len=2;len<=n;len<<=1){const ang=-2*Math.PI/len,wr=Math.cos(ang),wi=Math.sin(ang);
+    for(let i=0;i<n;i+=len){let cr=1,ci=0;for(let j=0;j<len/2;j++){const a=i+j,b=a+len/2,xr=re[b]*cr-im[b]*ci,xi=re[b]*ci+im[b]*cr;
+      re[b]=re[a]-xr;im[b]=im[a]-xi;re[a]+=xr;im[a]+=xi;const nr=cr*wr-ci*wi;ci=cr*wi+ci*wr;cr=nr;}}}}
+function spectrumDB(x,center,N,fs,fLo,fHi){
+  let s=Math.round(center-N/2);s=Math.max(0,Math.min(x.length-N,s));
+  const re=new Float64Array(N),im=new Float64Array(N);
+  for(let i=0;i<N;i++){const w=0.5-0.5*Math.cos(2*Math.PI*i/N);re[i]=(s+i>=0&&s+i<x.length?x[s+i]:0)*w;}
+  fft(re,im);const df=fs/N,j0=Math.max(0,Math.floor(fLo/df)),j1=Math.min(N/2,Math.ceil(fHi/df));
+  const f=[],p=[];let mx=1e-30;for(let j=j0;j<=j1;j++){const v=re[j]*re[j]+im[j]*im[j];f.push(j*df);p.push(v);if(v>mx)mx=v;}
+  return{f,p,mx};
+}
+function syl(t){const seg=(a,b,amp)=>{if(t<a||t>b)return 0;const r=0.04;let e=1;
+  if(t<a+r)e=0.5-0.5*Math.cos(Math.PI*(t-a)/r);else if(t>b-r)e=0.5-0.5*Math.cos(Math.PI*(b-t)/r);return amp*e;};
+  return seg(0.06,0.56,1)+seg(0.68,1.14,0.7);}
+
+let voice={key:null};
+function getVoice(){
+  const key=[state.src,state.f0,state.W,upload?upload.id:0,isFT8()?state.msg+"|"+state.ft8f0:""].join("|");if(voice.key===key)return voice;
+  let m,tc,span=null;
+  if(state.src==="upload"&&upload){const raw=upload.raw.slice();let mu0=0;for(const q of raw)mu0+=q;mu0/=raw.length;for(let i=0;i<raw.length;i++)raw[i]-=mu0;m=butter4(raw,FSA,state.W);
+    const fr=960;let best=0,bi=0;for(let s=4096;s+fr+4096<m.length;s+=fr/2){let e=0;for(let i=0;i<fr;i++)e+=m[s+i]*m[s+i];if(e>best){best=e;bi=s;}}
+    tc=bi||Math.min(4096,Math.max(0,m.length-960));}
+  else if(isFT8()){const r=ft8Audio(getFT8().tones);m=r.m;span=[r.i0,r.i1];tc=r.i0+Math.round(10.5*FT8.T*FSA);}
+  else if(state.src==="tone"){const n=Math.round(1.2*FSA);m=new Float32Array(n);for(let i=0;i<n;i++)m[i]=Math.cos(2*Math.PI*1000*i/FSA);tc=Math.round(0.3*FSA);}
+  else{const n=Math.round(1.2*FSA),F=FORM[state.src],f0=state.f0,K=Math.max(1,Math.floor(state.W/(f0*1.02))),rnd=mulberry32(7),amps=[],ph=[];
+    for(let k=1;k<=K;k++){const f=k*f0;let g=1;for(const[Fi,Bi]of F)g*=Fi*Fi/Math.sqrt((Fi*Fi-f*f)**2+(Bi*f)**2);amps.push(g/k);ph.push(rnd()*2*Math.PI);}
+    m=new Float32Array(n);let Phi=0;
+    for(let i=0;i<n;i++){const t=i/FSA;Phi+=2*Math.PI*f0*(1+0.015*Math.sin(2*Math.PI*5.2*t))/FSA;const e=syl(t);if(e<=0)continue;
+      let s=0;for(let k=0;k<K;k++)s+=amps[k]*Math.cos((k+1)*Phi+ph[k]);m[i]=e*s;}
+    tc=Math.round(0.3*FSA);}
+  if(!span)span=[0,m.length];
+  let pk=1e-9,pp=0;for(const v of m){pk=Math.max(pk,-v);pp=Math.max(pp,v);}if(pk<0.05*pp)pk=Math.max(pp,1e-9);let ms=0;for(let i=0;i<m.length;i++)m[i]/=pk;for(let i=span[0];i<span[1];i++)ms+=m[i]*m[i];ms/=(span[1]-span[0]);
+  voice={key,m,tc,ms,span,pmax:pp/pk};return voice;
+}
+let am={key:null};
+function getAM(){const v=getVoice(),key=v.key+"|"+state.mu+"|"+state.fc;if(am.key===key)return am;
+  const L=v.m.length,n=L*UP,env=new Float32Array(n),x=new Float32Array(n),w=2*Math.PI*state.fc/FSR,mu=state.mu;
+  for(let i=0;i<n;i++){const j=(i/UP)|0,fr=(i-j*UP)/UP,a=v.m[j],b=v.m[Math.min(j+1,L-1)],e=1+mu*(a+(b-a)*fr);env[i]=e;x[i]=e*Math.cos(w*i);}
+  let P=0;const s0=v.span[0]*UP,s1=v.span[1]*UP;for(let i=s0;i<s1;i++)P+=x[i]*x[i];P/=(s1-s0);
+  am={key,env,x,P};return am;}
+let rx={key:null};
+let unitNoise=null;
+function getNoise(n){if(unitNoise&&unitNoise.length===n)return unitNoise;const r=mulberry32(99),z=new Float32Array(n);
+  for(let i=0;i<n;i+=2){const u1=Math.max(r(),1e-12),u2=r(),rad=Math.sqrt(-2*Math.log(u1));z[i]=rad*Math.cos(2*Math.PI*u2);if(i+1<n)z[i+1]=rad*Math.sin(2*Math.PI*u2);}
+  unitNoise=z;return z;}
+const NOFF=()=>isFT8()?40:60;
+const noiseOn=()=>state.noise<=NOFF();
+const sigmaN=()=>isFT8()?Math.sqrt(getAM().P*FSR/(2*2500*Math.pow(10,state.noise/10))):Math.sqrt(0.5*FSR/(4*state.W*Math.pow(10,state.noise/10)));
+const cnDB=()=>isFT8()?state.noise+10*Math.log10(0.5*2500/(getAM().P*2*state.W)):state.noise;
+const gammaLin=()=>{const sg=sigmaN();return getAM().P*FSR/(2*sg*sg*state.W);};
+function amGap(){if(!noiseOn()||!(state.mu>0)||state.mu>1)return null;const r=getRX();if(r.snr==null)return null;const v=getVoice(),eta=state.mu*state.mu*v.ms/(1+state.mu*state.mu*v.ms);return 10*Math.log10(eta*gammaLin())-r.snr;}
+const noiseText=()=>isFT8()?`${state.noise} dB SNR in 2500 Hz`:`${state.noise} dB C/N`;
+function bandpass(x,fs,f0,bw){const w=2*Math.PI*f0/fs,c=Math.cos(w),s=Math.sin(w),Q=f0/bw,al=s/(2*Q),a0=1+al;
+  const b0=al/a0,b2=-al/a0,a1=-2*c/a0,a2=(1-al)/a0,y=new Float32Array(x.length);let x1=0,x2=0,y1=0,y2=0;
+  for(let i=0;i<x.length;i++){const xi=x[i],yi=b0*xi+b2*x2-a1*y1-a2*y2;x2=x1;x1=xi;y2=y1;y1=yi;y[i]=yi;}return y;}
+function onePoleLP(x,fs,f){const a=Math.exp(-2*Math.PI*f/fs),y=new Float32Array(x.length);let p=x[0]||0;for(let i=0;i<x.length;i++){p=(1-a)*x[i]+a*p;y[i]=p;}return y;}
+function getRX(){const a=getAM(),key=a.key+"|"+state.rcIdx+"|"+state.noise;if(rx.key===key)return rx;
+  const n=a.x.length,sg=noiseOn()?sigmaN():0,raw=new Float32Array(n);
+  if(sg){const z=getNoise(n);for(let i=0;i<n;i++)raw[i]=a.x[i]+sg*z[i];}else raw.set(a.x);
+  const y=bandpass(raw,FSR,state.fc,3*state.W);
+  const decay=Math.exp(-1/(FSR*RC())),v=new Float32Array(n);let p=0;
+  for(let i=0;i<n;i++){p*=decay;if(y[i]>p)p=y[i];v[i]=p;}
+  const vl=butter4(v,FSR,state.W),N=Math.floor(n/UP),r=new Float32Array(N);
+  if(!a.e48){const yb=bandpass(a.x,FSR,state.fc,3*state.W),wc=2*Math.PI*state.fc/FSR;let zi=new Float32Array(n),zq=new Float32Array(n);for(let i=0;i<n;i++){zi[i]=yb[i]*Math.cos(wc*i);zq[i]=-yb[i]*Math.sin(wc*i);}const lpc=Math.min(state.fc/2,6*state.W);zi=butter4(zi,FSR,lpc);zq=butter4(zq,FSR,lpc);const en=new Float32Array(n);for(let i=0;i<n;i++)en[i]=2*Math.hypot(zi[i],zq[i])*(zi[i]<0?-1:1);
+    const el=butter4(en,FSR,state.W),e0=new Float32Array(N),D=0;let me=0;for(let j=0;j<N;j++){e0[j]=el[Math.max(0,j*UP-D)];me+=e0[j];}me/=N;for(let j=0;j<N;j++)e0[j]-=me;a.e48=e0;}
+  const e=a.e48;let mr=0;for(let j=0;j<N;j++){r[j]=vl[j*UP];mr+=r[j];}mr/=N;for(let j=0;j<N;j++)r[j]-=mr;
+  const snr=state.mu>0?snrOf(r,e,getVoice().span):null;
+  rx={key,y,v,r,e,snr};return rx;}
+
+/* ---------- drawing ---------- */
+function colors(){const cs=getComputedStyle(document.documentElement),g=n=>cs.getPropertyValue(n).trim();
+  return{surface:g("--surface"),ink:g("--ink"),muted:g("--muted"),rule:g("--rule"),grid:g("--grid"),m:g("--m"),c:g("--c"),u:g("--u"),l:g("--l"),warn:g("--warn"),accent:g("--accent"),mono:g("--f-mono")};}
+function setup(cv,hOverride){const w=cv.clientWidth;if(!w)return null;const h=hOverride||+cv.dataset.h;
+  cv.style.height=h+"px";const dpr=Math.min(window.devicePixelRatio||1,3);cv.width=Math.round(w*dpr);cv.height=Math.round(h*dpr);
+  const ctx=cv.getContext("2d");ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,w,h);return{ctx,w,h};}
+function niceTicks(a,b,n){const raw=(b-a)/Math.max(1,n),mag=Math.pow(10,Math.floor(Math.log10(raw))),r=raw/mag;
+  const step=(r<1.5?1:r<3?2:r<7?5:10)*mag,out=[];for(let v=Math.ceil(a/step-1e-9)*step;v<=b+1e-9;v+=step)out.push(Math.abs(v)<1e-9?0:+v.toFixed(8));return out;}
+const fmt=v=>{const a=Math.abs(v);let s=a>=100||Number.isInteger(+v.toFixed(6))?(+v.toFixed(0)).toString():a>=10?v.toFixed(1):v.toFixed(a<1?2:1);
+  s=s.replace(/(\.\d*?)0+$/,"$1").replace(/\.$/,"");return s.replace("-","−");};
+function label(ctx,C,text,x,y,color,align){ctx.font="500 12px "+C.mono;ctx.textAlign=align||"left";ctx.textBaseline="middle";
+  const w=ctx.measureText(text).width,x0=align==="right"?x-w:align==="center"?x-w/2:x;
+  ctx.fillStyle=C.surface;ctx.globalAlpha=0.88;ctx.fillRect(x0-4,y-9,w+8,18);ctx.globalAlpha=1;ctx.fillStyle=color;ctx.fillText(text,x,y);return w;}
+function strokePath(ctx,xs,ys,X,Y){ctx.beginPath();let on=false;
+  for(let i=0;i<xs.length;i++){const yv=ys[i];if(!isFinite(yv)){on=false;continue;}const px=X(xs[i]),py=Y(yv);if(!on){ctx.moveTo(px,py);on=true;}else ctx.lineTo(px,py);}ctx.stroke();}
+function drawPanels(cv,panels,xr,opts){
+  opts=opts||{};const S=setup(cv,opts.h);if(!S)return;const{ctx,w,h}=S,C=colors();
+  const L=48,R=10,T=8,B=26,gap=14,n=panels.length,ph=(h-T-B-gap*(n-1))/n,pw=w-L-R;
+  const X=x=>L+(x-xr[0])/(xr[1]-xr[0])*pw,xt=opts.xticks||niceTicks(xr[0],xr[1],Math.max(3,Math.round(pw/80)));
+  panels.forEach((p,pi)=>{
+    const y0=T+pi*(ph+gap),yr=p.yr,Y=y=>y0+ph-(y-yr[0])/(yr[1]-yr[0])*ph;
+    ctx.lineWidth=1;ctx.setLineDash([]);ctx.strokeStyle=C.grid;
+    xt.forEach(x=>{ctx.beginPath();ctx.moveTo(Math.round(X(x))+0.5,y0);ctx.lineTo(Math.round(X(x))+0.5,y0+ph);ctx.stroke();});
+    const yt=p.yticks||niceTicks(yr[0],yr[1],p.ny||4);ctx.font="400 11px "+C.mono;ctx.fillStyle=C.muted;ctx.textAlign="right";ctx.textBaseline="middle";
+    yt.forEach(y=>{const py=Math.round(Y(y))+0.5;ctx.strokeStyle=C.grid;ctx.beginPath();ctx.moveTo(L,py);ctx.lineTo(w-R,py);ctx.stroke();ctx.fillText(fmt(y),L-6,py);});
+    if(yr[0]<0&&yr[1]>0){ctx.strokeStyle=C.rule;ctx.beginPath();ctx.moveTo(L,Math.round(Y(0))+0.5);ctx.lineTo(w-R,Math.round(Y(0))+0.5);ctx.stroke();}
+    ctx.strokeStyle=C.rule;ctx.strokeRect(L+0.5,y0+0.5,pw-1,ph-1);
+    ctx.save();ctx.beginPath();ctx.rect(L,y0,pw,ph);ctx.clip();
+    (p.bands||[]).forEach(b=>{ctx.fillStyle=b.color;ctx.globalAlpha=b.alpha||0.12;ctx.fillRect(X(b.x0),y0,X(b.x1)-X(b.x0),ph);ctx.globalAlpha=1;});
+    (p.fills||[]).forEach(f=>{ctx.fillStyle=f.color;ctx.globalAlpha=f.alpha||0.25;ctx.beginPath();let on=false,startX=0;
+      for(let i=0;i<f.x.length;i++){const yv=f.y[i];if(!isFinite(yv)){if(on){ctx.lineTo(X(f.x[i-1]),Y(f.base));ctx.lineTo(startX,Y(f.base));ctx.closePath();on=false;}continue;}
+        if(!on){startX=X(f.x[i]);ctx.moveTo(startX,Y(f.base));on=true;}ctx.lineTo(X(f.x[i]),Y(yv));}
+      if(on){ctx.lineTo(X(f.x[f.x.length-1]),Y(f.base));ctx.lineTo(startX,Y(f.base));ctx.closePath();}ctx.fill();ctx.globalAlpha=1;});
+    (p.vlines||[]).forEach(v=>{ctx.strokeStyle=v.color;ctx.globalAlpha=v.alpha||1;ctx.setLineDash(v.dash||[]);ctx.lineWidth=1;
+      ctx.beginPath();ctx.moveTo(Math.round(X(v.x))+0.5,y0);ctx.lineTo(Math.round(X(v.x))+0.5,y0+ph);ctx.stroke();ctx.globalAlpha=1;ctx.setLineDash([]);});
+    (p.series||[]).forEach(s=>{ctx.strokeStyle=s.color;ctx.lineWidth=s.width||1.6;ctx.globalAlpha=s.alpha==null?1:s.alpha;
+      ctx.setLineDash(s.dash||[]);ctx.lineJoin="round";strokePath(ctx,s.x,s.y,X,Y);ctx.globalAlpha=1;ctx.setLineDash([]);});
+    (p.dots||[]).forEach(d=>{ctx.beginPath();ctx.arc(X(d.x),Y(d.y),d.r||3.5,0,2*Math.PI);ctx.fillStyle=d.color;ctx.fill();ctx.lineWidth=1.5;ctx.strokeStyle=C.surface;ctx.stroke();});
+    ctx.restore();
+    (p.notes||[]).forEach(o=>label(ctx,C,o.text,X(o.x),Y(o.y),o.color,o.align||"center"));
+    if(p.label){let lx=L+8;p.label.forEach(([t,c])=>{const tw=label(ctx,C,t,lx,y0+13,c);lx+=tw+16;});}
+    if(pi===n-1){ctx.font="400 11px "+C.mono;ctx.fillStyle=C.muted;ctx.textAlign="center";ctx.textBaseline="top";
+      xt.forEach(x=>ctx.fillText(fmt(x),X(x),y0+ph+6));if(opts.xTitle){ctx.textAlign="right";ctx.fillStyle=C.muted;
+        const tw=ctx.measureText(opts.xTitle).width;ctx.fillStyle=C.surface;ctx.fillRect(w-R-tw-4,y0+ph+4,tw+4,16);ctx.fillStyle=C.muted;ctx.fillText(opts.xTitle,w-R,y0+ph+6);}}
+  });
+}
+
+/* ---------- schematics ---------- */
+const MARK="<defs>"+["ink","m","c"].map(c=>`<marker id="ah-${c}" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah-${c}" d="M0,0 L10,5 L0,10 z"/></marker>`).join("")+"</defs>";
+function badge(x,y,n,href){const g=`<g class="badge"><circle cx="${x}" cy="${y}" r="9"/><text x="${x}" y="${y+0.5}" text-anchor="middle" dominant-baseline="middle">${n}</text></g>`;
+  return href?`<a href="${href}" aria-label="Go to step ${n}">${g}</a>`:g;}
+function box(x,y,w,h,lines,href,n,aria){const lh=16,y0=y+h/2-(lines.length-1)*lh/2;
+  const t=lines.map((l,i)=>`<text class="${l[1]||"t"}" x="${x+w/2}" y="${y0+i*lh}" text-anchor="middle" dominant-baseline="middle">${l[0]}</text>`).join("");
+  const inner=`<rect class="box" x="${x}" y="${y}" width="${w}" height="${h}" rx="6"/>${t}${n?badge(x+w,y,n):""}`;
+  return href?`<a href="${href}" aria-label="${aria||lines[0][0]}">${inner}</a>`:inner;}
+const wire=(d,cls,ah)=>`<path class="w ${cls||""}" d="${d}"${ah?` marker-end="url(#ah-${ah})"`:""}/>`;
+const txt=(x,y,s,cls,an)=>`<text class="${cls}" x="${x}" y="${y}" text-anchor="${an||"start"}" dominant-baseline="middle">${s}</text>`;
+const circ=(cx,cy,sym,lab)=>`<g role="img" aria-label="${lab}"><circle class="box" cx="${cx}" cy="${cy}" r="20"/><text class="sym" x="${cx}" y="${cy+1}" text-anchor="middle" dominant-baseline="middle">${sym}</text></g>`;
+const sub=s=>`<tspan baseline-shift="sub" font-size="8">${s}</tspan>`;
+function antenna(x,y){return wire(`M${x},${y} V${y-34} M${x-12},${y-52} L${x},${y-34} L${x+12},${y-52}`);}
+function renderSchematics(){
+  const yc=130,W=(state.W/1000).toFixed(1);
+  $("#schTx").innerHTML=`<svg class="sch" viewBox="0 0 760 230" role="group" aria-label="AM transmitter block diagram">${MARK}
+    ${box(10,yc-30,74,60,(isFT8()?[["WSJT-X","t"],["FT8 audio","s"]]:[["Mic","t"],["voice","s"]]),"#s1",null,"Microphone")}
+    ${wire(`M84,${yc} H120`,"wm","m")}
+    ${box(122,yc-35,116,70,[["Audio filter","t"],["≤ "+W+" kHz","s"],["then ×μ","s"]],"#s1",1,"Audio low-pass filter")}
+    ${wire(`M238,${yc} H308`,"wm","m")}${txt(246,yc-12,"μm(t)","lm")}
+    ${box(290,18,80,46,[["DC","t"],["1","s"]],"#s2",null,"DC offset")}${wire(`M330,64 V${yc-21}`,"","ink")}
+    ${circ(330,yc,"+","Adder")}${badge(352,yc-24,2,"#s2")}
+    ${wire(`M350,${yc} H448`,"wm","m")}${txt(362,yc-12,"1 + μm(t)","lm")}
+    ${circ(470,yc,"×","Modulator")}${badge(492,yc-24,3,"#s3")}
+    ${box(420,182,100,44,[["Oscillator","t"],["cos 2πf"+sub("c")+"t","s"]],"#s3",null,"Carrier oscillator")}${wire(`M470,182 V${yc+21}`,"wc","c")}
+    ${wire(`M490,${yc} H556`,"","ink")}
+    <polygon class="box" points="558,${yc-23} 558,${yc+23} 600,${yc}"/>${txt(570,yc,"PA","s")}
+    ${wire(`M600,${yc} H650`)}${antenna(650,yc)}${txt(662,yc+18,"x(t)","t")}${badge(690,yc-30,4,"#s4")}
+  </svg>`;
+  const rcus=(RC()*1e6);
+  $("#schRx").innerHTML=`<svg class="sch" viewBox="0 0 800 170" role="group" aria-label="Envelope detector receiver block diagram">${MARK}
+    ${antenna(24,95)}${wire("M24,95 H50","","ink")}${txt(4,128,noiseOn()?"+ noise":"","s")}
+    ${box(52,62,112,66,[["Tuned LC","t"],["BW 3W at f"+sub("c"),"s"]])}
+    ${wire("M164,95 H198","wc","c")}${txt(170,82,"x(t)","lc")}
+    ${box(200,62,96,66,[["Diode","t"],["one-way","s"]])}
+    ${wire("M296,95 H330","","ink")}
+    ${box(332,62,120,66,[["R ∥ C","t"],["RC = "+rcus.toFixed(rcus<10?1:0)+" µs","s"]])}
+    ${wire("M452,95 H486","wm","m")}${txt(456,82,"1+μm","lm")}
+    ${box(488,62,106,66,[["Series C","t"],["blocks the 1","s"]])}
+    ${wire("M594,95 H628","wm","m")}
+    ${box(630,62,96,66,[["Audio LPF","t"],["≤ "+W+" kHz","s"]])}
+    ${wire("M726,95 H758","wm","m")}${txt(764,95,"μm(t)","lm")}
+  </svg>`;
+}
+
+/* ---------- render ---------- */
+const msArr=(n,fs,off)=>{const a=new Float64Array(n);for(let i=0;i<n;i++)a[i]=(i+(off||0))/fs*1000;return a;};
+const db=(p,mx)=>10*Math.log10(Math.max(p/mx,1e-9));
+function renderControls(){
+  $("#src-"+state.src).checked=true;$("#fr-"+state.frame).checked=true;
+  $("#f0").value=state.f0;$("#f0Out").textContent=state.f0+" Hz";$("#f0Wrap").hidden=!(state.src in FORM);
+  $("#W").value=state.W;$("#WOut").textContent=(state.W/1000).toFixed(1)+" kHz";
+  $("#mu").value=state.mu;$("#muOut").textContent=state.mu.toFixed(2);
+  $("#fc").value=state.fc;$("#fcOut").textContent=(state.fc/1000)+" kHz";
+  $("#rc").value=state.rcIdx;const r=RC()*1e6;$("#rcOut").textContent=(r<10?r.toFixed(1):r.toFixed(0))+" µs";
+  $("#phi").value=state.phi;$("#phiOut").textContent=state.phi+"°";$("#dfo").value=state.dfo;$("#dfoOut").textContent=(state.dfo>0?"+":"")+state.dfo+" Hz";$("#sb-"+state.sb).checked=true;
+  $("#noise").value=state.noise;$("#noiseOut").textContent=noiseOn()?state.noise+" dB":"off";
+  $("#src-upload").disabled=!upload;if(upload)$("#uploadName").textContent=upload.short;
+  const tr=isFT8()?"ft8":"voice";document.querySelectorAll("[data-track]").forEach(el=>{if(el.dataset.sections)return;el.hidden=el.dataset.track!==tr;});
+  $("#gs-"+state.gsrc).checked=true;$("#gbt").value=state.gbtIdx;$("#gbtOut").textContent=isFinite(gbtv())?String(gbtv())+(gbtv()===2?", as in FT8":""):"∞, plain FSK";if(document.activeElement!==$("#gbits"))$("#gbits").value=state.gbits;
+  $("#gWinWrap").hidden=state.gsrc!=="msg";$("#gBitsWrap").hidden=state.gsrc!=="custom";$("#gwin").value=state.gwin;$("#gwin").disabled=state.gall;$("#gall").checked=state.gall;$("#gwinOut").textContent=state.gall?"all 79":`symbols ${state.gwin}–${state.gwin+9}`;
+  const nz=$("#noise");nz.min=isFT8()?-30:-5;nz.max=isFT8()?41:61;nz.value=state.noise;$("#noiseOut").textContent=noiseOn()?state.noise+" dB":"off";
+  $("#noiseLab").textContent=isFT8()?"Noise, SNR in 2500 Hz":"RF noise, C/N in 2W";
+  const wEl=$("#W");wEl.max=isFT8()?5000:8000;if(state.W>+wEl.max)state.W=+wEl.max;wEl.value=state.W;$("#WOut").textContent=(state.W/1000).toFixed(1)+" kHz";
+  const fcEl=$("#fc");fcEl.min=isFT8()?20000:40000;fcEl.max=isFT8()?50000:200000;fcEl.step=isFT8()?5000:10000;fcEl.value=state.fc;
+  $("#ft8f0").value=state.ft8f0;$("#ft8f0Out").textContent=state.ft8f0+" Hz";
+  if(document.activeElement!==$("#ft8msg"))$("#ft8msg").value=state.msg;
+  $("#dec-"+state.dec).checked=true;
+  $("#lsVoiceLab").textContent=isFT8()?"FT8 tx":"Voice";
+  $("#s1title").textContent=isFT8()?"The message: an FT8 packet":"The message: a voice";
+  document.querySelectorAll('[data-listen="voice"]').forEach(b=>{if(!b.dataset.label)b.dataset.label=b.textContent;b.textContent=isFT8()?"Play the FT8 audio":b.dataset.label;});
+}
+function setMode(src){const was=isFT8();state.src=src;
+  if(isFT8()!==was){if(isFT8())Object.assign(state,{W:3000,fc:40000,rcIdx:43,noise:-15});else Object.assign(state,{W:4500,fc:100000,rcIdx:26,noise:61});
+    try{stopAudio();stopShot();}catch(e){}}}
+const rcFm=()=>isFT8()?state.ft8f0+50:state.src==="tone"?1000:state.W;
+function rcLimit(){const mu=state.mu;if(mu>1)return null;if(mu<=0)return Infinity;const fm=rcFm();return Math.sqrt(1-mu*mu)/(2*Math.PI*fm*mu);}
+function renderReadouts(){
+  const v=getVoice(),r=getRX(),mu=state.mu,eta=mu*mu*v.ms/(1+mu*mu*v.ms),lim=rcLimit();
+  const chip=mu>1?'<span class="chip bad">overmodulated</span>':'<span class="chip ok">μ ≤ 1</span>';
+  const rows=[["Envelope",chip],["Bandwidth 2W",(2*state.W/1000).toFixed(1)+" kHz"],["Voice share of power",(eta*100).toFixed(1)+" %"],
+    ["Carrier period",(1e6/state.fc).toFixed(1)+" µs"],["RC worst-case limit",lim===null?"none, μ > 1":lim===Infinity?"∞":lim===0?"0 µs at μ = 1":(lim*1e6).toFixed(0)+" µs"],
+    [isFT8()?"Noise, SNR in 2500 Hz":"RF noise C/N",noiseOn()?state.noise+" dB":"off"],
+    ...(isFT8()&&noiseOn()?[["AM carrier C/N in 2W",cnDB().toFixed(1)+" dB"]]:[]),
+    ["AM SNR, above-threshold formula",noiseOn()&&mu>0&&mu<=1?(10*Math.log10(eta*gammaLin())).toFixed(1)+" dB":mu>1?"n/a, μ > 1":"n/a"],
+    ...(amGap()!=null&&amGap()>1.5?[["AM state",'<span class="chip bad">below threshold</span>']]:[]),
+    ["AM receiver SNR",r.snr==null?"no modulation":r.snr>60?"> 60 dB":r.snr.toFixed(1)+" dB"]];
+  $("#readouts").innerHTML=rows.map(x=>`<dt>${x[0]}</dt><dd>${x[1]}</dd>`).join("");
+  $("#factBW").textContent=(2*state.W/1000).toFixed(1)+" kHz";$("#factEta").textContent=(eta*100).toFixed(1)+" %";
+}
+function renderS1(){
+  if(isFT8())return renderS1FT8();
+  const C=colors(),v=getVoice(),N=WIN(),seg=v.m.subarray(v.tc,v.tc+N),xs=msArr(seg.length,FSA);
+  drawPanels($("#cvVoice"),[{yr:[-1.15,1.15],yticks:[-1,0,1],series:[{x:xs,y:seg,color:C.m,width:1.8}],label:[["m(t)",C.m]]}],[0,20],{xTitle:"ms"});
+  const top=Math.min(FSA/2,state.W+2000),sp=spectrumDB(v.m,v.tc+N/2,8192,FSA,0,top);
+  drawPanels($("#cvVoiceSpec"),[{yr:[-70,5],yticks:[-60,-40,-20,0],series:[{x:sp.f.map(f=>f/1000),y:sp.p.map(p=>db(p,sp.mx)),color:C.m,width:1.4}],
+    vlines:[{x:state.W/1000,color:C.muted,dash:[4,4]}],notes:[{x:state.W/1000,y:-62,text:"W",color:C.muted}],label:[["|M(f)|, dB",C.m]]}],[0,top/1000],{xTitle:"kHz"});
+  const isV=state.src in FORM;
+  $("#voiceCap").textContent=isV?`20 ms of ${VOWEL[state.src]} at ${state.f0} Hz: one period every ${(1000/state.f0).toFixed(1)} ms.`:state.src==="tone"?"20 ms of a 1 kHz test tone: 20 cycles.":"The loudest 20 ms of your clip.";
+  $("#voiceSpecCap").textContent=isV?`Harmonics every ${state.f0} Hz. Formant peaks near ${FORM[state.src].slice(0,3).map(f=>f[0]).join(", ")} Hz shape the comb.`:state.src==="tone"?"A single line at 1 kHz.":"Spectrum of your clip around that moment, low-passed at W.";
+}
+function renderS2(){
+  const C=colors(),v=getVoice(),mu=state.mu,seg=v.m.subarray(v.tc,v.tc+WIN()),xs=msArr(seg.length,FSA);
+  const sm=seg.map(x=>mu*x),env=seg.map(x=>1+mu*x),neg=env.map(e=>e<0?e:NaN);
+  let sx=0;for(const q of sm)sx=Math.max(sx,Math.abs(q));const r1=Math.max(0.3,sx+0.15),lo=Math.min(-0.25,1-mu-0.15),hi=Math.max(1.25,1+sx+0.15);
+  drawPanels($("#cvOffset"),[
+    {yr:[-r1,r1],series:[{x:xs,y:sm,color:C.m,width:1.6}],label:[["μ·m(t)",C.m]]},
+    {yr:[lo,hi],fills:[{x:xs,y:neg,base:0,color:C.warn,alpha:0.3}],series:[{x:xs,y:env,color:C.ink,width:1.8},{x:xs,y:neg,color:C.warn,width:2.4}],
+      label:[["1 + μ·m(t)",C.ink]].concat(mu>1?[["below zero: overmodulation",C.warn]]:[])}],[0,20],{xTitle:"ms"});
+  let mn=Infinity;for(const e of env)mn=Math.min(mn,e);
+  $("#offsetCap").textContent=`μ = ${mu.toFixed(2)}. Lowest envelope value in this window: ${mn.toFixed(2)}.`+(mn<-1e-6?" The red stretch cannot be an amplitude.":mn<1e-6?" The envelope just touches zero at the deepest negative swing; any more modulation and it would fold.":" The envelope never reaches zero, so it is a faithful copy.");
+}
+function renderS3(){
+  const C=colors(),v=getVoice(),a=getAM(),I0=v.tc*UP,N=WIN()*UP,xs=msArr(N,FSR),x=a.x.subarray(I0,I0+N),e=a.env.subarray(I0,I0+N),ne=e.map(q=>-q);
+  let em=0;for(const q of e)em=Math.max(em,Math.abs(q));const R=Math.max(1.2,em)*1.08,z0=5,z1=5.3;
+  drawPanels($("#cvAM"),[{yr:[-R,R],series:[{x:xs,y:x,color:C.c,width:0.8},{x:xs,y:e,color:C.m,width:1.4,dash:[5,4]},{x:xs,y:ne,color:C.m,width:1.4,dash:[5,4]}],
+    bands:[{x0:z0,x1:z1,color:C.ink,alpha:0.1}],label:[["x(t)",C.c],["±(1 + μm)",C.m]]}],[0,20],{xTitle:"ms"});
+  const Z0=I0+Math.round(z0/1000*FSR),ZN=Math.round((z1-z0)/1000*FSR),zx=msArr(ZN,FSR,Math.round(z0/1000*FSR)),zz=a.x.subarray(Z0,Z0+ZN),ze=a.env.subarray(Z0,Z0+ZN);
+  const car=zx.map(t=>Math.cos(2*Math.PI*state.fc*(I0/FSR+t/1000)));
+  drawPanels($("#cvAMzoom"),[{yr:[-R,R],series:[{x:zx,y:car,color:C.muted,width:1,alpha:0.6,dash:[2,3]},{x:zx,y:zz,color:C.c,width:1.6},{x:zx,y:ze,color:C.m,width:1.4,dash:[5,4]},{x:zx,y:ze.map(q=>-q),color:C.m,width:1.4,dash:[5,4]}],
+    label:[["x(t)",C.c],["unmodulated carrier",C.muted]]}],[z0,z1],{xTitle:"ms"});
+  $("#amCap").textContent=`f_c = ${state.fc/1000} kHz: ${(state.fc/50).toFixed(0)} carrier cycles fill this 20 ms window. Shaded: the zoom below.`;
+  $("#amZoomCap").textContent=`0.3 ms zoom: ${(state.fc*0.0003).toFixed(0)} cycles. Dotted: the carrier before modulation. Same zero crossings, different heights.`+(state.mu>1?" Where 1 + μm < 0, the cycles flip sign: a 180° phase jump.":"");
+}
+function renderS4(){
+  const C=colors(),v=getVoice(),a=getAM(),fc=state.fc,W=state.W,span=W+2000,sp=spectrumDB(a.x,(v.tc+WIN()/2)*UP,SPN(),FSR,fc-span,fc+span);
+  const fk=sp.f.map(f=>f/1000),y=sp.p.map(p=>db(p,sp.mx)),gap=Math.min(60,state.f0/2);
+  const part=(test)=>y.map((q,i)=>test(sp.f[i])?q:NaN);
+  drawPanels($("#cvRF"),[{yr:[-80,5],yticks:[-60,-40,-20,0],
+    bands:[{x0:(fc-W)/1000,x1:fc/1000,color:C.l,alpha:0.08},{x0:fc/1000,x1:(fc+W)/1000,color:C.u,alpha:0.08}],
+    vlines:[{x:(fc-W)/1000,color:C.l,dash:[4,4]},{x:(fc+W)/1000,color:C.u,dash:[4,4]}],
+    series:[{x:fk,y:part(f=>f<fc-gap),color:C.l,width:1.3},{x:fk,y:part(f=>f>fc+gap),color:C.u,width:1.3},{x:fk,y:part(f=>Math.abs(f-fc)<=gap),color:C.c,width:2}],
+    notes:[{x:(fc-W/2)/1000,y:-74,text:"lower sideband",color:C.l},{x:(fc+W/2)/1000,y:-74,text:"upper sideband",color:C.u},{x:fc/1000,y:2,text:"carrier",color:C.c}],
+    label:[["|X(f)|, dB re carrier",C.ink]]}],[(fc-span)/1000,(fc+span)/1000],{xTitle:"kHz"});
+  $("#rfCap").textContent=`The LSB is the USB mirrored around f_c = ${fc/1000} kHz. Dashed edges at f_c ± W: total width ${(2*W/1000).toFixed(1)} kHz.`;
+  const mu=state.mu,eta=mu*mu*v.ms/(1+mu*mu*v.ms);
+  $("#powerNote").innerHTML=`<b>Power.</b> The carrier line holds A²/2 regardless of the voice. The sidebands hold μ²⟨m²⟩·A²/2, so the voice's share is μ²⟨m²⟩ / (1 + μ²⟨m²⟩). For this clip ⟨m²⟩ = ${v.ms.toFixed(3)} (scaled so the deepest negative swing is −1), giving <b>${(eta*100).toFixed(1)}%</b> at μ = ${mu.toFixed(2)}. Even a full-scale sine tone at μ = 1 only reaches 33%. ${isFT8()?"FT8 is a constant-amplitude tone, so it does as well as a sine can, and still most of":"Speech has a high peak-to-average ratio, so its share is much lower, and most of"} an AM transmitter's power goes into the carrier.`;
+}
+
+/* ---------- phasors ---------- */
+const ph={t:0.7,playing:!reduceMotion,last:0,visible:false,raf:0};
+function arrow(ctx,x0,y0,x1,y1,color,w){const dx=x1-x0,dy=y1-y0,len=Math.hypot(dx,dy);ctx.strokeStyle=color;ctx.fillStyle=color;ctx.lineWidth=w;ctx.lineCap="round";
+  const hl=Math.min(10,len*0.4),ux=dx/(len||1),uy=dy/(len||1);ctx.beginPath();ctx.moveTo(x0,y0);ctx.lineTo(x1-ux*hl*0.6,y1-uy*hl*0.6);ctx.stroke();
+  if(len>3){ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x1-ux*hl-uy*hl*0.45,y1-uy*hl+ux*hl*0.45);ctx.lineTo(x1-ux*hl+uy*hl*0.45,y1-uy*hl-ux*hl*0.45);ctx.closePath();ctx.fill();}}
+function drawPhasor(){
+  const C=colors(),cv=$("#cvPh"),w=cv.clientWidth;if(!w)return;const S=setup(cv,w),{ctx}=S,mu=state.mu,lab=state.frame==="lab",t=ph.t;
+  const wm=2*Math.PI*(lab?0.16:0.3),wc=2*Math.PI*0.9,th=wm*t,pc=lab?wc*t:0;
+  const ox=lab?w/2:w*0.26,oy=w/2,sc=lab?(w/2-16)/(1+mu):(w*0.68)/(1+mu),P=(x,y)=>[ox+x*sc,oy-y*sc];
+  ctx.strokeStyle=C.grid;ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(8,oy+0.5);ctx.lineTo(w-8,oy+0.5);ctx.moveTo(ox+0.5,8);ctx.lineTo(ox+0.5,w-8);ctx.stroke();
+  ctx.setLineDash([3,4]);ctx.strokeStyle=C.rule;ctx.beginPath();ctx.arc(ox,oy,sc,0,2*Math.PI);ctx.stroke();ctx.setLineDash([]);
+  const cX=Math.cos(pc),cY=Math.sin(pc),uX=cX+mu/2*Math.cos(pc+th),uY=cY+mu/2*Math.sin(pc+th),rX=uX+mu/2*Math.cos(pc-th),rY=uY+mu/2*Math.sin(pc-th);
+  const[o0,o1]=P(0,0),[c0,c1]=P(cX,cY),[u0,u1]=P(uX,uY),[r0,r1]=P(rX,rY);
+  ctx.globalAlpha=0.9;arrow(ctx,o0,o1,r0,r1,(1+mu*Math.cos(th))<0?C.warn:C.ink,4);ctx.globalAlpha=1;
+  arrow(ctx,o0,o1,c0,c1,C.c,2.2);arrow(ctx,c0,c1,u0,u1,C.u,2.2);arrow(ctx,u0,u1,r0,r1,C.l,2.2);
+  if(lab){ctx.setLineDash([3,3]);ctx.strokeStyle=C.muted;ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(r0,r1);ctx.lineTo(r0,oy);ctx.stroke();ctx.setLineDash([]);
+    ctx.beginPath();ctx.arc(r0,oy,4.5,0,2*Math.PI);ctx.fillStyle=C.c;ctx.fill();}
+  ctx.font="500 11px "+C.mono;ctx.textBaseline="middle";ctx.textAlign="left";
+  ctx.fillStyle=C.muted;ctx.fillText(lab?"Re":"carrier axis",w-8-ctx.measureText(lab?"Re":"carrier axis").width,oy-10);
+  ctx.fillStyle=C.c;ctx.fillText("carrier",10,16);ctx.fillStyle=C.u;ctx.fillText("USB μ/2",10,32);ctx.fillStyle=C.l;ctx.fillText("LSB μ/2",10,48);
+  ctx.fillStyle=C.ink;ctx.fillText("sum",10,64);
+  const env=1+mu*Math.cos(th);
+  $("#phCap").textContent=lab?`Everything turns at f_c; the sum's projection on Re is x(t). Length now ${env.toFixed(2)}.`:`Carrier held still. Sum length = 1 + μ cos ω_m t = ${env.toFixed(2)}`+(env<0?" (negative: overmodulated)":"")+".";
+  const span=lab?5:8,n=lab?900:500,xs=new Float64Array(n),ys=new Float64Array(n),ep=new Float64Array(n),en=new Float64Array(n);
+  for(let i=0;i<n;i++){const tau=t-span+span*i/(n-1),e=1+mu*Math.cos(wm*tau);xs[i]=tau;ep[i]=e;en[i]=-e;ys[i]=lab?e*Math.cos(wc*tau):e;}
+  const R=(1+mu)*1.1,lo=lab?-R:Math.min(-0.2,1-mu-0.15);
+  const pan={yr:[lo,R],series:lab?[{x:xs,y:ep,color:C.m,width:1.2,dash:[5,4]},{x:xs,y:en,color:C.m,width:1.2,dash:[5,4]},{x:xs,y:ys,color:C.c,width:1.6}]
+    :[{x:xs,y:ys,color:C.ink,width:2},{x:xs,y:ys.map(q=>q<0?q:NaN),color:C.warn,width:2.4}],
+    dots:[{x:t,y:ys[n-1],color:lab?C.c:C.ink,r:4.5}],label:lab?[["x(t) = Re{sum}",C.c],["±envelope",C.m]]:[["sum length = envelope",C.ink]]};
+  drawPanels($("#cvPhTrace"),[pan],[t-span,t],{xticks:[],xTitle:"time →"});
+}
+function drawLines(){
+  const C=colors(),cv=$("#cvLines"),S=setup(cv);if(!S)return;const{ctx,w,h}=S,mu=state.mu,base=h-28,top=14,sc=(base-top),xs=[w*0.25,w*0.5,w*0.75];
+  ctx.strokeStyle=C.rule;ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(16,base+0.5);ctx.lineTo(w-16,base+0.5);ctx.stroke();
+  [[xs[0],mu/2,C.l,"f_c − f_m"],[xs[1],1,C.c,"f_c"],[xs[2],mu/2,C.u,"f_c + f_m"]].forEach(([x,a,c,l])=>{
+    const y=base-Math.min(1,a)*sc;ctx.strokeStyle=c;ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(x,base);ctx.lineTo(x,y);ctx.stroke();
+    ctx.beginPath();ctx.arc(x,y,4,0,2*Math.PI);ctx.fillStyle=c;ctx.fill();
+    ctx.font="500 11px "+C.mono;ctx.textAlign="center";ctx.textBaseline="top";ctx.fillStyle=c;ctx.fillText(l,x,base+6);
+    ctx.textBaseline="bottom";ctx.fillText(a.toFixed(2),x+(x===xs[1]?0:0),y-6);});
+  $("#phTraceCap").textContent=`Bottom: the same three phasors as lines in the spectrum, with amplitudes 1 and μ/2 = ${(mu/2).toFixed(2)}.`;
+}
+function phLoop(ts){ph.raf=0;if(!ph.playing||!ph.visible){ph.last=0;return;}
+  if(ph.last)ph.t+=Math.min(0.1,(ts-ph.last)/1000);ph.last=ts;drawPhasor();ph.raf=requestAnimationFrame(phLoop);}
+function phKick(){if(ph.playing&&ph.visible&&!ph.raf){ph.last=0;ph.raf=requestAnimationFrame(phLoop);}}
+
+function renderS6(){
+  const C=colors(),v=getVoice(),a=getAM(),r=getRX(),I0=v.tc*UP,N=WIN()*UP,xs=msArr(N,FSR);
+  const x=r.y.subarray(I0,I0+N),e=a.env.subarray(I0,I0+N),d=r.v.subarray(I0,I0+N);let em=0;for(const q of e)em=Math.max(em,Math.abs(q));const R=Math.max(1.2,em)*1.08;
+  let zc=0,best=Infinity;for(let i=200;i<N-200;i+=10){const s=e[i+100]-e[i];if(s<best){best=s;zc=i;}}
+  const zms=zc/FSR*1000,z0=Math.max(0,zms-0.15),z1=z0+0.5;
+  const ra=r.r.subarray(v.tc,v.tc+WIN()),ea=r.e.subarray(v.tc,v.tc+WIN()),xa=msArr(ra.length,FSA);let g=0,gg=0;for(let i=0;i<ra.length;i++){g+=ra[i]*ea[i];gg+=ea[i]*ea[i];}
+  const gain=gg>1e-9?g/gg:1,rs=Array.from(ra,q=>q/(gain||1));let am2=0;for(const q of ea)am2=Math.max(am2,Math.abs(q));const ar=Math.max(0.3,am2*1.2);
+  drawPanels($("#cvRx"),[
+    {yr:[-R,R],bands:[{x0:z0,x1:z1,color:C.ink,alpha:0.1}],series:[{x:xs,y:x,color:C.c,width:0.7,alpha:0.4},{x:xs,y:e,color:C.m,width:1.4,dash:[5,4]},{x:xs,y:d,color:C.ink,width:1.5}],
+      label:[["detector output",C.ink],["ideal 1 + μm",C.m]]},
+    {yr:[-ar,ar],series:[{x:xa,y:ea,color:C.m,width:2,alpha:0.6},{x:xa,y:rs,color:C.ink,width:1.5}],label:[["recovered, after series C and LPF",C.ink],["μm(t)",C.m]]}
+  ],[0,20],{xTitle:"ms"});
+  const Z0=I0+Math.round(z0/1000*FSR),ZN=Math.round(0.5/1000*FSR),zx=msArr(ZN,FSR,Math.round(z0/1000*FSR));
+  drawPanels($("#cvRxZoom"),[{yr:[-R,R],series:[{x:zx,y:r.y.subarray(Z0,Z0+ZN),color:C.c,width:1.2,alpha:0.7},{x:zx,y:a.env.subarray(Z0,Z0+ZN),color:C.m,width:1.4,dash:[5,4]},{x:zx,y:r.v.subarray(Z0,Z0+ZN),color:C.ink,width:1.8}],
+    label:[["capacitor voltage",C.ink],["received, after LC",C.c]]}],[z0,z1],{xTitle:"ms"});
+  const fc=state.fc,Wd=state.W,span=4*Wd,sp=spectrumDB(r.y,(v.tc+WIN()/2)*UP,SPN(),FSR,fc-span,fc+span);
+  const cref=sp.mx;drawPanels($("#cvRxSpec"),[{yr:[-90,5],yticks:[-80,-60,-40,-20,0],
+    bands:[{x0:(fc-Wd)/1000,x1:(fc+Wd)/1000,color:C.c,alpha:0.07}],vlines:[{x:(fc-Wd)/1000,color:C.muted,dash:[4,4]},{x:(fc+Wd)/1000,color:C.muted,dash:[4,4]}],
+    series:[{x:sp.f.map(f=>f/1000),y:sp.p.map(q=>db(q,cref)),color:C.c,width:1.2}],label:[["received after tuned LC, dB re carrier",C.c]]}],[(fc-span)/1000,(fc+span)/1000],{xTitle:"kHz"});
+  $("#rxSpecCap").textContent=noiseOn()?`${isFT8()?`SNR ${state.noise} dB in 2500 Hz; AM carrier C/N ${cnDB().toFixed(1)} dB in the shaded 2W band.`:`C/N = ${state.noise} dB in the shaded 2W band.`} The noise floor is shaped by the resonator's skirts; sidebands sink into it as C/N falls.`:"No noise: the station after the tuned circuit. Move the RF noise slider to add some.";
+  const rcus=RC()*1e6,T=1e6/state.fc,lim=rcLimit();
+  $("#rxCap").textContent=`Top: carrier faint, capacitor voltage solid. Bottom: receiver output over the original, gain-matched. Shaded: the zoom below, placed where the envelope falls fastest.`;
+  $("#rxZoomCap").textContent=`0.5 ms zoom. Each diode pulse charges C to a carrier peak; between peaks it decays with RC = ${rcus.toFixed(rcus<10?1:0)} µs.`;
+  let msg;
+  const gap=amGap();
+  if(state.mu>1)msg=`<span class="cw">Overmodulated.</span> The detector follows |1 + μm|, which folds the negative excursions upward. No choice of RC can fix this, because the information was lost at the transmitter.`;
+  else if(rcus<1.5*T)msg=`<span class="cw">RC short.</span> At ${rcus.toFixed(1)} µs against a ${T.toFixed(1)} µs carrier period, the capacitor nearly empties between peaks, so a large ripple at f_c rides on the detector output (see the zoom). The audio filter removes it, so it barely shows in the SNR.`;
+  else if(lim!==Infinity&&RC()>lim)msg=`<span class="cw">RC above the worst-case limit.</span> `+(lim===0?`At μ = 1 a full-scale tone drives the envelope to zero, and no RC can follow it all the way down.`:`${rcus.toFixed(0)} µs exceeds ${(lim*1e6).toFixed(0)} µs, the limit for a full-scale tone at ${(rcFm()/1000).toFixed(2)} kHz with μ = ${state.mu.toFixed(2)}.`)+` Where the envelope falls faster than the capacitor discharges, the output follows an exponential instead (diagonal clipping). How much that costs depends on how much of the message sits near that frequency; for speech it is usually small.`;
+  else msg=`RC = ${rcus.toFixed(0)} µs falls between the carrier period (${T.toFixed(1)} µs) and the tracking limit (${lim===Infinity?"none at μ = 0":(lim*1e6).toFixed(0)+" µs"}), so the output tracks the envelope.`;
+  if(state.mu<=1&&gap!=null&&gap>1.5)msg=`<span class="cw">Below threshold.</span> At ${cnDB().toFixed(1)} dB C/N in 2W the measured SNR is ${gap.toFixed(1)} dB under the above-threshold formula: the noise envelope often exceeds the carrier inside the tuned circuit, and the detector output starts to follow the noise. This is the AM threshold effect; a product detector would not show it.`;
+  else if(noiseOn()&&!/cw/.test(msg))msg+=` With noise at ${noiseText()}, the hiss you hear is the in-phase noise component riding on the envelope.`;
+  $("#rxNote").innerHTML=msg+(r.snr==null?"":` The recovered audio matches the original to <b>${r.snr>60?"better than 60":r.snr.toFixed(1)} dB</b> SNR.`);
+}
+
+/* ---------- FT8 packet: pack, CRC, parity, tones ---------- */
+function erf(x){const sg=x<0?-1:1;x=Math.abs(x);const t=1/(1+0.3275911*x);return sg*(1-((((1.061405429*t-1.453152027)*t+1.421413741)*t-0.284496736)*t+0.254829592)*t*Math.exp(-x*x));}
+const FT8={costas:[3,1,4,0,6,5,2],gray:[0,1,3,2,5,6,4,7],T:0.16,start:0.32,dur:13.6};
+const GRAYINV=[0,1,3,2,6,4,5,7];
+const isSync=s=>s<7||(s>=36&&s<43)||s>=72;
+const DATA_IDX=(()=>{const a=[];for(let s=0;s<79;s++)if(!isSync(s))a.push(s);return a;})();
+const CH1=" 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ",CH2="0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ",CH3="0123456789",CH4=" ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+const NTOK=2063592,MAX22=4194304,MAXGRID4=32400;
+function packCall(c,first){
+  if(first){if(c==="DE")return 0;if(c==="QRZ")return 1;if(c==="CQ")return 2;}
+  if(!/^[A-Z0-9]{3,6}$/.test(c)||!/[A-Z]/.test(c))return null;let s=c;
+  if(!/[0-9]/.test(s[2]||"")){if(/[0-9]/.test(s[1]))s=" "+s;else return null;}
+  if(s.length>6)return null;s=s.padEnd(6," ");
+  if(/ [A-Z]/.test(s.slice(3)))return null;
+  const i=[CH1.indexOf(s[0]),CH2.indexOf(s[1]),CH3.indexOf(s[2]),CH4.indexOf(s[3]),CH4.indexOf(s[4]),CH4.indexOf(s[5])];
+  if(i.some(v=>v<0))return null;
+  return NTOK+MAX22+((((i[0]*36+i[1])*10+i[2])*27+i[3])*27+i[4])*27+i[5];}
+function unpackCall(n){
+  if(n<NTOK)return n===0?"DE":n===1?"QRZ":n===2?"CQ":"<token>";
+  let v=n-NTOK-MAX22;if(v<0)return"<hash>";
+  const i5=v%27;v=Math.floor(v/27);const i4=v%27;v=Math.floor(v/27);const i3=v%27;v=Math.floor(v/27);
+  const i2=v%10;v=Math.floor(v/10);const i1=v%36;v=Math.floor(v/36);
+  if(v>=CH1.length)return"<?>";return(CH1[v]+CH2[i1]+CH3[i2]+CH4[i3]+CH4[i4]+CH4[i5]).trim();}
+function packGrid(g){if(g==="")return MAXGRID4+1;if(g==="RRR")return MAXGRID4+2;if(g==="RR73")return MAXGRID4+3;if(g==="73")return MAXGRID4+4;
+  if(!/^[A-R][A-R][0-9][0-9]$/.test(g))return null;return((g.charCodeAt(0)-65)*18+(g.charCodeAt(1)-65))*100+(+g[2])*10+(+g[3]);}
+function unpackGrid(v){if(v<MAXGRID4){const d=v%100,l=Math.floor(v/100);return String.fromCharCode(65+Math.floor(l/18),65+l%18)+String(Math.floor(d/10))+String(d%10);}
+  const ir=v-MAXGRID4;if(ir<=4)return["","","RRR","RR73","73"][ir]||"";const dd=ir-35;return(dd<0?"-":"+")+String(Math.abs(dd)).padStart(2,"0");}
+const bitsOf=(n,k)=>{const b=[];for(let j=k-1;j>=0;j--)b.push(Math.floor(n/Math.pow(2,j))%2);return b;};
+const valOf=(b,a,e)=>{let v=0;for(let i=a;i<e;i++)v=v*2+b[i];return v;};
+function crc14(bits){let c=0;for(const b of bits){const fb=((c>>13)&1)^b;c=(c<<1)&0x3FFF;if(fb)c^=0x2757;}return c;}
+/* FT8 (174,91) LDPC code from WSJT-X, as tabulated in ft8_lib (kFTX_LDPC_generator, kFTX_LDPC_Nm) */
+const LDPC_GEN=["8329ce11bf31eaf509f27fc0", "761c264e25c2593354931320", "dc265902fb277c6410a1bdc0", "1b3f417858cd2dd33ec7f620", "09fda4fee04195fd034783a0", "077cccc11b8873ed5c3d48a0", "29b62afe3ca036f4fe1a9da0", "6054faf5f35d96d3b0c8c3e0", "e20798e4310eed27884ae900", "775c9c08e80e26ddae563180", "b0b811028c2bf997213487c0", "18a0c9231fc60adf5c5ea320", "76471e8302a0721e01b12b80", "ffbccb80ca8341fafb47b2e0", "66a72a158f9325a2bf671700", "c4243689fe85b1c51363a180", "0dff739414d1a1b34b1c2700", "15b48830636c8b99894972e0", "29a89c0d3de81d665489b0e0", "4f126f37fa51cbe61bd6b940", "99c47239d0d97d3c84e09400", "1919b75119765621bb4f1e80", "09db12d731faee0b86df6b80", "488fc33df43fbdeea4eafb40", "827423ee40b675f756eb5fe0", "abe197c484cb74757144a9a0", "2b500e4bc0ec5a6d2bdbdd00", "c474aa53d702187616693600", "8eba1a13db3390bd6718cec0", "753844673a27782cc42012e0", "06ff83a145c37035a5c12680", "3b37417858cc2dd33ec3f620", "9a4a5a28ee17ca9c324842c0", "bc29f465309c977e89610a40", "2663ae6ddf8b5ce2bb294880", "46f231efe457034c18144180", "3fb2ce85abe9b0c72e06fbe0", "de87481f282c153971a0a2e0", "fcd7ccf23c69fa99bba14120", "f0261447e9490ca8e474cec0", "4410115818196f95cdd70120", "088fc31df4bfbde2a4eafb40", "b8fef1b6307729fb0a078c00", "5afea7acccb77bbc9d99a900", "49a7016ac653f65ecdc90760", "1944d085be4e7da8d6cc7d00", "251f62adc4032f0ee7140020", "56471f8702a0721e00b12b80", "2b8e4923f2dd51e2d537fa00", "6b550a40a66f4755de95c260", "a18ad28d4e27fe92a4f6c840", "10c2e586388cb82a3d807580", "ef34a41817ee02133db2eb00", "7e9c0c54325a9c15836e0000", "3693e572d1fde4cdf079e860", "bfb2cec5abe1b0c72e07fbe0", "7ee18230c583cccc57d4b080", "a066cb2fedafc9f526641260", "bb23725abc47cc5f4cc4cd20", "ded9dba3bee40c59b5609b40", "d9a7016ac653e6decdc90360", "9ad46aed5f707f280ab5fc40", "e5921c77822587316d7d3c20", "4f14da8242a8b86dca733520", "8b8b507ad467d4441df770e0", "22831c9cf1169467ad04b680", "213b838fe2ae54c38ee71800", "5d926b6dd71f085181a4e120", "66ab79d4b29ee6e69509e560", "958148682d748a38dd68baa0", "b8ce020cf069c32a723ab140", "f4331d6d461607e957527460", "6da23ba424b9596133cf9c80", "a636bcbc7b30c5fbeae67fe0", "5cb0d86a07df654a9089a200", "f11f106848780fc9ecdd80a0", "1fbb5364fb8d2c9d730d5ba0", "fcb86bc70a50c9d02a5d0340", "a534433029eac15f322e34c0", "c989d9c7c3d3b8c55d751300", "7bb38b2f0186d46643ae9620", "2644ebadeb44b9467d1f42c0", "608cc857594bfbb55d696000"];
+const LDPC_NM=[[4,31,59,91,92,96,153],[5,32,60,93,115,146],[6,24,61,94,122,151],[7,33,62,95,96,143],[8,25,63,83,93,96,148],[6,32,64,97,126,138],[5,34,65,78,98,107,154],[9,35,66,99,139,146],[10,36,67,100,107,126],[11,37,67,87,101,139,158],[12,38,68,102,105,155],[13,39,69,103,149,162],[8,40,70,82,104,114,145],[14,41,71,88,102,123,156],[15,42,59,106,123,159],[1,33,72,106,107,157],[16,43,73,108,141,160],[17,37,74,81,109,131,154],[11,44,75,110,121,166],[45,55,64,111,130,161,173],[8,46,71,112,119,166],[18,36,76,89,113,114,143],[19,38,77,104,116,163],[20,47,70,92,138,165],[2,48,74,113,128,160],[21,45,78,83,117,121,151],[22,47,58,118,127,164],[16,39,62,112,134,158],[23,43,79,120,131,145],[19,35,59,73,110,125,161],[20,36,63,94,136,161],[14,31,79,98,132,164],[3,44,80,124,127,169],[19,46,81,117,135,167],[7,49,58,90,100,105,168],[12,50,61,118,119,144],[13,51,64,114,118,157],[24,52,76,129,148,149],[25,53,69,90,101,130,156],[20,46,65,80,120,140,170],[21,54,77,100,140,171],[35,82,133,142,171,174],[14,30,83,113,125,170],[4,29,68,120,134,173],[1,4,52,57,86,136,152],[26,51,56,91,122,137,168],[52,84,110,115,145,168],[7,50,81,99,132,173],[23,55,67,95,172,174],[26,41,77,109,141,148],[2,27,41,61,62,115,133],[27,40,56,124,125,126],[18,49,55,124,141,167],[6,33,85,108,116,156],[28,48,70,85,105,129,158],[9,54,63,131,147,155],[22,53,68,109,121,174],[3,13,48,78,95,123],[31,69,133,150,155,169],[12,43,66,89,97,135,159],[5,39,75,102,136,167],[2,54,86,101,135,164],[15,56,87,108,119,171],[10,44,82,91,111,144,149],[23,34,71,94,127,153],[11,49,88,92,142,157],[29,34,87,97,147,162],[30,50,60,86,137,142,162],[10,53,66,84,112,128,165],[22,57,85,93,140,159],[28,32,72,103,132,166],[28,29,84,88,117,143,150],[1,26,45,80,128,147],[17,27,89,103,116,153],[51,57,98,163,165,172],[21,37,73,138,152,169],[16,47,76,130,137,154],[3,24,30,72,104,139],[9,40,90,106,134,151],[15,58,60,74,111,150,163],[18,42,79,144,146,152],[25,38,65,99,122,160],[17,42,75,129,170,172]];
+const CODE=(()=>{const gen=LDPC_GEN.map(h=>{const b=[];for(const ch of h)b.push(...bitsOf(parseInt(ch,16),4));return b.slice(0,91);});
+  return{K:91,M:83,gen,chk:LDPC_NM.map(r=>r.map(v=>v-1))};})();
+function ldpcEncode(u){return CODE.gen.map(g=>{let s=0;for(let j=0;j<91;j++)s^=g[j]&u[j];return s;});}
+function ldpcDecode(llr){const chk=CODE.chk,N=174,M=chk.length,c2v=chk.map(r=>new Float64Array(r.length)),tot=new Float64Array(N),hard=new Uint8Array(N);
+  let ok=false,it=0;
+  for(it=0;it<80;it++){
+    for(let v=0;v<N;v++)tot[v]=llr[v];
+    for(let m=0;m<M;m++){const r=chk[m];for(let i=0;i<r.length;i++)tot[r[i]]+=c2v[m][i];}
+    for(let v=0;v<N;v++)hard[v]=tot[v]<0?1:0;
+    ok=true;for(let m=0;m<M&&ok;m++){let s=0;for(const v of chk[m])s^=hard[v];if(s)ok=false;}
+    if(ok)break;
+    for(let m=0;m<M;m++){const r=chk[m],L=r.length,q=new Float64Array(L);let sg=1,m1=Infinity,m2=Infinity,im=-1;
+      for(let i=0;i<L;i++){q[i]=tot[r[i]]-c2v[m][i];const a=Math.abs(q[i]);if(q[i]<0)sg=-sg;if(a<m1){m2=m1;m1=a;im=i;}else if(a<m2)m2=a;}
+      for(let i=0;i<L;i++){c2v[m][i]=sg*(q[i]<0?-1:1)*(i===im?m2:m1)*0.8;}}}
+  return{bits:Array.from(hard),ok,iters:it};}
+function ft8Encode(text){
+  const t=text.trim().toUpperCase().split(/\s+/).filter(Boolean);
+  if(t.length<2||t.length>3)return{err:"Use the form CQ K1ABC FN42, K1ABC W9XYZ −12 or K1ABC W9XYZ RR73."};
+  const n1=packCall(t[0],true),n2=packCall(t[1],false),x3=t[2]||"",rm=x3.match(/^(R?)([+-])(\d{2})$/);let g=packGrid(x3),R1=0;
+  if(rm){const dd=(rm[2]==="-"?-1:1)*(+rm[3]);if(dd<-30||dd>30)return{err:"Signal reports run from −30 to +30 dB."};g=MAXGRID4+35+dd;R1=rm[1]?1:0;}
+  if(n1==null)return{err:`“${t[0]}” is not CQ, DE, QRZ or a standard callsign.`};
+  if(n2==null)return{err:`“${t[1]}” is not a standard callsign.`};
+  if(g==null)return{err:`“${t[2]}” is not a 4-character grid (such as FN42), a report (−12, R+05), RRR, RR73 or 73.`};
+  const fields=[{name:"call 1",k:28,v:n1,text:t[0]},{name:"/R flag",k:1,v:0,text:"0"},{name:"call 2",k:28,v:n2,text:t[1]},
+    {name:"/R flag",k:1,v:0,text:"0"},{name:"R prefix",k:1,v:R1,text:String(R1)},{name:rm?"report":"grid",k:15,v:g,text:rm?(rm[2]+rm[3]):(t[2]||"blank")},{name:"type i3",k:3,v:1,text:"standard"}];
+  const msg=[];fields.forEach(f=>msg.push(...bitsOf(f.v,f.k)));
+  const crc=crc14(msg.concat([0,0,0,0,0])),crcB=bitsOf(crc,14),u=msg.concat(crcB),p=ldpcEncode(u),cw=u.concat(p);
+  const tones=[];let bi=0;
+  for(let s=0;s<79;s++){if(s<7)tones.push(FT8.costas[s]);else if(s>=36&&s<43)tones.push(FT8.costas[s-36]);else if(s>=72)tones.push(FT8.costas[s-72]);
+    else{tones.push(FT8.gray[cw[bi]*4+cw[bi+1]*2+cw[bi+2]]);bi+=3;}}
+  return{text:t.join(" "),fields,msg,crc,crcB,u,p,cw,tones};}
+const unpackMsg=b=>{if(valOf(b,74,77)!==1)return"(not a standard message)";
+  return[unpackCall(valOf(b,0,28)),unpackCall(valOf(b,29,57)),(valOf(b,59,74)>MAXGRID4+4&&b[58]?"R":"")+unpackGrid(valOf(b,59,74))].filter(Boolean).join(" ");};
+let ft8c={msg:null};
+function getFT8(){if(ft8c.msg!==state.msg){const e=ft8Encode(state.msg);if(!e.err){ft8c=e;ft8c.msg=state.msg;}}return ft8c;}
+function ft8Audio(tones){
+  const fs=FSA,ns=Math.round(FT8.T*fs),n=Math.round(FT8.dur*fs),i0=Math.round(FT8.start*fs),N=79,m=new Float32Array(n);
+  const kap=Math.PI*2*Math.sqrt(2/Math.LN2),g=u=>0.5*(erf(kap*(u+0.5))-erf(kap*(u-0.5)));
+  const f0=state.ft8f0,ramp=Math.round(ns/8),tot=N*ns;let ph=0;
+  for(let j=0;j<tot;j++){const u=j/ns,kc=Math.floor(u);let s=0;
+    for(let k=kc-2;k<=kc+2;k++)s+=tones[Math.min(N-1,Math.max(0,k))]*g(u-(k+0.5));
+    ph+=2*Math.PI*(f0+6.25*s)/fs;let a=1;if(j<ramp)a=0.5-0.5*Math.cos(Math.PI*j/ramp);else if(j>tot-ramp)a=0.5-0.5*Math.cos(Math.PI*(tot-j)/ramp);
+    m[i0+j]=a*Math.sin(ph);}
+  return{m,i0,i1:i0+tot};}
+
+/* ---------- FT8 decoder ---------- */
+function ft8Decode(audio,enc){
+  const FS2=6400,ns=1024,hop=128,nfft=2048,df=FS2/nfft;
+  const lp=butter4(audio,FSA,3000),L2=Math.floor(audio.length*FS2/FSA),x=new Float32Array(L2),rr=FSA/FS2;
+  for(let i=0;i<L2;i++){const p=i*rr,j=p|0,f=p-j;x[i]=lp[j]+((j+1<lp.length?lp[j+1]:lp[j])-lp[j])*f;}
+  const fLo=200,fHi=3000,b0=Math.floor(fLo/df),b1=Math.ceil(fHi/df),nb=b1-b0+1;
+  const nfr=Math.floor((L2-ns)/hop)+1,S=new Float32Array(nfr*nb),re=new Float64Array(nfft),im=new Float64Array(nfft);
+  for(let fr=0;fr<nfr;fr++){re.fill(0);im.fill(0);const o=fr*hop;for(let i=0;i<ns;i++)re[i]=x[o+i];fft(re,im);
+    for(let b=0;b<nb;b++){const k=b0+b;S[fr*nb+b]=re[k]*re[k]+im[k]*im[k];}}
+  const t0max=nfr-1-8*78;let best=-1,bt=0,bf=0;
+  for(let t0=0;t0<=t0max;t0++)for(let fb=0;fb+14<nb;fb++){let sig=0,oth=0;
+    for(const g of [0,36,72])for(let s=0;s<7;s++){const row=(t0+8*(g+s))*nb+fb;let all=0;for(let k=0;k<8;k++)all+=S[row+2*k];const v=S[row+2*FT8.costas[s]];sig+=v;oth+=all-v;}
+    const mtr=sig/(oth/7+1e-30);if(mtr>best){best=mtr;bt=t0;bf=fb;}}
+  const P=[];for(let s=0;s<79;s++){const row=(bt+8*s)*nb+bf,pk=[];for(let k=0;k<8;k++)pk.push(S[row+2*k]);P.push(pk);}
+  let noise=0,amp=0;for(const s of DATA_IDX){const o=P[s].slice().sort((a,b)=>a-b);noise+=(o[0]+o[1]+o[2]+o[3]+o[4]+o[5])/6;amp+=Math.sqrt(o[7]);}
+  noise/=DATA_IDX.length;amp/=DATA_IDX.length;const sc=2*amp/Math.max(noise,1e-30);
+  const llr=[],hardTones=[];
+  for(const s of DATA_IDX){const a=P[s].map(Math.sqrt);let km=0;for(let k=1;k<8;k++)if(a[k]>a[km])km=k;hardTones.push(km);
+    for(let j=0;j<3;j++){let m0=-1,m1=-1;for(let k=0;k<8;k++){if((GRAYINV[k]>>(2-j))&1)m1=Math.max(m1,a[k]);else m0=Math.max(m0,a[k]);}
+      llr.push(Math.max(-25,Math.min(25,sc*(m0-m1))));}}
+  let symErr=0;DATA_IDX.forEach((s,i)=>{if(hardTones[i]!==enc.tones[s])symErr++;});
+  let bitErrPre=0;llr.forEach((l,i)=>{if((l<0?1:0)!==enc.cw[i])bitErrPre++;});
+  const dec=ldpcDecode(llr);let bitErrPost=0;dec.bits.forEach((b,i)=>{if(b!==enc.cw[i])bitErrPost++;});
+  const u=dec.bits.slice(0,91),msg=u.slice(0,77),crcOk=dec.ok&&crc14(msg.concat([0,0,0,0,0]))===valOf(u,77,91);
+  const synced=best>=SYNC_MIN;
+  return{spec:{S,nfr,nb,b0,hop,FS2,df},bt,bf,dt:bt*hop/FS2-FT8.start,freq:(b0+bf)*df,sync:best,synced,hardTones,symErr,bitErrPre,bitErrPost,
+    crcOk:synced&&crcOk,iters:dec.iters,text:synced&&crcOk?unpackMsg(msg):null};}
+const SYNC_MIN=2.5;
+
+/* ---------- DSB-SC and SSB ---------- */
+function upval(arr,i){const L=arr.length,j=(i/UP)|0,fr=(i-j*UP)/UP,a=arr[j],b=arr[Math.min(j+1,L-1)];return a+(b-a)*fr;}
+function dec(x){const N=Math.floor(x.length/UP),r=new Float32Array(N);let m=0;for(let j=0;j<N;j++){r[j]=x[j*UP];m+=r[j];}m/=N;for(let j=0;j<N;j++)r[j]-=m;return r;}
+function snrOf(r,e,span){const n=Math.min(r.length,e.length,span?span[1]:Infinity)-1,j0=Math.max(1,Math.round(0.02*FSA),span?span[0]:0);let a11=0,a12=0,a22=0,b1=0,b2=0;
+  for(let j=j0;j<n;j++){const d=0.5*(e[j+1]-e[j-1]);a11+=e[j]*e[j];a12+=e[j]*d;a22+=d*d;b1+=r[j]*e[j];b2+=r[j]*d;}
+  if(a11<1e-6)return null;const det=a11*a22-a12*a12;let g1,g2;if(Math.abs(det)<1e-12*a11*a22||a22<1e-12){g1=b1/a11;g2=0;}else{g1=(b1*a22-b2*a12)/det;g2=(a11*b2-a12*b1)/det;}
+  let err=0,sig=0;for(let j=j0;j<n;j++){const d=0.5*(e[j+1]-e[j-1]),f=g1*e[j]+g2*d,q=r[j]-f;err+=q*q;sig+=f*f;}if(sig<1e-9*a11)return null;
+  return 10*Math.log10(sig/Math.max(err,1e-12));}
+function addNoise(x){const n=x.length,y=new Float32Array(n),sg=noiseOn()?sigmaN():0;if(sg){const z=getNoise(n);for(let i=0;i<n;i++)y[i]=x[i]+sg*z[i];}else y.set(x);return y;}
+let hil={key:null};
+function getHilbert(){const v=getVoice();if(hil.key===v.key)return hil;const L=v.m.length;let N=1;while(N<L)N<<=1;
+  const re=new Float64Array(N),im=new Float64Array(N);for(let i=0;i<L;i++)re[i]=v.m[i];fft(re,im);
+  for(let k=1;k<N/2;k++){re[k]*=2;im[k]*=2;}for(let k=N/2+1;k<N;k++){re[k]=0;im[k]=0;}
+  for(let k=0;k<N;k++)im[k]=-im[k];fft(re,im);const mh=new Float32Array(L);for(let i=0;i<L;i++)mh[i]=-im[i]/N;
+  hil={key:v.key,mh};return hil;}
+const txC={};
+function getTx(kind){const v=getVoice(),a=getAM(),key=a.key+"|"+kind+(kind==="ssb"?state.sb:"");
+  if(txC[kind]&&txC[kind].key===key)return txC[kind];
+  const n=a.x.length,x=new Float32Array(n),w=2*Math.PI*state.fc/FSR,mh=kind==="ssb"?getHilbert().mh:null,sgn=state.sb==="usb"?-1:1;
+  let pa=0,px=0;const s0=v.span[0]*UP,s1=v.span[1]*UP;
+  for(let i=0;i<n;i++){let s=upval(v.m,i)*Math.cos(w*i);if(mh)s+=sgn*upval(mh,i)*Math.sin(w*i);x[i]=s;if(i>=s0&&i<s1){px+=s*s;pa+=a.x[i]*a.x[i];}}
+  const g=Math.sqrt(pa/Math.max(px,1e-12));for(let i=0;i<n;i++)x[i]*=g;
+  return txC[kind]={key,x,g,P:pa/(s1-s0)};}
+function prodDet(y,ph){const n=y.length,w=2*Math.PI*state.fc/FSR,p=new Float32Array(n);for(let i=0;i<n;i++)p[i]=2*y[i]*Math.cos(w*i+ph);return dec(butter4(p,FSR,state.W));}
+function ssbDet(y,df){const n=y.length,s=state.sb==="usb"?1:-1,f1=state.fc+df+s*state.W/2,w=2*Math.PI*f1/FSR,ws=s*Math.PI*state.W/FSR;
+  let zi=new Float32Array(n),zq=new Float32Array(n);for(let i=0;i<n;i++){zi[i]=y[i]*Math.cos(w*i);zq[i]=-y[i]*Math.sin(w*i);}
+  zi=butter4(zi,FSR,state.W/2);zq=butter4(zq,FSR,state.W/2);const o=new Float32Array(n);
+  for(let i=0;i<n;i++){const t=ws*i;o[i]=2*(zi[i]*Math.cos(t)-zq[i]*Math.sin(t));}return dec(o);}
+function envDet(y){const yb=bandpass(y,FSR,state.fc,3*state.W),decay=Math.exp(-1/(FSR*RC())),v=new Float32Array(yb.length);let p=0;
+  for(let i=0;i<yb.length;i++){p*=decay;if(yb[i]>p)p=yb[i];v[i]=p;}return dec(butter4(v,FSR,state.W));}
+const rxC={};
+function getDsbRx(){const t=getTx("dsb"),key=t.key+"|"+state.noise+"|"+state.phi+"|"+state.rcIdx;if(rxC.dsb&&rxC.dsb.key===key)return rxC.dsb;
+  if(!t.ref)t.ref=prodDet(t.x,0);const y=addNoise(t.x),ph=state.phi*Math.PI/180,out=prodDet(y,ph),out0=state.phi?prodDet(y,0):out,env=envDet(y);
+  return rxC.dsb={key,out,env,snr0:snrOf(out0,t.ref,getVoice().span),snr:snrOf(out,t.ref,getVoice().span)};}
+function getSsbRx(){const t=getTx("ssb"),key=t.key+"|"+state.noise+"|"+state.dfo;if(rxC.ssb&&rxC.ssb.key===key)return rxC.ssb;
+  if(!t.ref)t.ref=ssbDet(t.x,0);const y=addNoise(t.x),out=ssbDet(y,state.dfo),out0=state.dfo?ssbDet(y,0):out;
+  return rxC.ssb={key,out,snr0:snrOf(out0,t.ref,getVoice().span)};}
+const fitTo=(seg,ref)=>{let a=0,b=0;for(let i=0;i<seg.length;i++){a+=seg[i]*ref[i];b+=seg[i]*seg[i];}const g=b>1e-12?a/b:1;return Array.from(seg,q=>q*g);};
+const maxAbs=a=>{let m=0;for(const q of a)m=Math.max(m,Math.abs(q));return m;};
+function sbSeries(C,sp,fc,gap){const fk=sp.f.map(f=>f/1000),y=sp.p.map(p=>db(p,sp.mx)),part=t=>y.map((q,i)=>t(sp.f[i])?q:NaN);
+  return[{x:fk,y:part(f=>f<fc-gap),color:C.l,width:1.3},{x:fk,y:part(f=>f>fc+gap),color:C.u,width:1.3},{x:fk,y:part(f=>Math.abs(f-fc)<=gap),color:C.c,width:2}];}
+
+function renderS7(){
+  const C=colors(),v=getVoice(),t=getTx("dsb"),rr=getDsbRx(),I0=v.tc*UP,N=WIN()*UP,xs=msArr(N,FSR),x=t.x.subarray(I0,I0+N);
+  const seg=v.m.subarray(v.tc,v.tc+WIN()),xa=msArr(WIN(),FSA),ep=Array.from(seg,q=>Math.abs(q)*t.g),en=ep.map(q=>-q),R=Math.max(0.3,maxAbs(ep))*1.12;
+  let k0=1,bs=0;for(let k=1;k<WIN()-2;k++){if(seg[k]*seg[k+1]<0){const s=Math.abs(seg[k+1]-seg[k]);if(s>bs){bs=s;k0=k;}}}
+  const zc=(k0+0.5)/FSA*1000,z0=Math.max(0,zc-0.12),z1=z0+0.24;
+  drawPanels($("#cvDsbT"),[{yr:[-R,R],bands:[{x0:z0,x1:z1,color:C.ink,alpha:0.1}],series:[{x:xs,y:x,color:C.c,width:0.8},{x:xa,y:ep,color:C.m,width:1.4,dash:[5,4]},{x:xa,y:en,color:C.m,width:1.4,dash:[5,4]}],
+    label:[["x(t)",C.c],["±|m(t)|",C.m]]}],[0,20],{xTitle:"ms"});
+  $("#dsbTCap").textContent="Same voice, no carrier: the outline is |m(t)|, touching zero wherever the voice crosses zero. Shaded: the zoom.";
+  const Z0=I0+Math.round(z0/1000*FSR),ZN=Math.round(0.24/1000*FSR),zx=msArr(ZN,FSR,Math.round(z0/1000*FSR)),zm=new Float64Array(ZN);
+  for(let i=0;i<ZN;i++)zm[i]=upval(v.m,Z0+i)*t.g;const Rz=Math.max(0.15,maxAbs(zm))*1.3;
+  drawPanels($("#cvDsbZoom"),[{yr:[-Rz,Rz],series:[{x:zx,y:t.x.subarray(Z0,Z0+ZN),color:C.c,width:1.5},{x:zx,y:zm,color:C.m,width:1.4,dash:[5,4]},{x:zx,y:zm.map(q=>-q),color:C.m,width:1.4,dash:[5,4]}],
+    label:[["x(t)",C.c],["±m(t), signed",C.m]]}],[z0,z1],{xTitle:"ms"});
+  const fc=state.fc,span=state.W+2000,sp=spectrumDB(t.x,(v.tc+WIN()/2)*UP,SPN(),FSR,fc-span,fc+span);
+  drawPanels($("#cvDsbF"),[{yr:[-80,5],yticks:[-60,-40,-20,0],series:sbSeries(C,sp,fc,Math.min(60,state.f0/2)),vlines:[{x:fc/1000,color:C.c,dash:[2,4]}],
+    notes:[{x:fc/1000,y:-5,text:"no carrier",color:C.c}],label:[["dB re peak",C.ink]]}],[(fc-span)/1000,(fc+span)/1000],{xTitle:"kHz"});
+  const ref=t.ref.subarray(v.tc,v.tc+WIN()),eo=rr.env.subarray(v.tc,v.tc+WIN()),po=rr.out.subarray(v.tc,v.tc+WIN()),ar=Math.max(maxAbs(ref),maxAbs(po))*1.2||1;
+  const es=fitTo(eo,ref);
+  drawPanels($("#cvDsbRx"),[
+    {yr:[-ar,ar],series:[{x:xa,y:ref,color:C.m,width:2,alpha:0.55},{x:xa,y:es,color:C.warn,width:1.5}],label:[["envelope detector",C.warn],["voice",C.m]]},
+    {yr:[-ar,ar],series:[{x:xa,y:ref,color:C.m,width:2,alpha:0.55},{x:xa,y:po,color:C.ink,width:1.5}],label:[["product detector, φ = "+state.phi+"°",C.ink],["voice",C.m]]}
+  ],[0,20],{xTitle:"ms"});
+  const cphi=Math.cos(state.phi*Math.PI/180);
+  $("#dsbRxCap").textContent=`Top: the diode follows |m|, so every negative half of the voice comes out flipped. Bottom: product detector output at gain cos φ = ${cphi.toFixed(2)}`+(rr.snr!=null&&noiseOn()?`, SNR ${rr.snr.toFixed(1)} dB.`:".")+(Math.abs(cphi)<0.1?" Near 90° the two sidebands cancel.":"");
+}
+function phasingSVG(){const yI=60,yQ=240,yC=150,usb=state.sb==="usb";
+  return `<svg class="sch" viewBox="0 0 800 300" role="group" aria-label="Phasing-method SSB modulator">${MARK}
+  ${box(10,yC-26,78,52,[["m(t)","t"],["voice","s"]])}
+  ${wire(`M88,${yC} H120`,"wm")}${wire(`M120,${yC} V${yI} H448`,"wm","m")}${wire(`M120,${yC} V${yQ} H198`,"wm","m")}
+  ${txt(140,yI-12,"I = m(t)","lm")}
+  ${box(200,yQ-32,150,64,[["Hilbert filter","t"],["−90° at every f","s"]],null,null)}
+  ${wire(`M350,${yQ} H448`,"wm","m")}${txt(360,yQ-12,"Q = m̂(t)","lm")}
+  ${circ(470,yI,"×","I mixer")}${circ(470,yQ,"×","Q mixer")}
+  ${box(420,yC-24,100,48,[["Oscillator","t"],["cos 2πf"+sub("c")+"t","s"]])}
+  ${wire(`M470,${yC-24} V${yI+21}`,"wc","c")}${box(443,yC+37,54,26,[["−90°","s"]])}${wire(`M470,${yC+24} V${yC+37}`,"wc")}${wire(`M470,${yC+63} V${yQ-21}`,"wc","c")}
+  ${wire(`M490,${yI} H620 V${yC-21}`,"","ink")}${wire(`M490,${yQ} H620 V${yC+21}`,"","ink")}
+  ${circ(620,yC,"Σ","Adder")}${txt(632,yC-30,"+","t")}${txt(632,yC+32,usb?"−":"+","t")}
+  ${wire(`M640,${yC} H668`,"","ink")}<polygon class="box" points="670,${yC-23} 670,${yC+23} 712,${yC}"/>${txt(683,yC,"PA","s")}
+  ${wire(`M712,${yC} H745 V${yC-40} M733,${yC-58} L745,${yC-40} L757,${yC-58}`)}${txt(712,yC+22,usb?"USB":"LSB","t")}
+  ${txt(140,18,"complex envelope m + jm̂: the analytic signal, no negative frequencies","lc")}
+  </svg>`;}
+function renderS8(){
+  $("#schSsb").innerHTML=phasingSVG();
+  const C=colors(),v=getVoice(),h=getHilbert(),t=getTx("ssb"),seg=v.m.subarray(v.tc,v.tc+WIN()),hs=h.mh.subarray(v.tc,v.tc+WIN()),xa=msArr(WIN(),FSA);
+  const R=Math.max(1,maxAbs(seg),maxAbs(hs))*1.12;
+  drawPanels($("#cvHilb"),[{yr:[-R,R],series:[{x:xa,y:seg,color:C.m,width:1.7}],label:[["m(t)",C.m]]},{yr:[-R,R],series:[{x:xa,y:hs,color:C.l,width:1.7}],label:[["m̂(t), Hilbert transform",C.l]]}],[0,20],{xTitle:"ms"});
+  const I0=v.tc*UP,N=WIN()*UP,xs=msArr(N,FSR),x=t.x.subarray(I0,I0+N),env=Array.from(seg,(q,i)=>t.g*Math.hypot(q,hs[i])),Rs=Math.max(0.3,maxAbs(env))*1.12;
+  drawPanels($("#cvSsbT"),[{yr:[-Rs,Rs],series:[{x:xs,y:x,color:C.c,width:0.8},{x:xa,y:env,color:C.m,width:1.4,dash:[5,4]},{x:xa,y:env.map(q=>-q),color:C.m,width:1.4,dash:[5,4]}],
+    label:[["x(t)",C.c],["±|m + jm̂|",C.m]]}],[0,20],{xTitle:"ms"});
+  const fc=state.fc,span=state.W+2000,sp=spectrumDB(t.x,(v.tc+WIN()/2)*UP,SPN(),FSR,fc-span,fc+span);
+  const usb=state.sb==="usb";
+  drawPanels($("#cvSsbF"),[{yr:[-80,5],yticks:[-60,-40,-20,0],series:sbSeries(C,sp,fc,Math.min(60,state.f0/2)),vlines:[{x:fc/1000,color:C.c,dash:[2,4]}],
+    notes:[{x:(fc+(usb?-1:1)*state.W/2)/1000,y:-72,text:"suppressed",color:C.muted}],label:[["dB re peak",C.ink]]}],[(fc-span)/1000,(fc+span)/1000],{xTitle:"kHz"});
+  $("#ssbFCap").textContent=`${usb?"Upper":"Lower"} sideband only: ${(state.W/1000).toFixed(1)} kHz wide. The other side is suppressed to the level the Hilbert filter allows.`;
+}
+function renderS9(){
+  const C=colors(),v=getVoice(),t=getTx("ssb"),rr=getSsbRx(),xa=msArr(WIN(),FSA),ref=t.ref.subarray(v.tc,v.tc+WIN()),out=rr.out.subarray(v.tc,v.tc+WIN()),ar=Math.max(maxAbs(ref),maxAbs(out))*1.2||1;
+  drawPanels($("#cvSsbRx"),[{yr:[-ar,ar],series:[{x:xa,y:ref,color:C.m,width:2,alpha:0.55},{x:xa,y:out,color:C.ink,width:1.5}],label:[["receiver out, Δf = "+state.dfo+" Hz",C.ink],["voice",C.m]]}],[0,20],{xTitle:"ms"});
+  const top=Math.min(FSA/2,state.W+1000),so=spectrumDB(rr.out,v.tc+WIN()/2,8192,FSA,0,top),sr=spectrumDB(t.ref,v.tc+WIN()/2,8192,FSA,0,top);
+  const harm=[];if(state.src in FORM)for(let k=1;k*state.f0<=Math.min(1500,top);k++)harm.push({x:k*state.f0/1000,color:C.muted,dash:[2,4],alpha:0.6});
+  drawPanels($("#cvSsbRxF"),[{yr:[-70,5],yticks:[-60,-40,-20,0],vlines:harm,series:[{x:sr.f.map(f=>f/1000),y:sr.p.map(p=>db(p,sr.mx)),color:C.m,width:1.4,alpha:0.55},{x:so.f.map(f=>f/1000),y:so.p.map(p=>db(p,sr.mx)),color:C.ink,width:1.2}],
+    label:[["out",C.ink],["voice",C.m]]}],[0,top/1000],{xTitle:"kHz"});
+  const d=state.dfo,usb=state.sb==="usb",sh=usb?-d:d;
+  $("#ssbRxCap").textContent=d===0?"BFO on frequency: the output matches the voice."+(rr.snr0!=null&&noiseOn()?` SNR ${rr.snr0.toFixed(1)} dB.`:""):`BFO ${d>0?"high":"low"} by ${Math.abs(d)} Hz: every component moves ${sh>0?"up":"down"} by ${Math.abs(d)} Hz${isFT8()?". The eight tones keep their 6.25 Hz spacing, so the FT8 decoder in step 12 still finds them.":", so the waveform no longer repeats each pitch period."}`;
+  $("#ssbRxFCap").textContent=(state.src in FORM)?`Dotted: harmonics of f₀ = ${state.f0} Hz. With Δf ≠ 0 the output lines slide off them by the same ${Math.abs(d)} Hz.`:"Output spectrum against the voice spectrum.";
+}
+function renderS10(){
+  const v=getVoice(),a=getRX(),d=getDsbRx(),s=getSsbRx(),t=getTx("dsb"),mu=state.mu,eta=mu*mu*v.ms/(1+mu*mu*v.ms);
+  const on=noiseOn(),sg=on?sigmaN():0,gam=on?getAM().P*FSR/(2*sg*sg*state.W):null,f=x=>x==null||!isFinite(x)?"–":x>60?"> 60 dB":x.toFixed(1)+" dB",th=x=>on&&x>0&&isFinite(x)?f(10*Math.log10(x)):"–",gp=amGap();
+  const amTh=mu>1?"n/a, μ > 1":th(eta*gam)+(gp!=null&&gp>1.5?' <span class="chip bad">below threshold</span>':"");
+  const W=(state.W/1000).toFixed(1);
+  $("#cmpTable").innerHTML=`<thead><tr><th>System</th><th>Bandwidth</th><th>Power in voice</th><th>Receiver needs</th><th>SNR, above-threshold formula</th><th>SNR measured</th></tr></thead><tbody>
+    <tr><td><b>AM</b>, envelope detector</td><td>${(2*state.W/1000).toFixed(1)} kHz</td><td>${(eta*100).toFixed(1)} %</td><td>diode, RC</td><td>${amTh}</td><td>${f(a.snr)}</td></tr>
+    <tr><td><b>DSB-SC</b>, product detector</td><td>${(2*state.W/1000).toFixed(1)} kHz</td><td>100 %</td><td>LO locked in phase</td><td>${th(gam)}</td><td>${f(d.snr0)}</td></tr>
+    <tr><td><b>SSB</b>, product detector</td><td>${W} kHz</td><td>100 %</td><td>LO within ~20 Hz</td><td>${th(gam)}</td><td>${f(s.snr0)}</td></tr></tbody>`;
+  $("#cmpNote").textContent=on?`γ = ${(10*Math.log10(gam)).toFixed(1)} dB at the bench's noise. `+(eta>0&&mu<=1?`Above threshold, SSB's advantage over AM is 1/η = ${(10*Math.log10(1/eta)).toFixed(1)} dB`+(a.snr!=null&&s.snr0!=null?`; measured here it is ${(s.snr0-a.snr).toFixed(1)} dB`:"")+`. AM can measure slightly better than its formula because the tuned circuit also trims the noise near ±W. `:"")+`Measured values use the ideal LO (φ = 0, Δf = 0) and the current detector RC for AM; with noise this low they also include each receiver's own small distortion. Real transmitters are limited by peak power, not average, which shifts the numbers but not the order for speech.`
+    :"Turn on RF noise on the bench to compare the three receivers. Without noise, each figure only reflects the receiver's own distortion.";
+}
+
+
+/* ---------- g(t), f(t), m(t) explainer ---------- */
+const GBT=[0.3,0.5,1,1.5,2,3,4,Infinity];
+const gbtv=()=>GBT[state.gbtIdx];
+function gpulse(u,bt){if(!isFinite(bt)){const a=Math.abs(u);return a<0.5?1:a===0.5?0.5:0;}
+  const k=Math.PI*bt*Math.sqrt(2/Math.LN2);return 0.5*(erf(k*(u+0.5))-erf(k*(u-0.5)));}
+const tone2bits=t=>bitsOf(GRAYINV[t],3).join("");
+function parseGBits(str){const b=(str||"").replace(/[^01]/g,"");if(b.length<3)return null;const n=Math.min(8,Math.floor(b.length/3)),t=[];
+  for(let k=0;k<n;k++)t.push(FT8.gray[parseInt(b.slice(3*k,3*k+3),2)]);return t;}
+function gSymbols(){
+  if(state.gsrc==="msg"){const e=getFT8(),dIdx={};DATA_IDX.forEach((sy,d)=>dIdx[sy]=d);
+    const lab=sy=>isSync(sy)?"sync":e.cw.slice(3*dIdx[sy],3*dIdx[sy]+3).join(""),all=[];for(let k=0;k<79;k++)all.push(k);
+    return{tones:e.tones.slice(),bits:all.map(lab),msg:true,what:`“${e.text}”`};}
+  let t;if(state.gsrc==="costas")t=FT8.costas.slice();else if(state.gsrc==="stair")t=[0,1,2,3,4,5,6,7];else if(state.gsrc==="jump")t=[0,7,0,7,0,7,0,7];
+  else t=parseGBits(state.gbits)||[0];
+  return{tones:t,bits:t.map(tone2bits),msg:false,what:state.gsrc==="costas"?"the Costas sync pattern":state.gsrc==="stair"?"a staircase through all eight tones":state.gsrc==="jump"?"the largest possible jumps, 0 ↔ 7":"your bits"};}
+let gcache={key:null};
+function gCompute(){const S=gSymbols(),bt=gbtv(),sps=S.msg&&state.gall?32:128,key=S.tones.join("")+"|"+bt+"|"+sps+"|"+S.bits.join("");if(gcache.key===key)return gcache;
+  const N=S.tones.length,t0=-1,t1=N+1,n=Math.round((t1-t0)*sps)+1,t=new Float64Array(n),f=new Float64Array(n),ph=new Float64Array(n),m=new Float64Array(n),ideal=new Float64Array(n);
+  const ks=[];for(let k=-2;k<=N+1;k++)ks.push(k);const toneAt=k=>S.tones[Math.min(N-1,Math.max(0,k))],pulses=ks.map(()=>new Float64Array(n));
+  for(let i=0;i<n;i++)t[i]=t0+i/sps;
+  ks.forEach((k,j)=>{const c=k+0.5,a=Math.max(0,Math.floor((c-3-t0)*sps)),b=Math.min(n-1,Math.ceil((c+3-t0)*sps)),tn=toneAt(k);
+    for(let i=a;i<=b;i++){const v=tn*gpulse(t[i]-c,bt);pulses[j][i]=v;f[i]+=v;}});
+  for(let i=0;i<n;i++){ideal[i]=toneAt(Math.floor(t[i]));ph[i]=i?ph[i-1]+(f[i-1]+f[i])/2/sps:0;m[i]=Math.sin(2*Math.PI*(2*(t[i]-t0)+ph[i]));}
+  return gcache={key,S,N,t0,t1,sps,t,f,ph,m,ideal,ks,pulses,toneAt};}
+const GWIN=10,ga={tau:null,playing:false,last:0,raf:0,full:true};
+function drawGAnim(){
+  const C=colors(),g=gCompute(),{t0,t1,N,sps}=g;if(ga.tau==null||ga.tau>t1)ga.tau=t1;if(ga.tau<t0)ga.tau=t0;
+  const slide=g.S.msg&&!state.gall,full=ga.full||!slide&&false;let x0=t0,x1=t1;
+  if(slide){const v0=ga.full?Math.max(t0,Math.min(t1-GWIN,state.gwin)):Math.max(t0,Math.min(t1-GWIN,ga.tau-GWIN/2));if(!ga.full)state.gwin=Math.max(0,Math.min(70,Math.round(v0)));x0=v0;x1=v0+GWIN;}
+  const showAll=slide&&ga.full,tau=showAll?t1:ga.tau;
+  const i0=Math.max(0,Math.floor((x0-t0)*sps)),i1=Math.min(g.t.length,Math.ceil((x1-t0)*sps)+2),iT=Math.max(i0+1,Math.min(i1,Math.round((tau-t0)*sps)+1));
+  const cut=a=>a.subarray(i0,iT),win=a=>a.subarray(i0,i1),tc=cut(g.t);
+  const pser=[];g.ks.forEach((k,j)=>{if(k+0.5<x0-2.5||k+0.5>x1+2.5)return;const out=k<0||k>=N;
+    pser.push({x:tc,y:cut(g.pulses[j]),color:out?C.muted:g.S.bits[k]==="sync"?C.u:C.m,width:x1-x0>16?1:1.3,alpha:out?0.45:0.6});});
+  const cv=$("#cvGAnim"),wpx=cv.clientWidth||600,spacing=(wpx-58)/(x1-x0),notes=[];
+  g.S.tones.forEach((tn,k)=>{if(k+0.5<=x0||k+0.5>=x1)return;const sy=g.S.bits[k]==="sync";
+    notes.push({x:k+0.5,y:tn+1.35,text:spacing>58?(sy?`sync ${tn}`:`${g.S.bits[k]}→${tn}`):spacing>26?String(tn):"",color:sy?C.u:C.ink});});
+  const ix=iT-1,curVis=!showAll&&tau>=x0&&tau<=x1,cur=curVis?[{x:tau,color:C.accent}]:[],dot=(y,c)=>curVis?[{x:g.t[ix],y,color:c,r:4.5}]:[];
+  const pw=win(g.ph);let pmn=Infinity,pmx=-Infinity;for(const v of pw){if(v<pmn)pmn=v;if(v>pmx)pmx=v;}if(pmx-pmn<1)pmx=pmn+1;
+  const xt=[];if(g.S.msg&&state.gall)xt.push(0,7,36,43,72);else for(let k=Math.ceil(x0);k<x1-0.4;k++)xt.push(k);
+  drawPanels(cv,[
+    {yr:[-0.4,11.4],yticks:[0,2,4,6],series:pser,vlines:cur,notes:notes.filter(o=>o.text),label:[["tone_k · g(t − (k+½)T)",C.m]]},
+    {yr:[-0.5,9.2],yticks:[0,2,4,6],series:[{x:win(g.t),y:win(g.ideal),color:C.muted,width:1.2,dash:[5,4]},{x:tc,y:cut(g.f),color:C.ink,width:2.2}],vlines:cur,dots:dot(g.f[ix],C.ink),label:[["f(t) − f_a  [× 6.25 Hz]",C.ink],["unsmoothed",C.muted]]},
+    {yr:[pmn-0.4,pmx+0.6],series:[{x:tc,y:cut(g.ph),color:C.c,width:2}],vlines:cur,dots:dot(g.ph[ix],C.c),label:[["∫(f − f_a) dt  [cycles]",C.c]]},
+    {yr:[-1.25,1.25],yticks:[-1,0,1],series:[{x:tc,y:cut(g.m),color:C.m,width:1.5}],vlines:cur,dots:dot(g.m[ix],C.m),label:[["m(t), offset slowed to 2 cycles per symbol",C.m]]}
+  ],[x0,x1],{xticks:xt,xTitle:g.S.msg?"symbol":"t / T"});
+  const btTxt=`BT = ${isFinite(gbtv())?gbtv():"∞"}`;
+  if(showAll){const a=Math.max(0,Math.round(x0));$("#gRead").textContent=`Symbols ${a}–${Math.min(78,a+GWIN-1)} of ${g.S.what}, ${btTxt}. Press Play to sweep through the packet from here; the window follows the cursor and the window slider follows the window.`;}
+  else{const u=g.t[ix],contrib=[];for(let k=-2;k<=N+1;k++){const w=gpulse(u-(k+0.5),gbtv());if(w>0.01)contrib.push(`${k<0||k>=N?"held":"symbol "+k} (tone ${g.toneAt(k)}) × ${w.toFixed(2)}`);}
+    $("#gRead").textContent=`${g.S.msg?(state.gall?"All 79 symbols of "+g.S.what+" at real speed":g.S.what+", window following the cursor"):g.S.what}, ${btTxt}. At t = ${u.toFixed(2)} T: f − f_a = ${g.f[ix].toFixed(2)} × 6.25 Hz = ${(g.f[ix]*6.25).toFixed(1)} Hz, from ${contrib.join(" + ")||"no pulses"}. Phase so far: ${g.ph[ix].toFixed(2)} extra cycles.`;}
+  const lbl=ga.playing?"Pause":(!showAll&&tau>=t1)?"Replay":"Play",pos=Math.round(((showAll?state.gwin+GWIN/2:tau)-t0)/(t1-t0)*1000);
+  ["#gPlay","#gPlay2"].forEach(id=>$(id).textContent=lbl);["#gScrub","#gScrub2"].forEach(id=>$(id).value=pos);
+  if(slide){$("#gwin").value=state.gwin;$("#gwinOut").textContent=`symbols ${state.gwin}–${state.gwin+GWIN-1}`;}
+}
+function gRate(){const g=gCompute();return g.S.msg?(state.gall?FT8.T:0.55):0.9;}
+function gTick(ts){ga.raf=0;if(!ga.playing)return;if(ga.last)ga.tau+=(ts-ga.last)/1000/gRate();ga.last=ts;const g=gCompute();
+  if(ga.tau>=g.t1){ga.tau=g.t1;ga.playing=false;}drawGAnim();if(ga.playing)ga.raf=requestAnimationFrame(gTick);}
+function gPlay(){const g=gCompute();if(ga.playing){ga.playing=false;drawGAnim();return;}
+  if(ga.full&&g.S.msg&&!state.gall){ga.full=false;ga.tau=Math.max(g.t0,state.gwin+GWIN/2);}else{ga.full=false;if(ga.tau==null||ga.tau>=g.t1)ga.tau=g.t0;}
+  if(reduceMotion){ga.tau=g.t1;drawGAnim();return;}ga.playing=true;ga.last=0;if(!ga.raf)ga.raf=requestAnimationFrame(gTick);}
+const gpsdC={};
+function gfskPSD(bt){const key=String(bt);if(gpsdC[key])return gpsdC[key];
+  const sps=64,ns=640,rnd=mulberry32(4242),tones=[];for(let k=0;k<ns;k++)tones.push(Math.floor(rnd()*8));
+  const n=ns*sps,re=new Float64Array(n),im=new Float64Array(n);let cyc=0,fp=0;
+  for(let i=0;i<n;i++){const u=i/sps,kc=Math.floor(u);let f=0;for(let k=kc-3;k<=kc+3;k++)f+=tones[Math.min(ns-1,Math.max(0,k))]*gpulse(u-(k+0.5),bt);
+    if(i)cyc+=(fp+f)/2/sps;fp=f;re[i]=Math.cos(2*Math.PI*cyc);im[i]=Math.sin(2*Math.PI*cyc);}
+  const NF=2048,acc=new Float64Array(NF),xr=new Float64Array(NF),xi=new Float64Array(NF);
+  for(let s=0;s+NF<=n;s+=NF/2){for(let i=0;i<NF;i++){const w=0.5-0.5*Math.cos(2*Math.PI*i/NF);xr[i]=re[s+i]*w;xi[i]=im[s+i]*w;}fft(xr,xi);for(let i=0;i<NF;i++)acc[i]+=xr[i]*xr[i]+xi[i]*xi[i];}
+  const df=sps/FT8.T/NF,fq=[],p=[];let mx=0,tot=0;for(let j=0;j<NF;j++){const i=(j+NF/2)%NF;fq.push((j-NF/2)*df);p.push(acc[i]);mx=Math.max(mx,acc[i]);tot+=acc[i];}
+  let c=0,lo=0,hi=NF-1;for(let j=0;j<NF;j++){c+=p[j];if(c>=0.005*tot){lo=j;break;}}c=0;for(let j=NF-1;j>=0;j--){c+=p[j];if(c>=0.005*tot){hi=j;break;}}
+  let oob=0;for(let j=0;j<NF;j++)if(fq[j]<-15||fq[j]>58.75)oob+=p[j];
+  return gpsdC[key]={f:fq,db:p.map(v=>10*Math.log10(Math.max(v/mx,1e-12))),bw:fq[hi]-fq[lo],oob:10*Math.log10(Math.max(oob/tot,1e-12))};}
+function renderGFM(){
+  const C=colors(),bt=gbtv(),xs=[],gg=[],rect=[],hk=[],q=[];let acc=0;const sig=isFinite(bt)?Math.sqrt(Math.LN2)/(2*Math.PI*bt):0;
+  for(let i=0;i<=800;i++){const u=-2+4*i/800;xs.push(u);const v=gpulse(u,bt);if(i)acc+=(gg[i-1]+v)/2*(4/800);gg.push(v);q.push(acc);rect.push(Math.abs(u)<0.5?1:0);hk.push(sig?Math.exp(-u*u/(2*sig*sig)):NaN);}
+  drawPanels($("#cvG1"),[{yr:[-0.08,1.15],yticks:[0,0.5,1],series:[{x:xs,y:rect,color:C.muted,width:1.2,dash:[5,4]},...(sig?[{x:xs,y:hk,color:C.c,width:1.3,alpha:0.8}]:[]),{x:xs,y:q,color:C.l,width:1.4,dash:[2,3]},{x:xs,y:gg,color:C.m,width:2.2}],
+    label:[["g(t)",C.m],["rect",C.muted]].concat(sig?[["h(t), scaled",C.c]]:[]).concat([["q(t) = ∫g",C.l]])}],[-2,2],{xticks:[-2,-1.5,-1,-0.5,0,0.5,1,1.5],xTitle:"t / T"});
+  let w1=0;for(let i=0;i<xs.length;i++)if(gg[i]>0.01)w1=Math.max(w1,Math.abs(xs[i]));
+  $("#g1Cap").textContent=isFinite(bt)?`BT = ${bt}: σ = ${sig.toFixed(3)} T. g exceeds 1% of its peak out to ±${w1.toFixed(2)} T, so each symbol's pulse ${w1>0.55?"reaches into its neighbours":"stays almost inside its own slot"}. The kernel h is drawn scaled to peak 1.`:"BT = ∞: no smoothing. g is the bare rectangle and the frequency jumps at every symbol boundary.";
+  drawGAnim();
+  const a=gfskPSD(bt),b=isFinite(bt)?gfskPSD(Infinity):null,sel=(o)=>{const x=[],y=[];o.f.forEach((v,i)=>{if(v>=-45&&v<=90){x.push(v);y.push(o.db[i]);}});return{x,y};};
+  const sa=sel(a),sb=b?sel(b):null,tl=[];for(let k=0;k<8;k++)tl.push({x:6.25*k,color:C.muted,dash:[2,4],alpha:0.6});
+  drawPanels($("#cvGSpec"),[{yr:[-70,4],yticks:[-60,-40,-20,0],vlines:tl,series:(sb?[{x:sb.x,y:sb.y,color:C.muted,width:1.1}]:[]).concat([{x:sa.x,y:sa.y,color:C.m,width:1.6}]),
+    label:[[`BT = ${isFinite(bt)?bt:"∞"}`,C.m]].concat(sb?[["BT = ∞",C.muted]]:[])}],[-45,90],{xTitle:"Hz from tone 0"});
+  $("#gSpecCap").textContent=`Dotted: the eight tones. At BT = ${isFinite(bt)?bt:"∞"}, 99% of the power lies within ${a.bw.toFixed(1)} Hz and ${a.oob.toFixed(1)} dB of it falls more than 15 Hz outside the tone range`+(b?`; with no smoothing, ${b.bw.toFixed(1)} Hz and ${b.oob.toFixed(1)} dB.`:".")+" Smaller BT cuts the skirts further, but each pulse then smears into its neighbours and the receiver sees intersymbol interference.";
+}
+
+/* ---------- FT8 rendering ---------- */
+function renderS1FT8(){
+  const C=colors(),v=getVoice(),enc=getFT8(),N=WIN(),seg=v.m.subarray(v.tc,v.tc+N),xs=msArr(seg.length,FSA);
+  drawPanels($("#cvVoice"),[{yr:[-1.15,1.15],yticks:[-1,0,1],series:[{x:xs,y:seg,color:C.m,width:1.8}],label:[["m(t)",C.m]]}],[0,20],{xTitle:"ms"});
+  const f0=state.ft8f0,lo=f0-60,hi=f0+110,sp=spectrumDB(v.m,Math.round((v.span[0]+v.span[1])/2),65536,FSA,lo,hi);
+  const tl=[];for(let k=0;k<8;k++)tl.push({x:f0+6.25*k,color:C.muted,dash:[2,4],alpha:0.7});
+  drawPanels($("#cvVoiceSpec"),[{yr:[-70,5],yticks:[-60,-40,-20,0],vlines:tl,series:[{x:sp.f,y:sp.p.map(p=>db(p,sp.mx)),color:C.m,width:1.3}],label:[["|M(f)|, dB",C.m]]}],[lo,hi],{xTitle:"Hz"});
+  const tone=enc.tones[10];
+  $("#voiceCap").textContent=`20 ms inside symbol 10 (tone ${tone}): one sine at ${(f0+6.25*tone).toFixed(2)} Hz, constant amplitude.`;
+  $("#voiceSpecCap").textContent=`5.5 s of the packet around its middle. Dotted: the eight tone frequencies, ${f0} to ${(f0+43.75).toFixed(2)} Hz.`;
+  const row=(name,val,bits,cls)=>`<div class="bf ${cls}"><span class="bfn">${name}</span><span class="bfv">${val}</span><code>${bits.join("")}</code></div>`;
+  $("#ft8Bits").innerHTML=`<div class="bfh">“${enc.text}” → 77 message bits + 14 CRC + 83 parity = 174 coded bits</div>`+
+    enc.fields.map(f=>row(`${f.name} · ${f.k}`,f.k>=15?`${f.text} = ${f.v}`:f.text,bitsOf(f.v,f.k),"bm")).join("")+
+    row("CRC · 14","0x"+enc.crc.toString(16).toUpperCase().padStart(4,"0"),enc.crcB,"bl")+row("parity · 83","LDPC (174,91)",enc.p,"bc");
+  const xd=[],yd=[],xs2=[],ys2=[];enc.tones.forEach((t,s)=>{const a=isSync(s)?[xs2,ys2]:[xd,yd];a[0].push(s+0.08,s+0.92,NaN);a[1].push(t,t,NaN);});
+  drawPanels($("#cvTones"),[{yr:[-0.6,7.6],yticks:[0,1,2,3,4,5,6,7],bands:[{x0:0,x1:7,color:C.u,alpha:0.1},{x0:36,x1:43,color:C.u,alpha:0.1},{x0:72,x1:79,color:C.u,alpha:0.1}],
+    series:[{x:xd,y:yd,color:C.m,width:3},{x:xs2,y:ys2,color:C.u,width:3}],label:[["data",C.m],["Costas sync",C.u]]}],[0,79],{xticks:[0,7,36,43,72],xTitle:"symbol"});
+  renderGFM();
+}
+function hexRGB(h){h=(h||"").trim();if(h[0]==="#"){if(h.length===4)h="#"+h[1]+h[1]+h[2]+h[2]+h[3]+h[3];return[parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)];}
+  const m=h.match(/\d+/g);return m?m.slice(0,3).map(Number):[128,128,128];}
+function drawWaterfall(cv,d){
+  const S0=setup(cv);if(!S0)return;const{ctx,w,h}=S0,C=colors(),L=48,R=10,T=8,B=26,pw=w-L-R,ph=h-T-B;
+  const{S,nfr,nb:NB,hop,FS2,df}=d.spec,dur=nfr*hop/FS2,vb0=Math.max(0,Math.min(NB-272,d.bf-128)),nb=Math.min(272,NB),b0=d.spec.b0+vb0,fLo=b0*df,fSpan=nb*df,SI=(fr,b)=>S[fr*NB+vb0+b];
+  const smp=[];for(let fr=0;fr<nfr;fr+=3)for(let b=0;b<nb;b+=7)smp.push(SI(fr,b));smp.sort((a,b)=>a-b);const fl=smp[Math.floor(smp.length/2)]||1e-12;
+  const c0=hexRGB(C.surface),c1=hexRGB(C.c),c2=hexRGB(C.ink);
+  const off=document.createElement("canvas");off.width=nfr;off.height=nb;const oc=off.getContext("2d"),img=oc.createImageData(nfr,nb);
+  for(let fr=0;fr<nfr;fr++)for(let b=0;b<nb;b++){let v=10*Math.log10(SI(fr,b)/fl+1e-12)/24;v=v<0?0:v>1?1:v;
+    const lo=v<0.55?c0:c1,hi2=v<0.55?c1:c2,t=v<0.55?v/0.55:(v-0.55)/0.45,k=((nb-1-b)*nfr+fr)*4;
+    img.data[k]=lo[0]+(hi2[0]-lo[0])*t;img.data[k+1]=lo[1]+(hi2[1]-lo[1])*t;img.data[k+2]=lo[2]+(hi2[2]-lo[2])*t;img.data[k+3]=255;}
+  oc.putImageData(img,0,0);ctx.imageSmoothingEnabled=true;ctx.drawImage(off,L,T,pw,ph);
+  const X=s=>L+s/dur*pw,Y=f=>T+ph-(f-fLo)/fSpan*ph;
+  ctx.strokeStyle=C.rule;ctx.lineWidth=1;ctx.strokeRect(L+0.5,T+0.5,pw-1,ph-1);
+  ctx.font="400 11px "+C.mono;ctx.fillStyle=C.muted;ctx.textAlign="center";ctx.textBaseline="top";
+  niceTicks(0,dur,Math.max(3,Math.round(pw/80))).forEach(s=>ctx.fillText(fmt(s),X(s),T+ph+6));
+  ctx.textAlign="right";ctx.fillText("s",w-R,T+ph+6);ctx.textBaseline="middle";
+  niceTicks(fLo,fLo+fSpan,4).forEach(f=>{if(f>fLo&&f<fLo+fSpan)ctx.fillText(fmt(f),L-6,Y(f));});
+  const x0=X(d.bt*hop/FS2),x1=X((d.bt+79*8)*hop/FS2+1024/FS2),y1=Y((d.spec.b0+d.bf-1)*df),y0=Y((d.spec.b0+d.bf+15)*df),col=d.crcOk?C.u:C.warn;
+  ctx.strokeStyle=col;ctx.lineWidth=1.6;ctx.setLineDash(d.synced?[]:[4,4]);ctx.strokeRect(x0,y0,x1-x0,y1-y0);ctx.setLineDash([]);
+  label(ctx,C,d.crcOk?"decoded: "+d.text:d.synced?"sync found, no decode":"no sync",Math.min(x0+6,w-R-160),Math.max(T+12,y0-12),col);
+  label(ctx,C,"Hz",L+8,T+12,C.muted);
+}
+function drawSymStrip(cv,r,enc){
+  const S0=setup(cv);if(!S0)return;const{ctx,w,h}=S0,C=colors(),L=48,R=10,pw=w-L-R,cw=pw/79,y0=6,ch=h-30,hm={};
+  DATA_IDX.forEach((s,i)=>hm[s]=r.hardTones[i]);
+  for(let s=0;s<79;s++){const x=L+s*cw,sync=isSync(s);ctx.fillStyle=sync?C.rule:hm[s]===enc.tones[s]?C.u:C.warn;ctx.globalAlpha=sync?0.9:0.85;
+    ctx.fillRect(x+0.5,y0,Math.max(1,cw-1),ch);ctx.globalAlpha=1;}
+  ctx.font="400 11px "+C.mono;ctx.fillStyle=C.muted;ctx.textAlign="center";ctx.textBaseline="top";
+  [0,7,36,43,72].forEach(s=>ctx.fillText(s,L+s*cw,y0+ch+6));ctx.textAlign="right";ctx.fillText("symbol",w-R,y0+ch+6);
+}
+function rxFor(kind){if(kind==="am"){const r=getRX();return{obj:r,out:r.r};}if(kind==="dsb"){const r=getDsbRx();return{obj:r,out:r.out};}const r=getSsbRx();return{obj:r,out:r.out};}
+function decodeFor(kind){const{obj,out}=rxFor(kind);if(!obj.ft8)obj.ft8=ft8Decode(out,getFT8());return obj.ft8;}
+function renderS12(){
+  if(!isFT8())return;const enc=getFT8(),res={am:decodeFor("am"),dsb:decodeFor("dsb"),ssb:decodeFor("ssb")},d=res[state.dec];
+  $("#dec-"+state.dec).checked=true;
+  drawWaterfall($("#cvWf"),d);drawSymStrip($("#cvSym"),d,enc);
+  const nm={am:"AM, envelope detector",dsb:`DSB-SC, product detector, φ = ${state.phi}°`,ssb:`${state.sb.toUpperCase()}, product detector, Δf = ${state.dfo>0?"+":""}${state.dfo} Hz`};
+  const sgn=v=>(v>=0?"+":"−")+Math.abs(v).toFixed(2);
+  $("#ft8Table").innerHTML=`<thead><tr><th>Receiver</th><th>Sync: DT, tone 0</th><th>Symbol errors</th><th>Bit errors, before → after parity</th><th>CRC</th><th>Decoded text</th></tr></thead><tbody>`+
+    ["am","dsb","ssb"].map(k=>{const r=res[k];return`<tr${k===state.dec?' class="sel"':""}><td><b>${nm[k]}</b></td><td>${r.synced?`${sgn(r.dt)} s, ${r.freq.toFixed(1)} Hz`:"not found"}</td><td>${r.symErr} / 58</td><td>${r.bitErrPre} → ${r.bitErrPost}</td><td>${r.crcOk?'<span class="chip ok">pass</span>':'<span class="chip bad">fail</span>'}</td><td>${r.crcOk?r.text:"–"}</td></tr>`;}).join("")+"</tbody>";
+  $("#wfCap").textContent=`${nm[state.dec]}: receiver audio as a spectrogram, 3.125 Hz bins, a row every 20 ms. The box marks the best Costas match`+
+    (d.synced?` (DT ${sgn(d.dt)} s, tone 0 at ${d.freq.toFixed(1)} Hz).`:"; the match is too weak to count as sync.");
+  $("#symCap").textContent=`Hard tone decisions before parity decoding: ${d.symErr} of 58 data symbols wrong (red). `+
+    (d.crcOk?(d.bitErrPre?`The parity decoder corrected ${d.bitErrPre} bit errors in ${d.iters} iterations.`:"No corrections needed."):"Too many errors for the parity decoder, so the CRC fails.");
+  const ok=["ssb","dsb","am"].map(k=>`${k==="am"?"AM":k==="dsb"?"DSB-SC":"SSB"} ${res[k].crcOk?"decodes":"fails"}`).join(", ");
+  $("#ft8Note").textContent=`At ${noiseOn()?state.noise+" dB SNR in 2500 Hz":"no added noise"}: ${ok}. All three transmitters send the same power. This page's single-pass decoder reaches about −19 dB on SSB and DSB-SC. WSJT-X is usually quoted near −21 dB, helped by multiple passes, signal subtraction and a priori information.`;
+}
+
+const RENDER={s12:renderS12,s0:renderSchematics,s1:renderS1,s2:renderS2,s3:renderS3,s4:renderS4,s5:()=>{drawPhasor();drawLines();},s6:()=>{renderSchematics();renderS6();},s7:renderS7,s8:renderS8,s9:renderS9,s10:renderS10};
+const dirty=new Set(),visible=new Set();let hasIO=typeof IntersectionObserver!=="undefined";
+function flush(){for(const id of [...dirty]){if(!hasIO||visible.has(id)){dirty.delete(id);try{RENDER[id]();}catch(e){console.error(id,e);}}}}
+function renderAll(){
+  setRates();renderControls();renderReadouts();Object.keys(RENDER).forEach(k=>dirty.add(k));flush();refreshAudio();syncAudioUI();activeSec=null;pickActive();applyContext();
+  $("#phPlay").textContent=ph.playing?"Pause":"Play";
+}
+
+/* ---------- audio ---------- */
+let actx=null;
+function ac(){if(!actx)actx=new(window.AudioContext||window.webkitAudioContext)();if(actx.state==="suspended")actx.resume();return actx;}
+const audio={on:false,src:"am",node:null,gain:null,t0:0,dur:1,sig:"",loop:false};
+const LISTEN_NAME={voice:"the voice in",am:"the AM receiver",dsbEnv:"an envelope detector on DSB-SC",dsbProd:"the DSB-SC product detector",ssb:"the SSB receiver"};
+const nameOf=src=>src==="voice"&&isFT8()?"the FT8 audio":LISTEN_NAME[src];
+function sourceData(src){
+  if(src==="voice"){const v=getVoice();return{d:v.m,ref:v.m};}
+  if(src==="am"){const r=getRX();return{d:r.r,ref:getAM().e48};}
+  if(src==="dsbEnv")return{d:getDsbRx().env,ref:getTx("dsb").ref};
+  if(src==="dsbProd")return{d:getDsbRx().out,ref:getTx("dsb").ref};
+  return{d:getSsbRx().out,ref:getTx("ssb").ref};}
+function buildBuffer(a,src){const{d,ref}=sourceData(src),b=a.createBuffer(1,d.length,FSA),ch=b.getChannelData(0);
+  let pk=1e-9;for(let i=0;i<ref.length;i++)pk=Math.max(pk,Math.abs(ref[i]));const g=0.45/pk,fade=720;
+  for(let i=0;i<d.length;i++){let w=1;if(i<fade)w=i/fade;else if(i>d.length-fade)w=(d.length-i)/fade;ch[i]=Math.tanh(d[i]*g)*w;}
+  return b;}
+let shot=null;
+function startNode(a,buf,offset){const gn=a.createGain(),s=a.createBufferSource();s.buffer=buf;s.loop=audio.loop;s.connect(gn);gn.connect(a.destination);s.onended=()=>{if(audio.node&&audio.node.s===s){audio.node=null;audio.on=false;syncAudioUI();}};
+  const now=a.currentTime;gn.gain.setValueAtTime(0,now);gn.gain.linearRampToValueAtTime(shot?0:1,now+0.03);s.start(now,offset%buf.duration);
+  audio.t0=now-offset;audio.dur=buf.duration;return{s,gn};}
+function fadeOut(n){if(!n)return;n.s.onended=null;const a=ac(),now=a.currentTime;try{n.gn.gain.cancelScheduledValues(now);n.gn.gain.setValueAtTime(n.gn.gain.value,now);n.gn.gain.linearRampToValueAtTime(0,now+0.03);n.s.stop(now+0.05);}catch(e){}}
+function audioSig(){return[audio.src,voice.key,state.mu,state.fc,state.rcIdx,state.noise,state.phi,state.sb,state.dfo].join("|");}
+function startAudio(){try{const a=ac(),buf=buildBuffer(a,audio.src),old=audio.node;audio.node=startNode(a,buf,0);fadeOut(old);audio.on=true;audio.sig=audioSig();}
+  catch(e){audio.on=false;$("#status").textContent="Audio playback is not available here.";}syncAudioUI();}
+function stopAudio(){fadeOut(audio.node);audio.node=null;audio.on=false;syncAudioUI();}
+function refreshAudio(){if(!audio.on)return;const sig=audioSig();if(sig===audio.sig)return;audio.sig=sig;
+  try{const a=ac(),buf=buildBuffer(a,audio.src),el=Math.max(0,a.currentTime-audio.t0);if(!audio.loop&&el>=audio.dur)return;const off=el%audio.dur,old=audio.node;audio.node=startNode(a,buf,off*(buf.duration/audio.dur));fadeOut(old);}catch(e){}}
+function duck(down){const n=audio.node;if(!n)return;const a=ac(),now=a.currentTime;try{n.gn.gain.cancelScheduledValues(now);n.gn.gain.setValueAtTime(n.gn.gain.value,now);n.gn.gain.linearRampToValueAtTime(down?0:1,now+0.06);}catch(e){}}
+function stopShot(){if(!shot)return;const s=shot;shot=null;try{s.node.onended=null;s.node.stop();}catch(e){}duck(false);syncAudioUI();}
+function playOnce(src){if(shot&&shot.src===src){stopShot();return;}
+  try{const a=ac();if(shot){try{shot.node.onended=null;shot.node.stop();}catch(e){}shot=null;}
+    const buf=buildBuffer(a,src),node=a.createBufferSource();node.buffer=buf;node.connect(a.destination);
+    shot={src,node};duck(true);node.onended=()=>{if(shot&&shot.node===node){shot=null;duck(false);syncAudioUI();}};node.start(a.currentTime+0.03);}
+  catch(e){shot=null;$("#status").textContent="Audio playback is not available here.";}syncAudioUI();}
+function syncAudioUI(){$("#ls-"+audio.src).checked=true;
+  $("#listenBtn").setAttribute("aria-pressed",audio.on?"true":"false");$("#listenBtn").textContent=audio.on?"Stop":"Play";$("#loopChk").checked=audio.loop;
+  document.querySelectorAll("[data-listen]").forEach(b=>b.setAttribute("aria-pressed",shot&&b.dataset.listen===shot.src?"true":"false"));
+  $("#listenStatus").textContent=shot?`Playing ${nameOf(shot.src)} once${audio.on?"; radio paused until it ends":""}.`
+    :audio.on?`${audio.loop?"Looping":"Playing"} ${nameOf(audio.src)}${noiseOn()&&audio.src!=="voice"?` with RF noise at ${noiseText()}`:""}. Knob changes are heard live.`
+    :"Plays the selected receiver once. Knob changes are heard live while it plays.";}
+$("#loopChk").addEventListener("change",e=>{audio.loop=e.target.checked;if(audio.node)try{audio.node.s.loop=audio.loop;}catch(err){}syncAudioUI();});
+$("#listenBtn").addEventListener("click",()=>{if(audio.on)stopAudio();else startAudio();});
+document.querySelectorAll('input[name="listen"]').forEach(r=>r.addEventListener("change",()=>{audio.src=r.value;if(audio.on)startAudio();else syncAudioUI();}));
+document.querySelectorAll("[data-listen]").forEach(b=>b.addEventListener("click",()=>playOnce(b.dataset.listen)));
+
+$("#file").addEventListener("change",async e=>{const f=e.target.files&&e.target.files[0];if(!f)return;
+  $("#status").textContent="Decoding "+f.name+"…";
+  try{const arr=await f.arrayBuffer(),a=ac(),buf=await a.decodeAudioData(arr),dur=Math.min(buf.duration,3);
+    const off=new OfflineAudioContext(1,Math.max(1,Math.ceil(dur*48000)),48000),s=off.createBufferSource();s.buffer=buf;s.connect(off.destination);s.start(0);
+    const out=await off.startRendering(),raw=out.getChannelData(0).slice();
+    if(raw.length<48000*0.25)throw new Error("short");
+    upload={raw,id:Date.now(),short:f.name.length>12?f.name.slice(0,11)+"…":f.name};setMode("upload");
+    $("#status").textContent="Using the first "+dur.toFixed(1)+" s of "+f.name+".";renderAll();}
+  catch(err){$("#status").textContent=err&&err.message==="short"?"That clip is shorter than 0.25 s. Load a longer one.":"Could not decode that file. Try a WAV, MP3 or M4A.";}
+  e.target.value="";});
+
+/* ---------- contextual bench ---------- */
+let activeSec="s0";
+const narrowMQ=(()=>{try{return matchMedia("(max-width: 880px)");}catch(e){return{matches:false,addEventListener(){}};}})();
+function applyContext(){const all=false;let any=false;
+  document.querySelectorAll("#stepBox [data-sections]").forEach(el=>{const trOK=!el.dataset.track||el.dataset.track===(isFT8()?"ft8":"voice"),show=trOK&&(all||el.dataset.sections.split(" ").includes(activeSec));
+    if(show){any=true;if(el.hidden){el.hidden=false;el.classList.remove("enter");void el.offsetWidth;el.classList.add("enter");}}else el.hidden=true;});
+  $("#stepBox").hidden=!any;
+  const sec=document.getElementById(activeSec),num=sec&&sec.querySelector(".num"),h=sec&&sec.querySelector("h2");
+  $("#stepLabel").textContent=num?`Step ${num.textContent}: ${h.textContent}`:"This step";dockSize();}
+function dockSize(){const b=$("#stepBox");let hgt=0;try{if(narrowMQ.matches&&!b.hidden)hgt=b.offsetHeight;document.documentElement.style.setProperty("--dockH",hgt+"px");}catch(e){}}
+$("#dockToggle").addEventListener("click",()=>{const b=$("#stepBox"),c=b.classList.toggle("collapsed");$("#dockToggle").textContent=c?"Show":"Hide";$("#dockToggle").setAttribute("aria-expanded",c?"false":"true");dockSize();});
+try{new ResizeObserver(dockSize).observe($("#stepBox"));}catch(e){}
+function pickActive(){const y=innerHeight*0.33;let id=null,first=null;
+  document.querySelectorAll("main > section").forEach(sec=>{if(sec.hidden)return;if(!first)first=sec.id;if(sec.getBoundingClientRect().top<=y)id=sec.id;});
+  id=id||first;if(id&&id!==activeSec){activeSec=id;applyContext();}}
+let pickRaf=0;const pickSoon=()=>{if(!pickRaf)pickRaf=requestAnimationFrame(()=>{pickRaf=0;pickActive();});};
+window.addEventListener("scroll",pickSoon,{passive:true});window.addEventListener("resize",pickSoon);
+try{narrowMQ.addEventListener("change",applyContext);}catch(e){}
+
+/* ---------- wiring ---------- */
+let raf=0,tmr=0;const schedule=()=>{cancelAnimationFrame(raf);clearTimeout(tmr);if(isFT8()){try{renderControls();}catch(e){}tmr=setTimeout(()=>{raf=requestAnimationFrame(renderAll);},220);}else raf=requestAnimationFrame(renderAll);};
+document.querySelectorAll('input[name="src"]').forEach(r=>r.addEventListener("change",()=>{setMode(r.value);renderAll();}));
+document.querySelectorAll('input[name="dec"]').forEach(r=>r.addEventListener("change",()=>{state.dec=r.value;schedule();}));
+function applyMsg(){const e=ft8Encode($("#ft8msg").value);if(e.err){$("#ft8Err").textContent=e.err;return;}$("#ft8Err").textContent="";state.msg=e.text;$("#ft8msg").value=e.text;schedule();}
+$("#ft8Go").addEventListener("click",applyMsg);$("#ft8msg").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();applyMsg();}});
+document.querySelectorAll('input[name="frame"]').forEach(r=>r.addEventListener("change",()=>{state.frame=r.value;drawPhasor();}));
+const bind=(id,k,conv)=>$(id).addEventListener("input",e=>{state[k]=conv(e.target.value);schedule();});
+bind("#f0","f0",Number);bind("#W","W",Number);bind("#mu","mu",Number);bind("#fc","fc",Number);bind("#rc","rcIdx",Number);bind("#noise","noise",Number);
+document.querySelectorAll('input[name="gsrc"]').forEach(r=>r.addEventListener("change",()=>{state.gsrc=r.value;ga.tau=null;ga.full=r.value==="msg"&&!state.gall;ga.playing=false;renderControls();if(isFT8())drawGAnim();}));
+$("#gwin").addEventListener("input",e=>{state.gwin=+e.target.value;state.gsrc="msg";ga.full=true;ga.playing=false;renderControls();if(isFT8())drawGAnim();});
+$("#gall").addEventListener("change",e=>{state.gall=e.target.checked;state.gsrc="msg";ga.tau=null;ga.full=!state.gall;ga.playing=false;renderControls();if(isFT8())drawGAnim();});
+$("#gbits").addEventListener("input",e=>{state.gbits=e.target.value;const t=parseGBits(state.gbits);$("#gbitsErr").textContent=t?`${t.length} symbol${t.length>1?"s":""}, tones ${t.join(" ")}`:"Type at least 3 bits (0s and 1s).";
+  if(t){state.gsrc="custom";$("#gs-custom").checked=true;ga.tau=null;ga.full=false;ga.playing=false;if(isFT8())renderGFM();}});
+$("#gbt").addEventListener("input",e=>{state.gbtIdx=+e.target.value;$("#gbtOut").textContent=isFinite(gbtv())?String(gbtv())+(gbtv()===2?", as in FT8":""):"∞, plain FSK";if(isFT8())renderGFM();});
+["#gPlay","#gPlay2","#cvGAnim"].forEach(id=>$(id).addEventListener("click",()=>{if(isFT8())gPlay();}));
+["#gScrub","#gScrub2"].forEach(id=>$(id).addEventListener("input",e=>{if(!isFT8())return;const g=gCompute();ga.playing=false;ga.full=false;ga.tau=g.t0+(+e.target.value/1000)*(g.t1-g.t0);drawGAnim();}));bind("#ft8f0","ft8f0",Number);bind("#phi","phi",Number);bind("#dfo","dfo",Number);
+document.querySelectorAll('input[name="sb"]').forEach(r=>r.addEventListener("change",()=>{state.sb=r.value;schedule();}));
+try{const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting)visible.add(e.target.id);else visible.delete(e.target.id);});flush();},{rootMargin:"400px 0px"});
+  Object.keys(RENDER).forEach(id=>io.observe(document.getElementById(id)));}catch(e){hasIO=false;}
+$("#phPlay").addEventListener("click",()=>{ph.playing=!ph.playing;$("#phPlay").textContent=ph.playing?"Pause":"Play";phKick();});
+try{new IntersectionObserver(es=>{ph.visible=es[0].isIntersecting;phKick();}).observe($("#cvPh"));}catch(e){}
+let lastW=0;
+new ResizeObserver(es=>{const w=Math.round(es[0].contentRect.width);if(w!==lastW){lastW=w;schedule();}}).observe($("main"));
+try{matchMedia("(prefers-color-scheme: dark)").addEventListener("change",schedule);}catch(e){}
+new MutationObserver(schedule).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(schedule);
+renderAll();applyContext();
+})();
+</script>
+
+</body>
+</html>

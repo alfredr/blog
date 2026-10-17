@@ -1,0 +1,19 @@
+# Gadgets: small self-contained web pages, not all of them mine. Each lives
+# in content/gadgets/<slug>/ as an index.html and the files it loads; kiln
+# copies that directory as-is and it is served at /gadgets/<slug>/. Gadgets
+# shouldn't load anything from third-party hosts (self-host fonts and the like).
+#
+# The gallery lists them in this order. Fields:
+#   slug        the directory name under content/gadgets/
+#   title, summary
+#   image       a 16:10 preview in the gadget's directory, light theme
+#   image_dark  optional dark-theme preview
+#   by          optional: who made it
+#   source      optional: link to the original
+
+[[gadgets]]
+slug = "voice-on-an-am-carrier"
+title = "Voice on an AM Carrier"
+summary = "Amplitude modulation from microphone to antenna and back. A vowel, your own clip or an FT8 packet goes through an envelope detector, then DSB-SC and SSB, with every plot and sound computed live from the knobs."
+image = "preview.webp"
+image_dark = "preview-dark.webp"

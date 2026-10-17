@@ -155,7 +155,7 @@ a:hover {
   display: none;
 }
 
-/* One row needs about 25rem, more than a phone has, so on phones the name
+/* One row needs about 30rem, more than a phone has, so on phones the name
    and toggle share the top row and the links move to a second row. The
    empty ::after item is the line break between them. */
 @media (max-width: 36rem) {
@@ -400,6 +400,79 @@ footer {
 .contact-email:hover {
   color: var(--accent);
   text-decoration-color: currentColor;
+}
+
+/* Gadgets (templates/gadgets.html, data/gadgets.toml): a grid of cards, each
+   a preview over its title and summary. */
+.gadgets {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+  gap: 2.5rem var(--gap);
+  margin-top: 2rem;
+}
+
+.gadget h2 {
+  margin: 0.75rem 0 0.25rem;
+  font-size: 1.1875rem;
+}
+
+.gadget h2 a {
+  text-decoration: none;
+}
+
+.gadget p {
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  margin-bottom: 0.5em;
+}
+
+.gadget-credit {
+  font-family: var(--sans);
+  color: var(--ink-2);
+  letter-spacing: normal;
+}
+
+.gadget-preview {
+  display: block;
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.gadget-preview:hover {
+  border-color: var(--accent);
+}
+
+.gadget-preview img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+  object-position: top;
+}
+
+/* A gadget with light and dark previews shows the one for the theme. */
+.gadget-preview .if-dark {
+  display: none;
+}
+
+:root[data-theme="dark"] .gadget-preview .if-light {
+  display: none;
+}
+
+:root[data-theme="dark"] .gadget-preview .if-dark {
+  display: block;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .gadget-preview .if-light {
+    display: none;
+  }
+
+  :root:not([data-theme="light"]) .gadget-preview .if-dark {
+    display: block;
+  }
 }
 
 /* CV (templates/cv.html, data/cv.toml, js/cv.js) */
