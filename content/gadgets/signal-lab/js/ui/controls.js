@@ -1,6 +1,6 @@
-// Inspector controls generated from parameter specs. Each control reports edits through
-// `onChange` (as a preview while a slider moves, a commit when it is released) and can be
-// updated in place when the value changes elsewhere, such as on undo.
+// Inspector inputs generated from parameter specifications. Changes emit
+// preview or commit events; external updates modify existing controls in
+// place.
 import { si, significant } from '../engine/format.js';
 import { coerceParam, } from '../engine/params.js';
 import { html } from './dom.js';
@@ -57,9 +57,9 @@ function fromPosition(spec, position) {
     // Round log-scale values to three significant digits so they read cleanly.
     return coerceParam(spec, spec.scale === 'log' ? Number(value.toPrecision(3)) : value);
 }
-/** Where `value` sits along the control's travel, from 0 to 1. */
+/** Maps a value to its normalized control position in [0, 1]. */
 export const toFraction = (spec, value) => toPosition(spec, value) / SLIDER_STEPS;
-/** The value at a point along the control's travel, from 0 to 1. */
+/** Maps a normalized control position in [0, 1] to a value. */
 export const fromFraction = (spec, fraction) => fromPosition(spec, Math.round(Math.min(1, Math.max(0, fraction)) * SLIDER_STEPS));
 let nextControlId = 0;
 function blurOnEnter(input) {

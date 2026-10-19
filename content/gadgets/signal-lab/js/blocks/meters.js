@@ -1,6 +1,5 @@
-// Blocks that measure rather than produce signals. They have no outputs; what
-// they find comes back as readings, shown on the block, in the inspector and on
-// the panel.
+// Measurement blocks with no signal outputs. Results are reported as readings
+// for the diagram, inspector, and panel.
 import { bestLag, fitReference } from '../dsp/correlate.js';
 import { defineBlock } from '../engine/block.js';
 import { si, toDecibels } from '../engine/format.js';

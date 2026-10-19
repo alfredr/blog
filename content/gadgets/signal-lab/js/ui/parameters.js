@@ -1,11 +1,10 @@
-// Inspector pieces for parameters: a number setting that can be bound to an
-// expression, and the editable list of a diagram's parameters.
+// Inspector controls for expression bindings and editable diagram parameters.
 import { isParameterName } from '../model/expressions.js';
 import { parameterSpec } from '../model/instruments.js';
 import { formatParam, paramControl, parseQuantity, } from './controls.js';
 import { html } from './dom.js';
 import { showMenu } from './menu.js';
-/** A menu item that adds something, unless it is there already. */
+/** An add action disabled when the corresponding item already exists. */
 export function addOnce(label, added, add) {
     return {
         label,
@@ -14,8 +13,8 @@ export function addOnce(label, added, add) {
     };
 }
 /**
- * A number setting with an ƒ button. Bound, it shows its expression and the
- * value worked out from it in place of the slider.
+ * Numeric setting with an expression-binding menu. Bound settings show the
+ * expression and evaluated value instead of a slider.
  */
 export function bindableControl(bindable) {
     const initial = bindable.read();
@@ -37,7 +36,7 @@ export function bindableControl(bindable) {
         'aria-label': `Bind ${bindable.spec.label}`,
     }, 'ƒ');
     const element = html('div', { class: 'bindable' }, control.element, row, button);
-    /** Showing the expression field before anything is bound. */
+    /** Whether an unbound expression field is currently being edited. */
     let editing = false;
     const sync = () => {
         const { value, binding, resolved, error } = bindable.read();
@@ -171,7 +170,7 @@ function editForm(parameter, apply, close) {
     cancel.addEventListener('click', close);
     return html('div', { class: 'parameter-form' }, field('Name', name), html('div', { class: 'mini-row' }, field('From', min), field('To', max)), html('div', { class: 'mini-row' }, field('Unit', unit), html('label', { class: 'control check' }, log, html('span', {}, 'log scale'))), problem, html('div', { class: 'actions' }, ok, cancel));
 }
-/** A diagram's parameters: a control for each, editable, plus a way to add one. */
+/** Editable controls for a diagram's parameters, with an action to add more. */
 export function parameterList(events) {
     const rows = html('div', { class: 'parameter-list' });
     const add = html('button', { type: 'button', class: 'small' }, 'Add parameter');

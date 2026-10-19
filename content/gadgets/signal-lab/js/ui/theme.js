@@ -1,7 +1,5 @@
-// The color theme: the system's, or light or dark whatever the system says.
-// A button in the top bar steps through the three, and this browser keeps
-// the choice. The stylesheet does the rest from `data-theme` on the root;
-// canvases, which take their colors when they draw, draw again.
+// Persists the system, light, or dark theme preference. CSS reads `data-theme`
+// on the root element; theme changes also request canvas redraws.
 import { html, svg } from './dom.js';
 const KEY = 'signal-lab:theme';
 const CHANGE = 'signal-lab:theme';
@@ -33,7 +31,7 @@ function apply(theme) {
     }
     dispatchEvent(new Event(CHANGE));
 }
-/** A circle half filled for the system's, a sun for light, a moon for dark. */
+/** Theme icons: half-filled circle, sun, and moon. */
 function icon(theme) {
     const parts = {
         system: [
@@ -54,7 +52,10 @@ function icon(theme) {
     }[theme];
     return svg('svg', { class: 'theme-icon', viewBox: '0 0 16 16', 'aria-hidden': 'true' }, ...parts);
 }
-/** Sets the theme this browser chose, and returns the button that changes it. */
+/**
+ * Applies the saved theme and creates a button that cycles through the
+ * choices.
+ */
 export function themeButton() {
     let theme = stored();
     const button = html('button', { type: 'button', class: 'layout-toggle' });
@@ -69,12 +70,12 @@ export function themeButton() {
             localStorage.setItem(KEY, theme);
         }
         catch {
-            // Without storage the choice lasts as long as the page.
+            // Keep the choice for this session if storage is unavailable.
         }
         apply(theme);
         show();
     });
-    // Following the system, a change there changes the colors here.
+    // Redraw on system theme changes when no explicit theme is selected.
     matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
         if (theme === 'system') {
             dispatchEvent(new Event(CHANGE));
@@ -85,9 +86,8 @@ export function themeButton() {
     return button;
 }
 /**
- * What to call when the colors change, held weakly: a canvas keeps its own
- * redraw, and when the canvas is gone and collected, so is its entry. One
- * taken off the page for a while, as a panel behind a tab is, stays listed.
+ * Weak references let discarded canvases be collected while retaining
+ * subscriptions for cached widgets temporarily detached from the DOM.
  */
 const redraws = new Set();
 addEventListener(CHANGE, () => {
@@ -102,8 +102,8 @@ addEventListener(CHANGE, () => {
     }
 });
 /**
- * Calls `redraw` whenever the colors change, for as long as whoever passed it
- * keeps a hold of it.
+ * Registers a redraw callback. The caller must retain a strong reference to
+ * it.
  */
 export function onThemeChange(redraw) {
     redraws.add(new WeakRef(redraw));

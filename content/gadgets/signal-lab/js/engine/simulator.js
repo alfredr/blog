@@ -1,16 +1,14 @@
-// Runs a circuit as a stream, forward in time from 0 for as long as it is asked to.
+// Streams a circuit forward from time zero in bounded chunks. Wires carry
+// samples for the same time interval at their own rates; processors retain
+// state between chunks.
 //
-// Time model: the stream advances in chunks of a few tens of milliseconds. In each chunk every
-// wire carries the samples of that stretch of time at its own sample rate, and blocks are causal
-// processors that keep their state from one chunk to the next. The stream splits the block graph
-// into strongly connected components and runs them upstream first. A lone block takes a whole
-// chunk in one call. A feedback loop (a component with a cycle) must contain a delay, and its
-// blocks are stepped together in spans no longer than the shortest delay, so every value a block
-// reads already exists. Loops run at a single sample rate.
+// The scheduler orders strongly connected components upstream first. Acyclic
+// blocks process whole chunks. Feedback components require a delay and a
+// common sample rate, and run in spans bounded by their shortest delay.
 //
-// Loading a changed circuit keeps the stream where it is. A block whose kind and rates are
-// unchanged keeps its processor and takes new settings in place where it can, so turning a knob
-// changes what happens from then on and leaves the past alone.
+// Circuit updates preserve simulation time and reuse compatible processors.
+// Settings changes apply to subsequent samples without altering existing
+// history.
 import { isDelayProcessor, RateError, sharedRate, } from './block.js';
 import { portKey, } from './circuit.js';
 import { errorMessage, errorName } from './errors.js';
@@ -21,8 +19,8 @@ import { sampleCount } from './signal.js';
 const CHUNK_SECONDS = 1 / 32;
 const CHUNK_SAMPLES = 32768;
 /**
- * Errors whose message is written for the user; anything else is reported as a
- * crash.
+ * Errors with user-facing messages. Other exceptions are reported as processor
+ * crashes.
  */
 const EXPLAINED = new Set(['RateError', 'BlockError']);
 const same = (a, b) => a.length === b.length && a.every((v, i) => Math.abs(v - b[i]) <= 1e-9 * v);
@@ -33,7 +31,7 @@ export class Stream {
     /** The fastest rate anywhere, which sets how long a chunk can be. */
     #fastest = 1;
     #running = new Map();
-    /** Blocks that threw as they ran, with why; they stay out until reset. */
+    /** Processing failures retained until reset. */
     #faults = new Map();
     #buffers = new Map();
     #silence = new Float32Array(0);
@@ -45,16 +43,16 @@ export class Stream {
     get time() {
         return this.#time;
     }
-    /** Runs `circuit` from where the stream is. */
+    /** Loads a circuit without rewinding simulation time. */
     load(circuit) {
         this.#faults.clear();
         return this.#plan(circuit);
     }
-    /** Pushes a block, as a button on the face does. */
+    /** Sends an external trigger to a block. */
     press(id) {
         this.#running.get(id)?.processor.press?.();
     }
-    /** Back to time 0, with every block built afresh. */
+    /** Resets time and rebuilds every processor. */
     reset() {
         this.#time = 0;
         this.#running.clear();
@@ -86,7 +84,8 @@ export class Stream {
                 message: `Unknown block type "${block.kind}".`,
             });
         }
-        // Carries a block on if it was built for the same rates, retuned if need be.
+        // Reuse processors with compatible kinds and rates, applying settings
+        // updates when supported.
         const start = (node, inputRates, outputRates) => {
             const old = this.#running.get(node.id);
             const params = JSON.stringify(node.params);
@@ -121,7 +120,8 @@ export class Stream {
                     return idle(`No signal reaches input "${type.inputs[i].name}".`);
                 }
             }
-            // Idle with nothing wired in, unless it can do without all its inputs.
+            // Leave blocks idle when no input is connected unless every input is
+            // optional.
             const needed = type.inputs.filter((port) => !port.optional);
             if (needed.length > 0 &&
                 type.inputs.every((port, i) => port.optional || !node.sources[i])) {
@@ -384,10 +384,7 @@ export class Stream {
         return { nodes, unknown };
     }
 }
-/**
- * Streams a circuit for its first `seconds` and keeps every signal, for when
- * the whole run is wanted at once.
- */
+/** Runs a circuit from zero for `seconds`, collecting complete output signals. */
 export function simulate(lookup, circuit, seconds) {
     const stream = new Stream(lookup);
     let { status } = stream.load(circuit);
@@ -478,10 +475,9 @@ function isLoop(component) {
         only.sources.some((source) => source?.block === only.id));
 }
 /**
- * Order for the loop's non-delay blocks so each runs after the members feeding
- * it. Delay outputs are ready at the start of every span, so edges out of
- * delays impose no order. Returns undefined when a cycle remains, meaning some
- * loop has no delay in it.
+ * Orders non-delay members after their dependencies. Delay outputs are
+ * available at the start of each span, so their outgoing edges impose no
+ * ordering constraint. Returns undefined if a cycle without a delay remains.
  */
 function orderWithinLoop(component, isDelay, members) {
     const pending = new Map();

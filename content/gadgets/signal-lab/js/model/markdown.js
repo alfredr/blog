@@ -1,8 +1,7 @@
-// The Markdown used in notes and descriptions: a small, safe subset. Paragraphs, headings
-// (#, ##, ###), lists (-, *, 1.), block quotes (>), code (`x` and fenced), rules (---),
-// emphasis (*em*, **strong**), links ([text](https://...)) and TeX math ($x$ inline,
-// $$x$$ displayed). There is no raw HTML, and links only go to http, https or mailto, so
-// text from an imported file can't inject anything into the page.
+// Parses the Markdown subset used by notes and descriptions: paragraphs,
+// headings, lists, quotes, code, rules, emphasis, links, and inline or display
+// TeX. Raw HTML is unsupported; links are restricted to http, https, and
+// mailto.
 const ESCAPABLE = '\\`*_[]()#+-.!$>';
 const SAFE_LINK = /^(https?:|mailto:)/i;
 const LIST_ITEM = /^([-*+]|\d+[.)])\s+(.*)$/;
@@ -21,8 +20,8 @@ function closingIndex(text, from, marker) {
     return -1;
 }
 /**
- * Where an emphasis run opened at `start` with `marker` closes. An underscore
- * only counts at a word boundary, so snake_case and f_c stay as they are.
+ * Finds the closing emphasis marker for a run opened at `start`. Underscores
+ * require word boundaries, preserving identifiers such as snake_case and f_c.
  */
 function emphasisEnd(text, start, marker) {
     if (isSpace(text[start + 1])) {

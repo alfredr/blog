@@ -3,9 +3,9 @@ import { si } from '../engine/format.js';
 import { blockAt } from '../model/document.js';
 import { displayName, typeOf } from '../model/subsystems.js';
 /**
- * A readable name for a port anywhere in the document: the blocks along its
- * path, then the port's own name if the block has more than one. "Station A ›
- * Modulator", "Phase splitter Q".
+ * Formats a port label from its block path, adding the port name when needed
+ * to distinguish multiple ports. Examples: "Station A › Modulator" and "Phase
+ * splitter Q".
  */
 export function portLabel(doc, ref, direction = 'out') {
     const block = blockAt(doc, ref.block);

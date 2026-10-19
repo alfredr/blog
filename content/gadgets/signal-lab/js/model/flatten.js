@@ -1,11 +1,7 @@
-// Turning a document into the flat circuit the simulator runs. Subsystems dissolve: their blocks
-// join the circuit under path ids ("rx/diode"), and each terminal's hidden port is wired to
-// whatever connects to the subsystem outside. Each antenna becomes the halves of it that are
-// wired, one radiating and one hearing, and hidden Air blocks carry what the others radiate to
-// each one that hears.
-// The engine never sees hierarchy, so caching and loops work across subsystem boundaries.
-// Instruments only watch or set things, so they and the wires into them are left out, except
-// a Button, which is a source the face can push.
+// Compiles a document into a flat simulation circuit. Subsystem blocks receive
+// full path ids and connect through terminal ports. Antennas become transmit
+// and receive halves connected by hidden Air blocks. Display-only instruments
+// are excluded; Buttons remain as sources.
 import { blockType } from '../blocks/index.js';
 import { isInstrument, isSimulated } from '../blocks/instruments.js';
 import { airType, ANTENNA, HEAR, RADIATE } from '../blocks/radio.js';
@@ -16,14 +12,14 @@ import { displayName } from './subsystems.js';
 /** Ids of the hidden blocks that carry what antennas radiate. */
 const AIR = '@air';
 /**
- * The id of the half of an antenna that radiates. The half that hears keeps
- * the antenna's own id, so its output is the antenna's.
+ * Full id of an antenna's transmit half. Its receive half retains the original
+ * id.
  */
 const radiating = (id) => `${id}@radiate`;
 /**
- * Resolves bindings scope by scope. A block sees the parameters of its own
- * diagram, then of each diagram around it. A subsystem's bindings set the
- * parameters inside it, and are worked out where the subsystem sits.
+ * Resolves bindings through nested scopes. Local parameters shadow enclosing
+ * declarations. A subsystem's bindings are evaluated in its parent scope and
+ * override parameters inside it.
  */
 export function resolveBindings(doc) {
     const values = new Map();
@@ -124,7 +120,7 @@ export function flatten(doc) {
             if (isInstrument(block.kind) && !isSimulated(block.kind)) {
                 continue;
             }
-            // Bound settings take their worked-out values; the engine sees plain numbers.
+            // Replace binding expressions with their evaluated numeric values.
             const bound = bindings.values.get(id);
             const params = bound ? { ...block.params, ...bound } : block.params;
             if (block.kind !== ANTENNA) {
@@ -208,9 +204,9 @@ export function signalsWithAliases(signals, aliases) {
     return all;
 }
 /**
- * Status for every block in the document by full id. A subsystem reports the
- * first error inside it, or the rates of its outputs; an antenna speaks for
- * its two halves, and says when there is nothing else on the air to hear.
+ * Builds document-level statuses from engine results. Subsystems expose
+ * internal errors or output rates; antennas combine their transmit and receive
+ * statuses and report when no other antenna is transmitting.
  */
 export function blockStatuses(doc, flat, engine) {
     const statuses = new Map();
@@ -222,7 +218,7 @@ export function blockStatuses(doc, flat, engine) {
             status = { state: 'error', message: `Binding: ${binding}.` };
         }
         else if (isInstrument(block.kind) && !isSimulated(block.kind)) {
-            // Instruments aren't simulated; they work whenever the page does.
+            // Display-only instruments do not require an engine processor.
             status = { state: 'ok', rates: [] };
         }
         else if (isSubsystem(block)) {
@@ -260,8 +256,8 @@ export function blockStatuses(doc, flat, engine) {
     return statuses;
 }
 /**
- * An antenna's status from its halves: an error in either, or else what it
- * hears, or else what it radiates.
+ * Combines antenna halves, preferring errors, then receive status, then
+ * transmit status.
  */
 function antennaStatus(id, flat, engine) {
     const radiate = engine.get(radiating(id));

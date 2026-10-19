@@ -1,7 +1,5 @@
-// What the page holds of the running stream: the latest stretch of every port
-// on screen, and every block's readings stamped with the time they were made,
-// so the page can show things as they stood at the playhead while the stream
-// runs a little ahead of it.
+// Browser-side signal history and timestamped readings. Retained data lets the
+// page display the playhead state while the simulation worker runs ahead.
 /** The longest stretch a trace holds, in samples, whatever its rate. */
 const LONGEST = 1 << 22;
 /** How long a trace tries to hold, in seconds. */

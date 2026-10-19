@@ -1,8 +1,6 @@
-// The block-diagram editor: an SVG canvas that draws one diagram (the document's top level or
-// the inside of a subsystem) and turns pointer gestures into edits. It never changes anything
-// itself; it reports new versions of the diagram through `change`, as previews while a gesture
-// is under way and as a commit when it ends. Instruments draw their own live widgets, which
-// stay in place across redraws so a knob keeps turning while the diagram changes under it.
+// Renders and edits one diagram at a time. Pointer gestures emit immutable
+// document previews and commits through `change`. Instrument widgets persist
+// across redraws to preserve active interactions.
 import { isInstrument } from '../blocks/instruments.js';
 import { INPUT_TERMINAL } from '../blocks/terminals.js';
 import { visiblePorts } from '../engine/block.js';
@@ -12,7 +10,7 @@ import { connect, isSubsystem, moveBlocks, pathId, removeWire, sameRef, terminal
 import { instrumentLeads, reachingIn, } from '../model/instruments.js';
 import { templates } from '../model/library.js';
 import { isTerminal, typeOf, wiredOutside, } from '../model/subsystems.js';
-import { svg } from './dom.js';
+import { html, svg } from './dom.js';
 import { hasIcon } from './drawings.js';
 import { drawingOf, layoutOf, SYMBOL, roundedPath, route, snap, } from './geometry.js';
 import { blockIcon } from './icons.js';
@@ -78,6 +76,8 @@ export class DiagramEditor {
     #outside;
     #instruments;
     #overlay;
+    /** Where instruments' widgets go: over the drawing, moved with it. */
+    #plane = html('div', { class: 'instrument-plane' });
     /** Instrument nodes by full id. */
     #nodes = new Map();
     /**
@@ -91,10 +91,9 @@ export class DiagramEditor {
     /** Pointers currently down, in client coordinates; two of them make a pinch. */
     #pointers = new Map();
     /**
-     * The last press on a block. Double-clicks are spotted from two presses
-     * rather than the browser's dblclick event, which never fires here: the
-     * first press selects the block, and redrawing replaces the element under
-     * the pointer before the second.
+     * Detect double-clicks from consecutive presses. Selection redraws may
+     * replace the SVG target between clicks, preventing the browser from
+     * emitting dblclick.
      */
     #lastPress;
     constructor(host, events) {
@@ -125,7 +124,10 @@ export class DiagramEditor {
             markerHeight: 6,
             orient: 'auto-start-reverse',
         }, svg('path', { d: 'M0,1 L9,5 L0,9 z', fill: 'context-stroke' }))), this.#grid, this.#leads, this.#wires, this.#blocks, this.#outside, this.#instruments, this.#overlay);
-        host.append(this.element);
+        // Render instrument widgets in a separate HTML overlay that shares the SVG
+        // transform. This avoids WebKit positioning errors for canvas and
+        // scrollable content inside foreignObject.
+        host.append(this.element, html('div', { class: 'instrument-layer' }, this.#plane));
         this.element.addEventListener('pointerdown', (event) => this.#pointerDown(event));
         this.element.addEventListener('pointermove', (event) => this.#pointerMove(event));
         this.element.addEventListener('pointerup', (event) => this.#pointerUp(event));
@@ -211,8 +213,8 @@ export class DiagramEditor {
         }
     }
     /**
-     * Instruments, each a frame holding its widget, plus dashed leads to what
-     * they set or read. The nodes persist, so a widget being used stays put.
+     * Keep instrument frames and widgets mounted across redraws. Dashed lines
+     * connect instruments to the blocks they control or read.
      */
     #drawInstruments(model) {
         const { diagram, path, selection } = model;
@@ -235,10 +237,15 @@ export class DiagramEditor {
             node.group.dataset.block = block.id;
             node.group.setAttribute('transform', `translate(${block.x},${block.y})`);
             node.group.setAttribute('class', classes('block', 'instrument', `instrument-${block.kind}`, selected.includes(block.id) && 'selected'));
-            for (const element of [node.body, node.face]) {
-                element.setAttribute('width', String(layout.width));
-                element.setAttribute('height', String(layout.height));
-            }
+            node.body.setAttribute('width', String(layout.width));
+            node.body.setAttribute('height', String(layout.height));
+            node.face.dataset.block = block.id;
+            Object.assign(node.face.style, {
+                left: `${block.x}px`,
+                top: `${block.y}px`,
+                width: `${layout.width}px`,
+                height: `${layout.height}px`,
+            });
             const widget = model.widgets.get('diagram', { id, path, block });
             if (node.face.firstChild !== widget) {
                 node.face.replaceChildren(widget);
@@ -263,6 +270,7 @@ export class DiagramEditor {
         for (const [id, node] of this.#nodes) {
             if (!live.has(id)) {
                 node.group.remove();
+                node.face.remove();
                 this.#nodes.delete(id);
             }
         }
@@ -272,12 +280,13 @@ export class DiagramEditor {
         let node = this.#nodes.get(id);
         if (!node) {
             const body = svg('rect', { class: 'body', rx: 8 });
-            const face = svg('foreignObject', { class: 'instrument-face' });
+            const face = html('div', { class: 'instrument-face' });
             const ports = svg('g', { class: 'ports' });
-            const group = svg('g', {}, body, face, ports);
+            const group = svg('g', {}, body, ports);
             node = { group, body, face, ports };
             this.#nodes.set(id, node);
             this.#instruments.append(group);
+            this.#plane.append(face);
         }
         return node;
     }
@@ -572,9 +581,9 @@ export class DiagramEditor {
                 const below = visiblePorts(type.inputs).length > 1 ||
                     visiblePorts(type.outputs).length > 1;
                 const inside = summary && !below;
-                // The palette's drawing of the block, over its name, with the name
-                // and summary moved down to make room.
-                // A subsystem from the library, still under its name, has its drawing.
+                // Place the palette icon above the label and adjust text spacing.
+                // Library subsystems retain their icon while their name matches the
+                // template.
                 const library = templates.find((t) => t.label === block.name);
                 const key = subsystem
                     ? `template:${library?.key ?? 'subsystem'}`
@@ -713,6 +722,7 @@ export class DiagramEditor {
         for (const [name, value] of Object.entries(box)) {
             this.#grid.setAttribute(name, String(value));
         }
+        this.#plane.style.transform = `scale(${scale}) translate(${-x}px, ${-y}px)`;
     }
     #inputUnder(clientX, clientY) {
         const hit = document
@@ -1059,11 +1069,11 @@ export class DiagramEditor {
     }
 }
 /**
- * How many notches a mouse wheel turned, down being positive, or undefined if
- * the event comes from two fingers on a trackpad. Firefox counts a wheel in
- * lines, three a notch. Chrome and Safari also give the old wheelDeltaY: 120 a
- * notch from a wheel, and exactly -3 deltaY from a trackpad. Failing both, a
- * wheel moves straight up or down by whole steps of 50 pixels or more.
+ * Estimates mouse-wheel notches, positive downward, or returns undefined for
+ * trackpad scrolling. Firefox line deltas use three lines per notch. Legacy
+ * wheelDeltaY distinguishes 120-unit wheel steps from trackpad deltas equal to
+ * -3 * deltaY. The fallback accepts vertical whole-pixel steps of at least 50
+ * pixels.
  */
 function wheelNotches(event) {
     if (event.deltaMode === WheelEvent.DOM_DELTA_LINE) {

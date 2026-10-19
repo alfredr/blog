@@ -210,8 +210,8 @@ function range(bits, start, n) {
     return { low: prefix * rest, high: prefix * rest + rest - 1 };
 }
 /**
- * The characters of a mixed-radix field (most significant first) that every
- * value from `low` to `high` agrees on, and the unknown mark for the rest.
+ * Decodes the character prefix shared by every mixed-radix value in [low,
+ * high], marking unresolved positions as unknown.
  */
 function digits(low, high, alphabets) {
     let weight = alphabets.reduce((w, a) => w * a.length, 1);
@@ -251,11 +251,10 @@ function partialGrid(bits) {
         : UNKNOWN.repeat(4);
 }
 /**
- * A standard message from however many of its 77 bits are in, the ones still
- * missing shown as `UNKNOWN`: the bits go out most significant first, so each
- * field fills in from the left as they arrive. It reads the fields as a
- * standard message whatever the last three bits say, since bits heard without
- * correction may say otherwise.
+ * Decodes an incomplete 77-bit standard message, marking missing information
+ * with `UNKNOWN`. Fields resolve from left to right as their most significant
+ * bits arrive. Treats the payload as a standard message even if the final type
+ * bits are corrupted in uncorrected reception.
  */
 export function partialMessage(bits) {
     return [partialCall(bits, 0), partialCall(bits, 29), partialGrid(bits)]

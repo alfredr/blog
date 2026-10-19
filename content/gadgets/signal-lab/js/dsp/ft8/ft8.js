@@ -30,10 +30,9 @@ export const grayTone = (b0, b1, b2) => GRAY[b0 * 4 + b1 * 2 + b2];
 /** The Costas sync tone at symbol `s`, which must be a sync symbol. */
 export const costasTone = (s) => COSTAS[(s % 36) % 7];
 /**
- * Where coded bit `k` passes between the stages that make it, as a stretch of
- * time from the start of the transmission, in seconds: a third of a symbol
- * each, one symbol before the symbol that carries it, so the symbol mapper has
- * all three bits of a symbol as that symbol begins.
+ * Returns the transmission-relative time interval for coded bit `k`. Each bit
+ * lasts one third of a symbol and is sent one symbol ahead, making all three
+ * bits available when their mapped tone begins.
  */
 export function bitCell(k) {
     const s = DATA_SYMBOLS[Math.floor(k / 3)];
@@ -75,10 +74,9 @@ function erf(x) {
     return sign * (1 - poly * Math.exp(-a * a));
 }
 /**
- * When each tone is sent, `length` samples at `rate` of it: the tone (0 to 7)
- * held for each symbol from `start` seconds in, and a key that is 1 while the
- * transmission is on, with raised-cosine ramps an eighth of a symbol long at
- * each end so it doesn't click.
+ * Generates `length` samples of symbol tones and a transmission key at `rate`,
+ * beginning at `start` seconds. The key uses raised-cosine ramps lasting one
+ * eighth of a symbol to reduce clicks.
  */
 export function schedule(tones, rate, start, length) {
     const tone = new Float32Array(length);
@@ -99,10 +97,9 @@ export function schedule(tones, rate, start, length) {
     return { tone, key };
 }
 /**
- * FT8 audio of `length` samples at `rate`, as WSJT-X makes it: tone 0 at
- * `offset` Hz, starting `start` seconds in, each step in frequency smoothed by
- * a Gaussian with BT = 2 (GFSK), and the phase added up from the frequency so
- * it never jumps, with short ramps at each end.
+ * Generates FT8 audio with tone 0 at `offset` Hz, starting at `start` seconds.
+ * Applies BT = 2 Gaussian frequency smoothing, continuous phase integration,
+ * and short amplitude ramps.
  */
 export function synthesize(tones, rate, offset, start, length) {
     const out = new Float32Array(length);
@@ -169,9 +166,8 @@ function spectrogram(audio, rate, low, high) {
     return { power, frames, bins, firstBin };
 }
 /**
- * The time and frequency whose Costas arrays (those starting at the symbols in
- * `arrays`) stand out most from the other tones, trying starts up to
- * `lastStart` frames in.
+ * Finds the strongest Costas match in time and frequency, using sync arrays
+ * indexed by `arrays` and start frames up to `lastStart`.
  */
 function search(spec, arrays, lastStart) {
     const { power, bins } = spec;
@@ -203,9 +199,9 @@ function search(spec, arrays, lastStart) {
 /** The latest start the search tries, in frames: about 2.5 s into the slot. */
 const LATEST_START = Math.round((2.5 * DECODE_RATE) / HOP);
 /**
- * Looks for an FT8 signal in the start of a slot, using the Costas arrays that
- * have arrived so far. Undefined until the first one has, or if nothing stands
- * out.
+ * Searches the available Costas arrays near the start of a slot. Returns
+ * undefined before the first array is complete or when no match is strong
+ * enough.
  */
 export function acquire(audio, rate, low = 200, high = 3000) {
     const spec = spectrogram(audio, rate, low, high);
@@ -260,9 +256,10 @@ export function dataBit(s) {
     return index < 0 ? undefined : 3 * index;
 }
 /**
- * Searches `audio` for the strongest FT8 signal between `low` and `high` Hz
- * and decodes it: resample to 6400 Hz, spectrogram of symbol-long frames every
- * eighth of a symbol, find the best Costas match, then soft-decision LDPC.
+ * Searches `audio` between `low` and `high` Hz for the strongest FT8 signal.
+ * Resamples to 6400 Hz, builds symbol-length FFT frames at one-eighth-symbol
+ * intervals, locates the best Costas match, and performs soft-decision LDPC
+ * decoding.
  */
 export function decode(audio, rate, low = 200, high = 3000) {
     const none = {

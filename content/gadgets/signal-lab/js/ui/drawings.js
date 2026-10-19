@@ -1,7 +1,6 @@
-// Small line drawings of what each palette entry does, 24 units square: a
-// sine for an oscillator, a filter's response, a meter's dial. Each is a list
-// of paths, circles and boxes; icons.ts draws them. These are plain data, so
-// the diagram's geometry can ask which blocks have one without a page.
+// Block icon definitions in a 24-unit coordinate system. Paths, circles, and
+// rectangles are rendered by icons.ts. Keeping these definitions independent
+// of the DOM lets geometry code inspect icon availability.
 const SINE = 'M2 12C5 4 9 4 12 12S19 20 22 12';
 const STEPS = 'M3 17h4v-5h4v-6h4v9h4v-4h2';
 export const DRAWINGS = {

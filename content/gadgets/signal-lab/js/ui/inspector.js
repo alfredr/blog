@@ -1,6 +1,6 @@
-// The side panel: settings for what is selected, or for the document when nothing is. It
-// rebuilds only when the selection changes; otherwise it updates the existing controls in
-// place, so a slider being dragged is never replaced under the pointer.
+// Settings for the selected item, or the document when nothing is selected.
+// Controls update in place while the selection remains stable so active input
+// gestures survive document changes.
 import { FT8_MESSAGE } from '../blocks/ft8.js';
 import { CONTROL, PLOT, READOUT, SYMBOLS } from '../blocks/instruments.js';
 import { RECORDING } from '../blocks/sources.js';
@@ -366,9 +366,9 @@ export class Inspector {
         };
     }
     /**
-     * Makes a parameter of a block's setting, in the block's own diagram, and
-     * binds the setting to it. Inside a subsystem, that makes it one of the
-     * subsystem's settings.
+     * Creates a parameter in the block's diagram and binds the setting to it.
+     * Within a subsystem, the new parameter is also exposed as a subsystem
+     * setting.
      */
     #expose(path, id, setting, spec, value) {
         const doc = this.#now.doc;

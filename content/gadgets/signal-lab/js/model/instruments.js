@@ -1,8 +1,6 @@
-// Instruments in the document: what controls set and readouts read, what
-// they connect to on the diagram, and where their widgets sit on the panel
-// face. The face is a grid like the front of a radio; the document saves each
-// widget's spot by instrument, and widgets without one fill the first free
-// space.
+// Resolves instrument targets, available controls and readings, diagram
+// reference lines, and panel widgets. Panel organization and layout are
+// handled in panels.ts.
 import { FT8_MAPPER } from '../blocks/ft8.js';
 import { BUTTON, CONTROL, isInstrument, NOTE, PLOT, READOUT, SPEAKER, SYMBOLS, } from '../blocks/instruments.js';
 import { number, resolveParams, } from '../engine/params.js';
@@ -31,7 +29,7 @@ function parseTarget(target) {
     }
     return target ? { kind: 'parameter', name: target } : undefined;
 }
-/** The diagram, at `path` or around it, that declares parameter `name`. */
+/** Finds the nearest enclosing diagram that declares `name`. */
 function parameterScope(doc, path, name) {
     for (let depth = path.length; depth >= 0; depth--) {
         const scope = path.slice(0, depth);
@@ -42,7 +40,10 @@ function parameterScope(doc, path, name) {
     }
     return undefined;
 }
-/** A parameter of the diagram at `path`, and how a binding outside sets it. */
+/**
+ * Resolves a parameter and any binding applied by its containing subsystem
+ * block.
+ */
 function parameterState(doc, bindings, path, parameter, label) {
     const holder = path.length ? blockAt(doc, path.join('/')) : undefined;
     return {
@@ -54,7 +55,7 @@ function parameterState(doc, bindings, path, parameter, label) {
         set: (d, value) => updateDiagramAt(d, path, (inner) => updateParameter(inner, parameter.name, { value: value })),
     };
 }
-/** What the control at `path` sets, or why it can't. */
+/** Resolves a control target or returns a diagnostic. */
 export function controlState(doc, bindings, path, control) {
     const target = parseTarget(String(control.params.target ?? ''));
     if (!target) {
@@ -71,7 +72,7 @@ export function controlState(doc, bindings, path, control) {
     if (id === undefined || !block) {
         return { problem: 'The block it set is gone.' };
     }
-    // A setting reached inside a subsystem is that subsystem's, as seen from here.
+    // Use the enclosing subsystem name when labeling a nested setting.
     const steps = target.block.split('/');
     const up = steps.findIndex((step) => step !== '..');
     const outer = steps.length > up + 1
@@ -118,7 +119,8 @@ export function settables(doc, path) {
         }
         const name = displayName(block);
         if (isSubsystem(block)) {
-            // Its parameters, and the text settings inside it, which can't be parameters.
+            // Include subsystem parameters and nested text settings, which cannot be
+            // numeric parameters.
             return [
                 ...(block.inner.parameters ?? []).map((p) => ({
                     target: `${block.id}.${p.name}`,
@@ -154,10 +156,7 @@ function usesParameter(block, name) {
             !block.inner.parameters?.some((p) => p.name === name) &&
             block.inner.blocks.some((inner) => usesParameter(inner, name))));
 }
-/**
- * The blocks of the same diagram an instrument acts on or reads from, which
- * the diagram joins to it with dashed lines.
- */
+/** Finds same-diagram targets for an instrument's dashed reference lines. */
 export function instrumentLeads(diagram, block) {
     const local = (ref) => {
         const [first] = ref.split('/');
@@ -180,10 +179,9 @@ export function instrumentLeads(diagram, block) {
         : [];
 }
 /**
- * The instruments outside the subsystem at `path` that reach into this copy of
- * it: readouts of its blocks, and controls on their settings or on the
- * parameters they use. Each is given at the block of the subsystem's own
- * diagram that it reaches, or that holds what it reaches.
+ * Finds external instruments targeting this subsystem instance. Each result
+ * identifies the immediate child block containing the target, including blocks
+ * driven by externally controlled parameters.
  */
 export function reachingIn(doc, path) {
     const inner = diagramAt(doc, path);
@@ -216,8 +214,7 @@ export function reachingIn(doc, path) {
             }
             continue;
         }
-        // A parameter declared here or around here, unless one further in hides
-        // it, reaches the blocks here that use it.
+        // Include parameter users unless a nested declaration shadows the target.
         const { scope, parameter } = reference;
         const around = scope.length <= path.length && scope.every((s, i) => path[i] === s);
         const hidden = path
@@ -234,8 +231,8 @@ export function reachingIn(doc, path) {
     return reaches;
 }
 /**
- * The instruments with a widget on the face, depth first: all but the notes
- * kept to the diagram.
+ * Lists face instruments depth first, excluding notes configured for the
+ * diagram only.
  */
 export function faceItems(doc) {
     return everyBlock(doc).filter(({ block }) => isInstrument(block.kind) &&
@@ -255,18 +252,17 @@ function stacks(doc) {
     return found;
 }
 /**
- * The instruments with a widget of their own on the face: all but the plots
- * stacked under a view, which join it as rows.
+ * Lists standalone face widgets, excluding plots embedded as rows in a Bits to
+ * tones view.
  */
 export function faceCards(doc) {
     const stacked = new Set([...stacks(doc).values()].flat().map((item) => item.id));
     return faceItems(doc).filter((item) => !stacked.has(item.id));
 }
 /**
- * What the Bits to tones view `item` watches, or why it can't show anything. A
- * signal made from the mapper's tone runs behind it by the lags of the blocks
- * on the way, such as the Gaussian filter's 42.4 ms, which the view takes back
- * out so its rows line up.
+ * Resolves the signals for a Bits to tones view or returns a diagnostic.
+ * Accumulated processing delays, such as the Gaussian filter's 42.4 ms, align
+ * derived traces with the mapper's symbols.
  */
 export function symbolSources(doc, item, context) {
     const ref = String(item.block.params.block ?? '');
@@ -301,8 +297,8 @@ export function symbolSources(doc, item, context) {
             }), rate)
             : 0;
     };
-    // From a block back up its inputs to the mapper's tone, adding up the lags
-    // on the way; undefined if it isn't made from the tone.
+    // Traces inputs back to the mapper's tone and sums processing delays.
+    // Returns undefined for unrelated signals.
     const lagFrom = (id) => {
         if (id === local) {
             return 0;
@@ -381,7 +377,7 @@ export function stackHosts(doc) {
         label: item.block.name || 'Bits to tones',
     }));
 }
-/** A widget's size in grid cells until someone resizes it. */
+/** Default widget dimensions in grid cells. */
 export function defaultSize(block, wide) {
     switch (block.kind) {
         case PLOT:
@@ -411,8 +407,8 @@ export function hasControl(diagram, target) {
     return diagram.blocks.some((block) => block.kind === CONTROL && block.params.target === target);
 }
 /**
- * Every reading a block in the diagram at `path` reports, including inside its
- * subsystems, for choosing what a readout shows.
+ * Lists readings available in this diagram and its subsystems for a readout
+ * picker.
  */
 export function readables(doc, path) {
     const diagram = diagramAt(doc, path);

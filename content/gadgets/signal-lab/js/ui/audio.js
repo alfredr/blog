@@ -1,12 +1,7 @@
-// Listening to the stream. A port being listened to plays as the stream
-// reaches it: each new stretch is resampled to the audio device's rate and
-// scheduled right after the last, so the sound runs on without gaps, and while
-// anything plays the playhead follows the audio clock. It plays at the
-// stream's speed the way a tape does, so at an eighth of the speed it sounds
-// three octaves lower. Turning a speaker on or off only connects or
-// disconnects it: time goes on either way. Levels ride a slow automatic gain,
-// so a whisper and a carrier are both comfortable, with peaks rounded off by
-// tanh.
+// Schedules monitored signals through Web Audio. Samples are resampled to the
+// device rate and queued contiguously; the playhead follows the audio clock
+// while playback is active. Playback speed scales pitch and duration. Each
+// voice uses automatic gain control and tanh peak limiting.
 import { Interpolator } from '../dsp/resample.js';
 /** Seconds of sound scheduled ahead of the audio clock, at most. */
 const AHEAD = 0.4;
@@ -19,15 +14,14 @@ export class Monitor {
     #context;
     #voices = new Map();
     /**
-     * Readers that filter out what the speaker can't play before it folds back:
-     * a long kernel, and a shorter one for reading very sparsely, as a fast tape
-     * of a radio-frequency signal does, where the long one costs too much.
+     * Bandlimited readers suppress aliasing. A shorter kernel limits the cost
+     * when high sample rates or playback speeds require sparse reads.
      */
     #fine = new Interpolator(8);
     #coarse = new Interpolator(4);
     /**
-     * While sound runs, audio time `audio` plays stream time `stream`, and each
-     * second of audio plays `speed` seconds of stream.
+     * Clock anchor: audio time `audio` corresponds to stream time `stream`, with
+     * `speed` stream seconds per audio second.
      */
     #anchor;
     #listeners = new Set();
@@ -64,7 +58,7 @@ export class Monitor {
             this.toggle(key);
         }
     }
-    /** The stream time the audio clock says it is, while sound runs. */
+    /** Converts the active audio clock to stream time. */
     clock() {
         const context = this.#context;
         const anchor = this.#anchor;
@@ -73,9 +67,9 @@ export class Monitor {
             : undefined;
     }
     /**
-     * Keeps the sound going: schedules what has arrived of each port listened
-     * to, from playhead time `t` on at `speed` while `running`, and falls silent
-     * otherwise. A new speed starts the sound again from `t`.
+     * Queues available monitored samples from time `t` at the requested speed
+     * while running. Pausing silences playback; speed changes restart scheduling
+     * from `t`.
      */
     feed(traces, t, running, speed) {
         const context = this.#context;
@@ -103,7 +97,7 @@ export class Monitor {
             }
         }
     }
-    /** Stops the sound, keeping the ports listened to for when it starts again. */
+    /** Stops audio while retaining the selected monitoring ports. */
     halt() {
         if (!this.#anchor) {
             return;
@@ -133,7 +127,7 @@ export class Monitor {
         const reader = ratio > 16 ? this.#coarse : this.#fine;
         const reach = reader.reach(ratio);
         voice.frame = Math.max(voice.frame, this.#soonest());
-        // As far as the clock allows, and as far as there are samples to read.
+        // Limit scheduling by both the audio clock and available signal history.
         const last = Math.min(Math.floor((context.currentTime + AHEAD - anchor.audio) * out), Math.floor((((trace.end - reach - 1) / rate - anchor.stream) / anchor.speed) *
             out));
         const frames = last - voice.frame;
@@ -149,9 +143,8 @@ export class Monitor {
         for (let k = 0; k < frames; k++) {
             channel[k] = reader.at(samples, at(voice.frame + k) - first, ratio);
         }
-        // The level is set by the signal on the wire, not by what is left of it
-        // to hear, so a carrier far above hearing plays as near silence rather
-        // than having its faint remains turned up.
+        // Measure gain from the unfiltered signal so an inaudible carrier does not
+        // amplify residual filter leakage.
         let peak = 0;
         let sum = 0;
         for (let i = reach; i < samples.length - reach; i++) {
@@ -161,7 +154,7 @@ export class Monitor {
         const rms = Math.sqrt(sum / Math.max(1, samples.length - 2 * reach));
         if (peak > 0) {
             const wanted = Math.min(0.8 / peak, 0.25 / rms);
-            // Quick to duck under something loud, slow to bring the level back up.
+            // Reduce gain quickly for loud signals and restore it slowly.
             voice.level =
                 voice.level === 0 || voice.level * peak > 1.5
                     ? wanted
@@ -178,7 +171,7 @@ export class Monitor {
         voice.sources.add(source);
         voice.frame = last;
     }
-    /** Fades a voice out and drops what it had scheduled. */
+    /** Fades out a voice and cancels its queued audio. */
     #silence(voice) {
         const context = this.#context;
         if (!context) {

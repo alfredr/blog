@@ -1,12 +1,8 @@
-// Ties the pieces together: the document history, the simulation worker, and
-// the views that show and edit them. The editor shows one diagram at a time,
-// the top level or the inside of a subsystem, chosen by `path`; the panel face
-// below it shows every instrument in the document. The worker runs the
-// document as a stream from time 0. While it runs, the playhead moves on with
-// the clock (the audio clock while a speaker plays) and the worker is kept a
-// little ahead of it; everything on screen shows the stream as it stood at the
-// playhead. Every change re-renders at once and goes to the worker, which
-// carries on with it from where it is.
+// Coordinates document history, simulation, and views. The editor shows the
+// diagram selected by `path`; the panel face exposes instruments throughout
+// the document. The worker runs ahead of the playhead, which follows the audio
+// clock during playback. Edits update the views immediately and are sent to
+// the running worker.
 import { blockType, categories } from '../blocks/index.js';
 import { CONTROL, isInstrument, PLOT, READOUT, SPEAKER, SYMBOLS, } from '../blocks/instruments.js';
 import { RECORDING } from '../blocks/sources.js';
@@ -40,7 +36,7 @@ import { inputOf, problemAt, Widgets } from './widgets.js';
 const STORAGE_KEY = 'signal-lab:document';
 /** How far ahead of the playhead the stream runs, in seconds of real time. */
 const LEAD = 0.3;
-/** Milliseconds of the recent past the status line measures over. */
+/** Status measurement window, in milliseconds. */
 const WINDOW = 2000;
 function byId(id) {
     const element = document.getElementById(id);
@@ -49,7 +45,7 @@ function byId(id) {
     }
     return element;
 }
-/** The diagram saved in this browser, if there is a readable one. */
+/** Loads a valid document from browser storage, if available. */
 function loadSaved() {
     try {
         const text = localStorage.getItem(STORAGE_KEY);
@@ -102,7 +98,7 @@ export class App {
     #readings = new Map();
     #path = [];
     #selection = NOTHING;
-    /** Something to say on the status line instead, until the next run or reset. */
+    /** Temporary status message cleared on run or reset. */
     #notice = '';
     #saveTimer;
     /** The playhead: the stream time on screen, in seconds. */
@@ -110,9 +106,8 @@ export class App {
     #running = false;
     #speed = 1;
     /**
-     * Lately, when the worker answered and how many milliseconds it worked for,
-     * and where the playhead was when, to say how busy the one is and how fast
-     * the other really runs.
+     * Recent worker timing and playhead samples used to measure processing load
+     * and effective playback speed.
      */
     #work = [];
     #progress = [];
@@ -187,8 +182,8 @@ export class App {
         return this.#history.present;
     }
     /**
-     * The diagram on screen. If the path stopped existing (after an undo, say),
-     * back out to one that does.
+     * Returns the current diagram, backing out to an existing ancestor if the
+     * path became invalid after an edit or undo.
      */
     get #diagram() {
         let diagram = diagramAt(this.#doc, this.#path);
@@ -258,9 +253,8 @@ export class App {
         this.#sync(diagram);
     }
     /**
-     * How the running stream is doing: the speed, and how much of each second
-     * the simulation spends working, which says how much faster it could go. If
-     * it can't keep up, how fast it really runs instead.
+     * Calculates simulation load, playback speed, and effective throughput when
+     * the worker falls behind.
      */
     #runningSummary() {
         const now = performance.now();
@@ -319,8 +313,8 @@ export class App {
         this.#crumbs.replaceChildren(...items);
     }
     /**
-     * The signal the selection points at: a wire's source, or a single block's
-     * first output. Instruments point at nothing; they show their own.
+     * Resolves the selected wire's source or selected block's first output.
+     * Instruments use their own displays and do not create a selection scope.
      */
     #scopeTarget(diagram) {
         const selection = this.#selection;
@@ -403,7 +397,7 @@ export class App {
                 : [])),
         ].filter(Boolean);
     }
-    /** Hands the worker the recordings the document plays that it lacks. */
+    /** Transfers missing recordings to the worker. */
     #handClips() {
         for (const id of this.#clipIds()) {
             if (!this.#client.hasClip(id)) {
@@ -449,7 +443,7 @@ export class App {
         }
         this.#render();
     }
-    /** Takes the stream back to time 0, with every block afresh. */
+    /** Resets simulation time and processor state. */
     #reset() {
         this.#client.reset();
         this.#live.clear();
@@ -470,7 +464,7 @@ export class App {
             this.#client.advance(until);
         }
     }
-    /** Shows the stream as it stood at the playhead, without a full render. */
+    /** Updates readings and traces at the playhead without rebuilding the views. */
     #refresh() {
         this.#readings = this.#live.readingsAt(this.#time);
         this.#widgets.setTime(this.#time, this.#readings);
@@ -499,7 +493,7 @@ export class App {
             const short = wanted > this.#live.time + 0.05;
             this.#waited = short ? this.#waited + elapsed : 0;
             if (clock !== undefined && short) {
-                // The sound has run out: start it again from where the stream is.
+                // Restart audio scheduling after an underrun.
                 this.#monitor.halt();
             }
             this.#time = Math.max(this.#time, Math.min(wanted, this.#live.time));
@@ -533,7 +527,7 @@ export class App {
             this.#editor.fit();
         }
     }
-    /** A spot near `near` (or the canvas's middle) clear of every block. */
+    /** Finds an unoccupied position near `near`, or near the canvas center. */
     #spot(diagram, kind, near) {
         const type = blockType(kind);
         const { width, height } = type
@@ -900,7 +894,8 @@ export class App {
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(this.#doc));
             }
             catch {
-                // Storage can be full or blocked; the diagram just won't survive a reload.
+                // If storage is unavailable or full, edits remain in memory for this
+                // session.
             }
         }, 400);
     }
@@ -988,7 +983,7 @@ export class App {
         this.#redo.addEventListener('click', () => this.#history.redo());
         byId('fit').addEventListener('click', () => this.#editor.fit());
         byId('export').addEventListener('click', async () => {
-            // The recordings it plays go in the file too, so it keeps its sound.
+            // Embed recordings in the exported document.
             const clips = {};
             for (const id of this.#clipIds()) {
                 const clip = await getClip(id);

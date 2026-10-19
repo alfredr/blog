@@ -1,5 +1,5 @@
-// Canvas plots of a signal over time and of its spectrum. Both draw millions of samples by
-// reducing each pixel column to the range of values it covers.
+// Canvas rendering for time traces, spectra, and waterfalls. Dense traces are
+// reduced to pixel-level summaries to keep large signals practical to display.
 import { fft, floorPowerOfTwo } from '../dsp/fft.js';
 import { welch } from '../dsp/spectrum.js';
 import { decibels, si, significant, toDecibels } from '../engine/format.js';
@@ -142,11 +142,9 @@ function extent(data) {
 /** The most pixel steps spent joining samples up in one phosphor frame. */
 const PHOSPHOR_BUDGET = 3_000_000;
 /**
- * Many samples to a pixel, drawn like the phosphor of an analog scope: every
- * sample, and the line on to the next, lights the pixels it passes, and a
- * pixel glows brighter the more of the trace lands on it. A carrier fills in
- * as a band whose edges glow where it turns, the envelope stands out, and
- * noise is a haze rather than a solid block.
+ * Accumulates sample and segment density per pixel. Brightness reflects how
+ * often the trace crosses each pixel, preserving carrier envelopes and noise
+ * structure when many samples share a column.
  */
 function drawPhosphor(frame, slice, view, y, color) {
     const { ctx, left, top, plotWidth, plotHeight } = frame;
@@ -224,9 +222,9 @@ function fit(data) {
     return { start: low - pad, end: high + pad };
 }
 /**
- * Draws the samples over `view` (seconds), between `bounds` (vertically) if
- * given; `hoverX` is a canvas x position to read out. The time axis counts
- * from `origin`, so its labels stay put while the samples move.
+ * Draws samples over `view` in seconds, with optional vertical `bounds` and
+ * cursor position `hoverX`. Axis labels are relative to `origin` so triggering
+ * can stabilize them independently of sample time.
  */
 export function drawTime(canvas, theme, slice, view, color, hoverX, bounds, origin = 0) {
     const frame = prepare(canvas);
@@ -304,9 +302,9 @@ function spectrumOf(signal, size) {
     return spectrum;
 }
 /**
- * Draws the spectrum over `view` (Hz) in dB, sine-calibrated (see welch). The
- * top of the scale is the loudest level rounded up to 10 dB with a margin, or
- * what `hold` makes of that, to keep it steady.
+ * Draws a sine-calibrated spectrum over `view` in Hz, with levels in dB; see
+ * welch. The upper bound rounds the peak up to a 10 dB step with a margin,
+ * optionally stabilized by `hold`.
  */
 export function drawSpectrum(canvas, theme, signal, view, color, hoverX, hold) {
     const frame = prepare(canvas);
@@ -409,9 +407,9 @@ function inferno(t) {
  */
 const WATERFALL_RANGE = { least: 20, most: 100 };
 /**
- * The levels a waterfall's colors run between: from a little above most of
- * what is on screen, so noise and a window's leakage stay dark, to the
- * loudest. Silence before the stream started doesn't count.
+ * Chooses waterfall color limits from visible data. The lower limit suppresses
+ * background noise and window leakage; the upper limit follows the peak.
+ * Excludes silence before the stream began.
  */
 function colorRange(lines) {
     const levels = [];
@@ -435,9 +433,8 @@ function colorRange(lines) {
 }
 const waterfalls = new WeakMap();
 /**
- * Level in dB of each of `columns` across `view` (Hz), from the windowed FFT
- * of `data`, each column keeping the loudest bin it covers so narrow lines
- * show.
+ * Maps a windowed FFT to `columns` over the frequency range `view`. Each
+ * column retains its maximum bin level in dB to preserve narrow peaks.
  */
 function spectrumRow(data, rate, view, columns) {
     const size = data.length;
@@ -466,11 +463,9 @@ function spectrumRow(data, rate, view, columns) {
     return levels;
 }
 /**
- * A waterfall of the stream in `trace`: the spectrum over `view` (Hz) across
- * and level as color, over the time `shown` (seconds), which ends at the
- * playhead. The newest line is at the top and older ones slide down, as on a
- * receiver. Each line is the spectrum of the stretch just before its time, so
- * a line appears only once its time has passed.
+ * Draws a waterfall over frequency `view` and time `shown`, ending at the
+ * playhead. New rows appear at the top. Each row uses samples preceding its
+ * timestamp and is shown only after that time has passed.
  */
 export function drawWaterfall(canvas, theme, trace, view, shown, hoverX, hoverY) {
     const frame = prepare(canvas);

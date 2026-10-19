@@ -24,7 +24,7 @@ export const paletteEntries = [
         description: t.description,
     })),
 ];
-/** The categories this browser has folded away. */
+/** Categories collapsed in this browser. */
 const FOLDED_KEY = 'signal-lab:palette';
 function loadFolded() {
     try {
@@ -36,10 +36,8 @@ function loadFolded() {
     }
 }
 /**
- * The palette: a tile for each entry, with a drawing of what it does, in
- * categories that fold away; a filter at the top narrows them by name or
- * category. Click a tile to add it, or drag it onto the diagram; in the
- * filter, Enter adds the first that matches.
+ * Renders draggable block tiles in collapsible categories. Filtering matches
+ * names and categories; Enter adds the first match.
  */
 export function renderPalette(host, add) {
     const folded = loadFolded();
@@ -67,7 +65,8 @@ export function renderPalette(host, add) {
                 localStorage.setItem(FOLDED_KEY, JSON.stringify([...folded]));
             }
             catch {
-                // Without storage the folds last as long as the page.
+                // Keep collapsed categories for this session if storage is
+                // unavailable.
             }
         });
         for (const entry of paletteEntries.filter((e) => e.category === category)) {

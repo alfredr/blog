@@ -13,16 +13,13 @@ export function defineBlock(type) {
     return type;
 }
 /**
- * Thrown by a block that can't run as set up, such as an FT8 message that
- * can't be encoded. Its message is shown as is.
+ * A configuration error with a user-facing message, such as an unsupported FT8
+ * message.
  */
 export class BlockError extends Error {
     name = 'BlockError';
 }
-/**
- * Thrown by `rates` when a block's inputs don't fit together. Its message is
- * shown as is.
- */
+/** A sample-rate incompatibility with a user-facing message. */
 export class RateError extends Error {
     name = 'RateError';
 }

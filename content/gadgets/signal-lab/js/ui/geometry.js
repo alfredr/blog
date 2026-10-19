@@ -1,21 +1,19 @@
-// Where blocks and their ports sit on the diagram, and how wires route between them.
+// Block dimensions, port positions, and wire routing.
 import { hasIcon } from './drawings.js';
 /** Blocks snap to this grid. */
 const GRID = 8;
 /** Spacing between ports along a side. */
 const PITCH = 24;
-/** How far a wire runs straight out of a port before it turns. */
+/** Straight wire segment before the first bend. */
 const STUB = 16;
 export const snap = (value) => Math.round(value / GRID) * GRID;
 /** A symbol's square, drawn in the middle of a box's footprint. */
 export const SYMBOL = 56;
 /**
- * How a block is drawn. A plain block with a drawing of its own, one input on
- * its left and one output at most (an input above or below has a side of its
- * own), is drawn as that drawing in a square, as on a schematic, its name
- * above and its settings below. It keeps a box's footprint and ports, leads
- * running out to them, so diagrams laid out with boxes still line up. One with
- * more ports keeps a box, which has room for their names along its sides.
+ * Uses a schematic symbol for box-shaped blocks with an icon, at most one left
+ * input, and at most one output. Top and bottom inputs are separate. The
+ * original footprint and port positions are preserved so existing diagrams
+ * remain aligned; blocks with more ports retain labeled boxes.
  */
 export function drawingOf(type) {
     const shape = type.shape ?? { kind: 'box' };
@@ -54,7 +52,7 @@ function layoutBlock(type) {
             [width, height] = [64, 56];
             break;
         case 'antenna':
-            // The mast's foot, where the wire meets it, is near the bottom.
+            // Place the antenna connection near the foot of the mast.
             [width, height, portY] = [48, 64, 56];
             break;
         case 'terminal':
@@ -100,7 +98,8 @@ export function route(from, to) {
             const middle = snap((from.x + to.x) / 2);
             return [from, { x: middle, y: from.y }, { x: middle, y: to.y }, to];
         }
-        // Backwards: cross over in the gap just above or below the target's row, or go under both.
+        // For a backward connection, route above or below the target row, or
+        // beneath both blocks.
         const y = to.y - from.y > 100
             ? to.y - 48
             : from.y - to.y > 100

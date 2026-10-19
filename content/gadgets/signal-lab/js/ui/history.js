@@ -1,14 +1,13 @@
 /**
- * The current value plus undo and redo stacks. Continuous edits such as drags
- * call preview() as they go and commit() at the end, which records the whole
- * gesture as one undo step.
+ * Undo and redo history. Continuous edits call preview() during the gesture
+ * and commit() at completion, producing one undo step.
  */
 export class History {
     static LIMIT = 200;
     #present;
     #past = [];
     #future = [];
-    /** The value before the preview in progress, if one is. */
+    /** Snapshot before the active preview gesture. */
     #anchor;
     #listeners = new Set();
     constructor(initial) {

@@ -1,8 +1,6 @@
-// What each instrument looks like, on the diagram and on the panel face. Both
-// places show the same live state as of the playhead: the face's widgets are
-// larger, and its screens zoom and listen. A widget is rebuilt only when what
-// it is built from changes, so a knob keeps working while it turns and changes
-// the document under it.
+// Instrument widgets for the diagram and panel face. Both display state at the
+// playhead. Cached widgets are rebuilt only when their defining properties
+// change, preserving active gestures during document updates.
 import { BUTTON, CONTROL, NOTE, PLOT, READOUT, SPEAKER, SYMBOLS, } from '../blocks/instruments.js';
 import { portKey } from '../engine/circuit.js';
 import { formatReading } from '../engine/format.js';
@@ -21,10 +19,7 @@ export function inputOf(doc, item) {
     const wire = diagram && wireInto(diagram, { block: item.block.id, port: 0 });
     return (wire && { block: pathId(item.path, wire.from.block), port: wire.from.port });
 }
-/**
- * The current version of an instrument, which may have changed since it was
- * built.
- */
+/** Fetches an instrument's current block after document edits. */
 function current(context, item) {
     const block = diagramAt(context.doc, item.path)?.blocks.find((b) => b.id === item.block.id);
     return block ? { ...item, block } : item;
@@ -46,10 +41,9 @@ function arc(from, to, radius = RIM) {
     return `M${point(from)} A${radius} ${radius} 0 ${to - from > 180 ? 1 : 0} 1 ${point(to)}`;
 }
 /**
- * A rotary knob: a dark dial with its value lit around the rim and written in
- * the middle, and the ends of its range under it. Drag up or down (with Shift
- * for fine steps), scroll, or use the arrow keys; double-click it, or press
- * Enter, to type a value.
+ * Rotary numeric control with a value display and range labels. Supports
+ * dragging, Shift for fine adjustment, scrolling, and keyboard steps.
+ * Double-click or Enter enables text entry.
  */
 function knob(spec, value, onChange) {
     const fill = svg('path', { class: 'knob-fill' });
@@ -97,7 +91,7 @@ function knob(spec, value, onChange) {
             text.classList.toggle('long', text.value.length > 6);
         }
     };
-    // Typing a value: the field in the middle of the dial takes the keys.
+    // Enable text entry in the value field.
     const type = () => {
         element.classList.add('typing');
         text.focus();
@@ -188,8 +182,8 @@ function knob(spec, value, onChange) {
     return { element, update: (v) => show(v) };
 }
 /**
- * An LCD you type into, as on the front of a radio: a text setting, or a
- * number that the wheel and the arrow keys also step.
+ * Text or numeric input styled as an LCD. Numeric fields also support wheel
+ * and arrow-key adjustments.
  */
 function lcd(spec, value, onChange) {
     const input = html('input', {
@@ -250,7 +244,7 @@ function lcd(spec, value, onChange) {
         update: (v) => show(v),
     };
 }
-/** What a control is built from, besides its block. */
+/** Control properties that determine whether its widget must be rebuilt. */
 function controlShape(state) {
     return 'problem' in state
         ? state.problem
@@ -273,7 +267,10 @@ export class Widgets {
         this.#context = context;
         this.#live.clear();
     }
-    /** The element for an instrument, reused while it still fits, and up to date. */
+    /**
+     * Returns an updated widget, reusing it while its structure remains
+     * compatible.
+     */
     get(place, item) {
         const context = this.#context;
         const key = JSON.stringify([
@@ -294,7 +291,7 @@ export class Widgets {
         widget.sync(context);
         return widget.element;
     }
-    /** Forgets the widgets no view asked for in this pass. */
+    /** Discards cached widgets unused in this render pass. */
     sweep() {
         for (const id of this.#instances.keys()) {
             if (!this.#live.has(id)) {
@@ -302,7 +299,7 @@ export class Widgets {
             }
         }
     }
-    /** Moves the playhead: readouts and plots catch up. */
+    /** Updates plots and readouts for a new playhead time. */
     setTime(time, readings) {
         if (!this.#context) {
             return;
@@ -397,9 +394,8 @@ export class Widgets {
                 this.#toggle(context, item);
             }
         });
-        // On the face a speaker is laid out as a knob is: its name over it, the
-        // grille as big as a knob there, and its switch where a knob's range
-        // goes. The grille switches it too.
+        // Align the speaker with knob controls: label above, grille in the center,
+        // and power button below. Clicking the grille also toggles playback.
         const grille = html('div', {
             class: 'speaker-grille',
             'aria-hidden': 'true',
@@ -440,8 +436,8 @@ export class Widgets {
         // Help text belongs in the inspector; a widget has no room for it.
         const spec = { ...state.spec, label, help: undefined };
         if (state.binding !== undefined) {
-            // A bound setting follows its expression, so show it rather than offer a
-            // control that would do nothing.
+            // Bound settings display their expression because direct edits would be
+            // overridden.
             const value = html('span', { class: 'widget-value' });
             return {
                 element: html('div', { class: 'widget-control' }, html('span', { class: 'control-label' }, label), value, html('p', { class: 'control-help' }, `= ${state.binding}`)),
@@ -482,7 +478,7 @@ export class Widgets {
         push.addEventListener('click', (event) => {
             event.stopPropagation();
             this.#events.press(item.id);
-            // A moment of light, as a lit push button gives.
+            // Briefly illuminate the button after a press.
             push.classList.add('pressed');
             setTimeout(() => push.classList.remove('pressed'), 150);
         });
@@ -491,11 +487,11 @@ export class Widgets {
             sync: () => { },
         };
     }
-    /** A Bits to tones view, here and on the face alike. */
+    /** Shared Bits to tones widget for the diagram and panel. */
     #symbols(item) {
         const view = new SymbolView();
         const title = html('span', { class: 'widget-title' });
-        // Worked out again only when the document or its statuses change.
+        // Recompute sources only when the document or statuses change.
         let made;
         return {
             element: html('div', { class: 'widget-plot widget-symbols' }, title, view.element),
@@ -549,8 +545,8 @@ export class Widgets {
                 ? 'widget-value lcd'
                 : 'widget-value',
         });
-        // A line under the value, only when something is wrong; where the
-        // reading comes from is in the tooltip, so readouts and controls line up.
+        // Reserve the line below the value for errors. Source details remain in
+        // the tooltip so controls and readouts align.
         const problem = html('span', { class: 'widget-from' });
         const element = html('div', { class: 'widget-readout' }, label, value, problem);
         return {
@@ -580,7 +576,7 @@ export class Widgets {
         };
     }
 }
-/** Why nothing comes out of a port, if nothing does. */
+/** Returns the diagnostic for an unavailable output signal. */
 export function problemAt(status, at) {
     const source = status.get(at.block);
     return source?.state === 'error'
