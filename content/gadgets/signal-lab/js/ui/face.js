@@ -541,6 +541,10 @@ export class Face {
         if (id !== SCOPE) {
             this.#dragFrom(grip, () => ({ kind: 'instrument', id, element }));
             resize.addEventListener('pointerdown', (event) => {
+                const before = this.#model?.doc;
+                if (!before) {
+                    return;
+                }
                 event.preventDefault();
                 event.stopPropagation();
                 resize.setPointerCapture(event.pointerId);
@@ -551,6 +555,7 @@ export class Face {
                     y: event.clientY,
                     w: Number(element.dataset.w),
                     h: Number(element.dataset.h),
+                    before,
                 };
             });
             resize.addEventListener('pointermove', (event) => {
@@ -562,14 +567,8 @@ export class Face {
                 const h = Math.max(2, drag.h + Math.round((event.clientY - drag.y) / PITCH));
                 this.#change((doc) => resizeInstrument(doc, id, { w, h }), 'preview');
             });
-            const settle = () => {
-                if (this.#drag?.kind === 'resize') {
-                    this.#drag = undefined;
-                    this.#change((doc) => doc, 'commit');
-                }
-            };
-            resize.addEventListener('pointerup', settle);
-            resize.addEventListener('pointercancel', settle);
+            resize.addEventListener('pointerup', () => this.#endDrag(true));
+            resize.addEventListener('pointercancel', () => this.#endDrag(false));
             resize.addEventListener('dblclick', () => this.#change((doc) => resizeInstrument(doc, id, undefined), 'commit'));
         }
         // Clicking an instrument away from its controls shows it on the diagram.
@@ -678,7 +677,13 @@ export class Face {
         const drag = this.#drag;
         this.#drag = undefined;
         this.#dropBar.hidden = true;
-        if (!drag || drag.kind === 'resize') {
+        if (!drag) {
+            return;
+        }
+        // A resize shows as it goes; letting go keeps it as one step to undo,
+        // and Escape puts back what was there, leaving nothing to undo.
+        if (drag.kind === 'resize') {
+            this.#change((doc) => (drop ? doc : drag.before), 'commit');
             return;
         }
         drag.element.classList.remove('dragging');

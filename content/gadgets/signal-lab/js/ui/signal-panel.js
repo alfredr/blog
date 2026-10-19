@@ -122,6 +122,8 @@ export class Screen {
     /** Pointer position over the plot, in canvas pixels. */
     #hover;
     #frame = 0;
+    /** Drawn again when the colors change; theme.ts holds it only weakly. */
+    #redraw = () => this.#schedule();
     constructor({ interactive }) {
         this.#interactive = interactive;
         this.element = html('div', { class: 'plot-wrap' }, this.#canvas, this.#empty);
@@ -129,7 +131,7 @@ export class Screen {
             this.#listen();
         }
         new ResizeObserver(() => this.#schedule()).observe(this.#canvas);
-        onThemeChange(this.element, () => this.#schedule());
+        onThemeChange(this.#redraw);
     }
     update(state) {
         const previous = this.#state;

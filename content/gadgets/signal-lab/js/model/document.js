@@ -581,9 +581,11 @@ function readRef(value) {
     }
     return { block: value.block, port: Math.trunc(value.port) };
 }
+/** The most grid cells an instrument can be across or down. */
+export const MOST_CELLS = 40;
 /** A size in grid cells, if it is one. */
 function readCells(value) {
-    return isNumber(value) && value >= 1 && value <= 40
+    return isNumber(value) && value >= 1 && value <= MOST_CELLS
         ? Math.round(value)
         : undefined;
 }

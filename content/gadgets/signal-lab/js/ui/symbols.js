@@ -83,10 +83,12 @@ export class SymbolView {
     /** Each stacked row's height above and below 0, by name. */
     #peaks = new Map();
     #shown = '';
+    /** Drawn again when the colors change; theme.ts holds it only weakly. */
+    #redraw = () => this.#schedule();
     constructor() {
         this.element = html('div', { class: 'plot-wrap' }, this.#canvas, this.#empty);
         new ResizeObserver(() => this.#schedule()).observe(this.#canvas);
-        onThemeChange(this.element, () => this.#schedule());
+        onThemeChange(this.#redraw);
     }
     update(state) {
         this.#state = state;
