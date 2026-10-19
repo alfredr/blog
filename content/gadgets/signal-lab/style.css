@@ -1,0 +1,861 @@
+/* Archivo, JetBrains Mono and Source Serif 4 (SIL Open Font License 1.1), self-hosted, latin subset. */
+@font-face { font-family: "Archivo"; font-style: normal; font-weight: 700 800; font-stretch: 112%; font-display: swap; src: url(fonts/archivo-latin.woff2) format("woff2"); }
+@font-face { font-family: "JetBrains Mono"; font-style: normal; font-weight: 400 600; font-display: swap; src: url(fonts/jetbrains-mono-latin.woff2) format("woff2"); }
+@font-face { font-family: "Source Serif 4"; font-style: normal; font-weight: 400 600; font-display: swap; src: url(fonts/source-serif-4-latin.woff2) format("woff2"); }
+@font-face { font-family: "Source Serif 4"; font-style: italic; font-weight: 400; font-display: swap; src: url(fonts/source-serif-4-italic-latin.woff2) format("woff2"); }
+
+:root {
+  color-scheme: light;
+  --bg: #eef2f0;
+  --surface: #fafcfb;
+  --canvas: #f4f7f5;
+  --ink: #15201c;
+  --muted: #56655f;
+  --rule: #cfd9d4;
+  --grid: #d6dfda;
+  --grid-dot: #a3b2ab;
+  --wire: #7d8c86;
+  --port: #56655f;
+  --accent: #1d6e8a;
+  --accent-soft: #e1eef2;
+  --warn: #c0392b;
+  --lcd: #b8c49c;
+  --lcd-ink: #1c2614;
+  --lcd-dots: rgba(28, 38, 20, 0.07);
+  --lcd-glow: none;
+  /* FT8's Costas sync symbols, set apart from the data around them. */
+  --sync: #8a5a1d;
+  --sync-soft: #f2eadd;
+  /* The panel face: raised modules on a darker panel, dark dials in bright
+     rims, lights in cyan, and screens set into the modules. */
+  --panel: #d5dcd8;
+  --strip: #c8d0cc;
+  --housing: #c6cfca;
+  --module: #f5f7f6;
+  --module-low: #e5eae7;
+  --module-edge: #bcc6c1;
+  --module-shine: rgba(255, 255, 255, 0.95);
+  --silk: #3f4c47;
+  --knob: #1d2a30;
+  --knob-high: #3a4d56;
+  --knob-rim: #edf1f2;
+  --knob-rim-edge: #a3afb3;
+  --knob-ink: #e8f4f8;
+  --knob-track: rgba(255, 255, 255, 0.1);
+  --grille: #d0d8dc;
+  --lit: #23b4e0;
+  --lit-glow: rgba(35, 180, 224, 0.55);
+  --led-off: #aab5b0;
+  --screen: #fbfcfc;
+  --screen-edge: #b3beb9;
+  --screen-ink: #15201c;
+  --screen-muted: #5d6c66;
+  --screen-rule: #c9d4cf;
+  --screen-grid: #dbe3df;
+  --screen-trace: #1b88ad;
+  --font-display: "Archivo", "Arial Narrow", system-ui, sans-serif;
+  --font-body: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #0d1311;
+    --surface: #141c19;
+    --canvas: #101715;
+    --ink: #e1e9e5;
+    --muted: #8fa199;
+    --rule: #28342f;
+    --grid: #1b2521;
+    --grid-dot: #26312d;
+    --wire: #6f817a;
+    --port: #8fa199;
+    --accent: #5cb8d8;
+    --accent-soft: #16303a;
+    --warn: #ff6b5b;
+    --lcd: #121b0c;
+    --lcd-ink: #a6e86c;
+    --lcd-dots: rgba(166, 232, 108, 0.06);
+    --lcd-glow: 0 0 6px rgba(166, 232, 108, 0.55);
+    --sync: #e0a95c;
+    --sync-soft: #2a2317;
+    --panel: #090c0b;
+    --strip: #050706;
+    --housing: #0e1311;
+    --module: #1a201e;
+    --module-low: #141917;
+    --module-edge: #27302c;
+    --module-shine: rgba(255, 255, 255, 0.05);
+    --silk: #aebdb6;
+    --knob: #171c1f;
+    --knob-high: #333c41;
+    --knob-rim: #3b4549;
+    --knob-rim-edge: #050606;
+    --knob-ink: #e8f4f8;
+    --knob-track: rgba(255, 255, 255, 0.08);
+    --grille: #2d3539;
+    --lit: #4fd1f0;
+    --lit-glow: rgba(79, 209, 240, 0.5);
+    --led-off: #2e3734;
+    --screen: #070a09;
+    --screen-edge: #000;
+    --screen-ink: #d3e2dc;
+    --screen-muted: #6d8178;
+    --screen-rule: #24302b;
+    --screen-grid: #111816;
+    --screen-trace: #4fd1f0;
+  }
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0d1311;
+  --surface: #141c19;
+  --canvas: #101715;
+  --ink: #e1e9e5;
+  --muted: #8fa199;
+  --rule: #28342f;
+  --grid: #1b2521;
+  --grid-dot: #26312d;
+  --wire: #6f817a;
+  --port: #8fa199;
+  --accent: #5cb8d8;
+  --accent-soft: #16303a;
+  --warn: #ff6b5b;
+  --lcd: #121b0c;
+  --lcd-ink: #a6e86c;
+  --lcd-dots: rgba(166, 232, 108, 0.06);
+  --lcd-glow: 0 0 6px rgba(166, 232, 108, 0.55);
+  --sync: #e0a95c;
+  --sync-soft: #2a2317;
+  --panel: #090c0b;
+  --strip: #050706;
+  --housing: #0e1311;
+  --module: #1a201e;
+  --module-low: #141917;
+  --module-edge: #27302c;
+  --module-shine: rgba(255, 255, 255, 0.05);
+  --silk: #aebdb6;
+  --knob: #171c1f;
+  --knob-high: #333c41;
+  --knob-rim: #3b4549;
+  --knob-rim-edge: #050606;
+  --knob-ink: #e8f4f8;
+  --knob-track: rgba(255, 255, 255, 0.08);
+  --grille: #2d3539;
+  --lit: #4fd1f0;
+  --lit-glow: rgba(79, 209, 240, 0.5);
+  --led-off: #2e3734;
+  --screen: #070a09;
+  --screen-edge: #000;
+  --screen-ink: #d3e2dc;
+  --screen-muted: #6d8178;
+  --screen-rule: #24302b;
+  --screen-grid: #111816;
+  --screen-trace: #4fd1f0;
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+
+html, body { height: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font: 400 15px/1.5 var(--font-body);
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+button, select, input, textarea { font: 500 12px/1.2 var(--font-mono); color: var(--ink); }
+
+button, select {
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  padding: 6px 10px;
+  cursor: pointer;
+}
+button:hover:not(:disabled), select:hover { border-color: var(--accent); color: var(--accent); }
+button:disabled { opacity: 0.45; cursor: default; }
+button[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* Top bar */
+
+.topbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 20px;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--rule);
+  background: var(--surface);
+}
+.brand { display: flex; align-items: baseline; gap: 12px; min-width: 0; }
+.brand-name { font: 800 20px/1 var(--font-display); font-stretch: 112%; letter-spacing: -0.01em; white-space: nowrap; }
+.doc-title { color: var(--muted); font-style: italic; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.toolbar select { width: 10.5rem; }
+.divider { width: 1px; height: 20px; background: var(--rule); margin: 0 4px; }
+/* Buttons that show and hide the side bars and the panel, with an icon of
+   the layout: the part filled while it shows. */
+.layout-toggles { display: flex; gap: 2px; margin-left: auto; }
+.layout-toggle { display: grid; place-items: center; width: 30px; height: 26px; padding: 0; color: var(--muted); background: none; border-color: transparent; }
+.layout-toggle[aria-pressed] { background: none; border-color: transparent; color: var(--muted); }
+.layout-toggle[aria-pressed="true"] { color: var(--ink); }
+.layout-toggle:hover:not(:disabled) { color: var(--ink); border-color: var(--rule); }
+.layout-icon { width: 16px; height: 16px; }
+.layout-icon rect { fill: none; stroke: currentColor; stroke-width: 1.2; }
+.layout-toggle[aria-pressed="true"] .layout-icon .part { fill: currentColor; }
+/* The colors: the system's, light or dark. */
+.theme-icon { width: 16px; height: 16px; }
+.theme-icon circle, .theme-icon path { fill: none; stroke: currentColor; stroke-width: 1.2; stroke-linecap: round; }
+.theme-icon .fill { fill: currentColor; stroke: none; }
+.layout-toggles + .layout-toggle { margin-left: 6px; padding-left: 0; border-left: 1px solid var(--rule); border-radius: 0 6px 6px 0; }
+
+/* The status line along the bottom. */
+.statusbar { display: flex; align-items: center; min-width: 0; height: 24px; padding: 0 12px; border-top: 1px solid var(--rule); background: var(--surface); }
+.status { margin: 0; font: 400 11.5px/1 var(--font-mono); color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* Workspace: a side bar either side of the middle, where the diagram sits
+   over the panel face or beside it. Each can be closed, and dragged wider or
+   narrower by the edge it shares with the middle. */
+
+.workspace {
+  --blocks-column: var(--blocks-width, 208px);
+  --inspector-column: var(--inspector-width, 300px);
+  --panel-track: var(--panel-size, 380px);
+  display: grid;
+  grid-template-columns: var(--blocks-column) minmax(0, 1fr) var(--inspector-column);
+  grid-template-areas: "blocks center inspector";
+  min-height: 0;
+}
+.workspace.no-blocks { --blocks-column: 0px; }
+.workspace.no-inspector { --inspector-column: 0px; }
+.workspace.no-blocks .area-blocks, .workspace.no-inspector .area-inspector { display: none; }
+.area { display: flex; flex-direction: column; min-width: 0; min-height: 0; background: var(--surface); }
+.area-blocks { grid-area: blocks; border-right: 1px solid var(--rule); }
+.area-inspector { grid-area: inspector; border-left: 1px solid var(--rule); }
+.area-head { display: flex; flex: none; align-items: center; justify-content: space-between; gap: 8px; height: 32px; padding: 0 4px 0 12px; border-bottom: 1px solid var(--rule); }
+.area-title { margin: 0; font: 600 11px/1 var(--font-mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+.area-close { padding: 0 7px; border-color: transparent; background: none; font: 400 17px/22px var(--font-mono); color: var(--muted); }
+.palette { flex: 1; min-height: 0; overflow: auto; padding: 0 12px 12px; }
+.inspector { flex: 1; min-height: 0; overflow: auto; padding: 16px; }
+
+.center {
+  grid-area: center; position: relative; display: grid; min-width: 0; min-height: 0;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr) var(--panel-track);
+  grid-template-areas: "canvas" "face";
+}
+.workspace.panel-right .center { grid-template-columns: minmax(0, 1fr) var(--panel-track); grid-template-rows: minmax(0, 1fr); grid-template-areas: "canvas face"; }
+.workspace.no-panel .center { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr); grid-template-areas: "canvas"; }
+.workspace.panel-max .center { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr); grid-template-areas: "face"; }
+.workspace.no-panel .face, .workspace.panel-max .canvas { display: none; }
+.canvas { grid-area: canvas; position: relative; min-width: 0; min-height: 0; background: var(--canvas); }
+.face { grid-area: face; min-width: 0; min-height: 0; overflow: auto; padding: 10px 12px 16px; border-top: 1px solid var(--rule); }
+.workspace.panel-right .face { border-top: 0; border-left: 1px solid var(--rule); }
+.workspace.panel-max .face { border: 0; }
+
+/* The edges to drag, which light up when the pointer finds them. */
+.sash { position: absolute; z-index: 6; touch-action: none; }
+.sash::after { content: ""; position: absolute; inset: 1px; background: var(--accent); opacity: 0; transition: opacity 0.1s; }
+.sash:hover::after { opacity: 1; transition-delay: 0.3s; }
+.sash.active::after { opacity: 1; transition-delay: 0s; }
+.sash-blocks, .sash-inspector, .workspace.panel-right .sash-panel { top: 0; bottom: 0; width: 6px; cursor: col-resize; }
+.sash-blocks { left: -3px; }
+.sash-inspector { right: -3px; }
+.sash-panel { left: 0; right: 0; bottom: calc(var(--panel-track) - 3px); height: 6px; cursor: row-resize; }
+.workspace.panel-right .sash-panel { left: auto; right: calc(var(--panel-track) - 3px); height: auto; }
+.workspace.no-blocks .sash-blocks, .workspace.no-inspector .sash-inspector, .workspace.no-panel .sash-panel, .workspace.panel-max .sash-panel { display: none; }
+
+/* Docking the panel by dragging its title: a shadow shows where it would go. */
+.dock-handle { cursor: grab; user-select: none; touch-action: none; }
+.workspace.docking, .workspace.docking * { cursor: grabbing !important; }
+.dock-preview { position: absolute; z-index: 7; pointer-events: none; background: color-mix(in srgb, var(--accent) 16%, transparent); outline: 2px solid var(--accent); outline-offset: -2px; border-radius: 4px; transition: inset 0.12s ease; }
+.dock-preview[data-position="bottom"] { inset: 55% 0 0 0; }
+.dock-preview[data-position="right"] { inset: 0 0 0 55%; }
+@media (prefers-reduced-motion: reduce) { .dock-preview { transition: none; } }
+/* The panel's own buttons: move, maximize and close. */
+.face button.icon-button { display: grid; place-items: center; width: 26px; height: 24px; padding: 0; }
+.layout-icon.glyph path { fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+.face .icon-button .layout-icon { width: 14px; height: 14px; }
+
+/* Palette */
+
+.palette-group + .palette-group { margin-top: 2px; }
+.palette-heading, .kicker, .control-label {
+  margin: 0 0 6px;
+  font: 600 11px/1.2 var(--font-mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+/* The palette: tiles with a drawing of each block, in categories that fold
+   away, under a filter that stays put. */
+.palette-search { position: sticky; top: 0; z-index: 1; margin: 0 -12px 4px; padding: 8px 12px; background: var(--surface); border-bottom: 1px solid var(--rule); }
+input.palette-filter { width: 100%; padding: 5px 8px; font: 500 12px/1.2 var(--font-mono); }
+button.palette-heading { display: flex; align-items: center; gap: 7px; width: 100%; margin: 0; padding: 7px 2px; background: none; border: 0; border-radius: 4px; text-align: left; cursor: pointer; }
+button.palette-heading:hover:not(:disabled) { color: var(--ink); }
+button.palette-heading::before { content: ""; flex: none; border-left: 4.5px solid currentColor; border-top: 3.5px solid transparent; border-bottom: 3.5px solid transparent; transform: rotate(90deg); transition: transform 0.12s; }
+.palette-group.folded button.palette-heading::before { transform: none; }
+.palette-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 4px; padding-bottom: 8px; }
+.palette-group.folded .palette-grid { display: none; }
+.palette.filtering .palette-group.folded .palette-grid { display: grid; }
+.palette-item {
+  display: flex; flex-direction: column; align-items: center; gap: 5px; min-width: 0; min-height: 66px; padding: 9px 4px 7px;
+  text-align: center; cursor: grab; border-radius: 6px;
+}
+.palette-label { font: 500 10.5px/1.2 var(--font-mono); overflow-wrap: break-word; }
+.block-icon { flex: none; width: 24px; height: 24px; }
+.block-icon path, .block-icon circle, .block-icon rect { fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+.block-icon .dashed { stroke-dasharray: 2.5 2; }
+/* Library subsystems: built from other blocks, which you can open up. */
+.palette-item.composite { border-style: dashed; }
+
+/* Diagram */
+
+.diagram { display: block; width: 100%; height: 100%; touch-action: none; user-select: none; -webkit-user-select: none; }
+.diagram:focus-visible { outline-offset: -3px; }
+.grid-dot { fill: var(--grid-dot); }
+
+.block { cursor: grab; }
+.block .body { fill: var(--surface); stroke: var(--port); stroke-width: 1.2; }
+.block.selected .body { stroke: var(--accent); stroke-width: 2.2; }
+.block.error .body { stroke: var(--warn); stroke-width: 1.8; }
+.block.idle { opacity: 0.55; }
+.block text { fill: var(--ink); text-anchor: middle; dominant-baseline: middle; pointer-events: none; }
+/* text-anchor as an SVG attribute loses to the rule above, so labels that hang off one side use these. */
+.block text.anchor-start { text-anchor: start; }
+.block text.anchor-end { text-anchor: end; }
+.block .title { font: 700 13px var(--font-display); }
+.block .summary { font: 400 11px var(--font-mono); fill: var(--muted); }
+.block .summary.inside { fill: var(--ink); }
+/* The palette's drawing of a block, small and quiet over its name. */
+.block .block-icon { color: var(--muted); overflow: visible; }
+.block .block-icon path, .block .block-icon circle, .block .block-icon rect { stroke-width: 2; }
+/* A block drawn as a schematic symbol: the drawing is its face, and its name
+   above reads as the name of anything else on the diagram. */
+.block.shape-symbol .block-icon { color: var(--ink); }
+.block.shape-symbol .block-icon path, .block.shape-symbol .block-icon circle, .block.shape-symbol .block-icon rect { stroke-width: 1.6; }
+.block.shape-symbol .label { fill: var(--ink); }
+.block .symbol-lead { fill: none; stroke: var(--wire); stroke-width: 1.5; }
+.block .symbol { font: 400 22px var(--font-mono); }
+.block .label { font: 600 11px var(--font-mono); fill: var(--muted); }
+.block .port-name { font: 500 10px var(--font-mono); fill: var(--muted); }
+
+.port { fill: var(--surface); stroke: var(--port); stroke-width: 1.5; }
+.port.target { fill: var(--accent); stroke: var(--accent); }
+.port-hit { fill: transparent; cursor: crosshair; }
+
+.badge circle { fill: var(--warn); }
+.badge text { fill: #fff !important; font: 700 11px var(--font-mono); }
+
+.wire-line { fill: none; stroke: var(--wire); stroke-width: 1.6; }
+.wire-hit { fill: none; stroke: transparent; stroke-width: 12; cursor: pointer; }
+.wire.selected .wire-line { stroke: var(--accent); stroke-width: 2.6; }
+.wire-line.dragging { stroke: var(--accent); stroke-dasharray: 5 4; }
+/* The wire or marquee being dragged must never sit between the pointer and the port under it. */
+.overlay { pointer-events: none; }
+
+.block.selected .antenna { stroke: var(--accent); }
+.antenna { fill: none; stroke: var(--ink); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.waves { fill: none; stroke: var(--muted); stroke-width: 1.4; stroke-linecap: round; }
+.hit { fill: transparent; }
+.shape-terminal .body { fill: var(--accent-soft); stroke: var(--accent); }
+.shape-terminal .title { font: 600 11px var(--font-mono); }
+/* Inside a subsystem: what each terminal is wired to outside, for the copy opened. */
+.outside-lead { fill: none; stroke: var(--accent); stroke-width: 1.4; stroke-dasharray: 4 3; }
+.outside-label { font: 600 11px var(--font-mono); fill: var(--accent); dominant-baseline: middle; cursor: pointer; }
+.outside-label:hover { text-decoration: underline; }
+.outside-label.anchor-start { text-anchor: start; }
+.outside-label.anchor-end { text-anchor: end; }
+.outside-word { font-weight: 400; fill: var(--muted); }
+.outside-label.more, .outside-end.unwired .outside-label { font-weight: 400; fill: var(--muted); cursor: default; text-decoration: none; }
+.outside-end.unwired .outside-lead { stroke: var(--muted); }
+.outside-label.reach { text-anchor: middle; cursor: default; }
+.outside-label.reach:hover { text-decoration: none; }
+.outside-name { cursor: pointer; }
+.outside-name:hover { text-decoration: underline; }
+.body.stack { opacity: 0.6; }
+.marquee { fill: var(--accent); fill-opacity: 0.08; stroke: var(--accent); stroke-dasharray: 4 3; }
+
+.crumbs {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  max-width: calc(100% - 20px);
+  padding: 4px 6px;
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  font: 500 12px var(--font-mono);
+}
+.crumb { padding: 3px 6px; border: 0; background: none; }
+.crumb.current { padding: 3px 6px; color: var(--ink); font-weight: 600; }
+.crumb-sep { color: var(--muted); }
+
+/* Bindable settings and parameters */
+
+.bindable { position: relative; }
+.bind-button { position: absolute; top: -3px; right: 0; padding: 1px 7px; font: italic 600 13px var(--font-body); border-radius: 5px; }
+.bindable.bound .control-row, .bindable.bound > .control > select { display: none; }
+.bindable.bound > .bind-button { color: var(--accent); border-color: var(--accent); background: var(--accent-soft); }
+.expression-row { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 6px; align-items: center; }
+.expression { font: 500 12px var(--font-mono); }
+.expression-sign { color: var(--muted); font: 500 12px var(--font-mono); }
+.expression-result { font: 600 12px var(--font-mono); color: var(--muted); white-space: nowrap; }
+.expression-result.error { color: var(--warn); white-space: normal; grid-column: 1 / -1; }
+.parameters, .settings { display: grid; gap: 10px; }
+.parameter-list { display: grid; gap: 14px; }
+/* A subsystem's parameter bound on the subsystem block outside: the binding, read-only. */
+.outside-binding { margin-top: 8px; }
+.outside-binding code.expression { padding: 4px 7px; font: 500 12px var(--font-mono); color: var(--ink); background: var(--bg); border: 1px dashed var(--rule); border-radius: 6px; overflow-wrap: anywhere; }
+.outside-binding .control-help { margin: 4px 0 0; }
+.parameter-form { display: grid; gap: 8px; margin-top: 8px; padding: 10px; border: 1px solid var(--rule); border-radius: 8px; background: var(--bg); }
+.mini-field { display: grid; gap: 4px; font: 500 11px var(--font-mono); color: var(--muted); }
+.mini-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; align-items: end; }
+.control-help.error { color: var(--warn); }
+details.inside > summary { cursor: pointer; margin-bottom: 10px; }
+
+/* Context menu */
+
+.menu {
+  position: fixed;
+  z-index: 10;
+  min-width: 220px;
+  max-height: 70vh;
+  overflow: auto;
+  padding: 4px;
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.25);
+}
+.menu-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  width: 100%;
+  padding: 6px 10px;
+  border: 0;
+  border-radius: 5px;
+  background: none;
+  text-align: left;
+}
+.menu-item:hover:not(:disabled), .menu-item:focus-visible { background: var(--accent-soft); color: var(--accent); outline: none; }
+.menu-item.danger:hover:not(:disabled), .menu-item.danger:focus-visible { color: var(--warn); }
+.menu-hint { color: var(--muted); }
+.menu-heading { padding: 8px 10px 2px; font: 600 10px var(--font-mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.menu-separator { height: 1px; margin: 4px 6px; background: var(--rule); }
+
+/* Inspector */
+
+.panel { display: grid; gap: 14px; }
+.panel h2 { margin: -10px 0 0; font: 800 22px/1.1 var(--font-display); font-stretch: 112%; }
+.description { margin: 0; color: var(--muted); }
+.params { display: grid; gap: 14px; }
+.control { display: grid; gap: 6px; min-width: 0; }
+.control-label { margin: 0; }
+label.control-label { display: grid; gap: 6px; }
+.control-row { display: grid; grid-template-columns: minmax(0, 1fr) 96px; gap: 10px; align-items: center; }
+.control-help { margin: 0; font: 400 12px/1.4 var(--font-mono); color: var(--muted); }
+.control.check { display: flex; align-items: center; gap: 8px; font: 500 12px var(--font-mono); }
+input[type="text"], textarea, select {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  padding: 6px 8px;
+}
+input.control-value { text-align: right; }
+textarea { resize: vertical; font: 400 14px/1.5 var(--font-body); }
+input[type="range"] { width: 100%; accent-color: var(--accent); }
+
+.segmented { display: flex; flex-wrap: wrap; gap: 3px; padding: 3px; border: 1px solid var(--rule); border-radius: 8px; background: var(--bg); }
+.segment { position: relative; flex: 1 1 auto; }
+.segment input { position: absolute; inset: 0; margin: 0; opacity: 0; cursor: pointer; }
+.segment span { display: block; padding: 5px 8px; border-radius: 5px; text-align: center; font: 500 12px var(--font-mono); color: var(--muted); }
+.segment input:checked + span { background: var(--surface); color: var(--ink); box-shadow: 0 0 0 1px var(--rule); }
+.segment input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+/* An FT8 message's fields, each worked out, its bits lit as they go out. */
+.packing { display: grid; gap: 6px; }
+.packing .control-help { margin: 0; }
+.pack-fields { display: grid; gap: 8px; }
+.pack-field { display: grid; gap: 6px; padding: 8px 10px; background: var(--bg); border: 1px solid var(--rule); border-radius: 8px; }
+.pack-head { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 10px; align-items: baseline; font: 600 12px var(--font-mono); }
+.pack-name { color: var(--muted); font-weight: 500; }
+.pack-value { color: var(--accent); }
+.pack-places { border-collapse: collapse; font: 500 12px var(--font-mono); }
+.pack-places th { padding: 1px 8px 1px 0; color: var(--muted); font-weight: 400; text-align: left; }
+.pack-places td { min-width: 2.1em; padding: 1px 2px; color: var(--muted); text-align: center; }
+.pack-places tr:first-child td { color: var(--ink); font-weight: 700; }
+.pack-how { margin: 0; font: 500 11px var(--font-mono); color: var(--muted); overflow-wrap: anywhere; }
+.pack-bits { margin: 0; font: 600 12px var(--font-mono); color: var(--ink); overflow-wrap: anywhere; }
+.pack-bits .sent { color: var(--accent); }
+.pack-bits .now { color: var(--surface); background: var(--accent); border-radius: 2px; }
+.pack-error { margin: 0; color: var(--warn); }
+.readings { display: grid; grid-template-columns: auto 1fr auto; gap: 4px 12px; margin: 0; font: 500 12px var(--font-mono); }
+.readings:empty { display: none; }
+.readings dt { color: var(--muted); }
+.readings dd { margin: 0; text-align: right; font-weight: 600; overflow-wrap: anywhere; }
+.status-note { margin: 0; font: 400 12px/1.4 var(--font-mono); color: var(--muted); }
+.status-note:empty { display: none; }
+.status-note[data-state="error"] { color: var(--warn); }
+.ports { display: grid; gap: 6px; padding-top: 12px; border-top: 1px solid var(--rule); }
+.port-row { display: grid; grid-template-columns: 1fr auto auto; gap: 10px; align-items: center; }
+.port-label, .port-rate { font: 500 12px var(--font-mono); }
+.port-rate { color: var(--muted); margin: 0; }
+.actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.small { padding: 4px 8px; font-size: 11px; }
+.danger:hover:not(:disabled) { border-color: var(--warn); color: var(--warn); }
+
+.inner-params { margin: 0; padding: 8px 12px 12px; border: 1px solid var(--rule); border-radius: 8px; }
+.inner-params legend { padding: 0 4px; font: 600 11px var(--font-mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.inner-block { display: flex; justify-content: space-between; align-items: center; font: 500 12px var(--font-mono); }
+
+math { font-size: 1.05em; }
+
+/* Markdown in notes and descriptions. */
+.description p, .notes p { margin: 0 0 10px; }
+.description p:last-child, .notes > :last-child { margin-bottom: 0; }
+.notes .md-heading { margin: 14px 0 6px; font: 700 15px/1.25 var(--font-display); }
+.notes h5.md-heading { font-size: 13px; color: var(--muted); }
+.notes ul, .notes ol { margin: 0 0 10px; padding-left: 20px; }
+.notes li + li { margin-top: 4px; }
+.notes blockquote { margin: 0 0 10px; padding-left: 10px; border-left: 3px solid var(--rule); color: var(--muted); }
+.notes hr { border: 0; border-top: 1px solid var(--rule); margin: 12px 0; }
+.notes code, .description code { font: 400 0.85em var(--font-mono); padding: 1px 4px; border-radius: 4px; background: var(--bg); }
+.notes pre { margin: 0 0 10px; padding: 8px 10px; overflow-x: auto; border-radius: 6px; background: var(--bg); }
+.notes pre code { padding: 0; background: none; }
+.notes a, .description a { color: var(--accent); }
+.md-math { margin: 0 0 10px; overflow-x: auto; }
+.notes math.tml-display, .description math.tml-display { margin: 0.2em 0; }
+
+.notes-block { display: grid; gap: 8px; }
+.notes-head { display: flex; justify-content: space-between; align-items: center; }
+.notes p { margin: 0 0 10px; }
+.notes .muted { color: var(--muted); }
+.help { padding-top: 12px; border-top: 1px solid var(--rule); }
+.help ul { margin: 0; padding-left: 18px; color: var(--muted); font-size: 14px; }
+.help li + li { margin-top: 4px; }
+
+.signal-panel { background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; padding: 10px 10px 6px; min-width: 0; }
+.signal-head { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.swatch { flex: none; width: 10px; height: 10px; border-radius: 50%; }
+.signal-name { display: grid; min-width: 0; flex: 1; }
+.signal-title { font: 700 13px/1.2 var(--font-display); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.signal-meta { font: 400 11px/1.3 var(--font-mono); color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.segmented-buttons { display: flex; }
+.segment-button { padding: 4px 8px; font-size: 11px; border-radius: 0; }
+.segment-button:first-child { border-radius: 6px 0 0 6px; }
+.segment-button:last-child { border-radius: 0 6px 6px 0; margin-left: -1px; }
+.icon { font-size: 15px; line-height: 1; padding: 3px 7px; }
+.plot-wrap { position: relative; }
+.plot { display: block; width: 100%; height: 170px; touch-action: none; cursor: grab; }
+.panel-empty { margin: 0; padding: 40px 12px; text-align: center; color: var(--muted); font: 400 12px var(--font-mono); }
+
+/* Instruments on the diagram: a frame holding the same widget the face shows. */
+
+.instrument .body { fill: var(--surface); stroke: var(--rule); stroke-width: 1.2; }
+.instrument.selected .body { stroke: var(--accent); stroke-width: 2.2; }
+.instrument-face { overflow: visible; }
+.instrument-face > * { width: 100%; height: 100%; padding: 6px 8px; overflow: hidden; color: var(--ink); font: 400 12px/1.35 var(--font-body); }
+.lead { stroke: var(--accent); stroke-width: 1.2; stroke-dasharray: 2 5; stroke-linecap: round; opacity: 0.55; }
+.lead.selected { opacity: 1; stroke-width: 1.8; }
+.wire.to-instrument .wire-line { stroke-dasharray: 6 3; }
+
+/* Widgets, on the diagram and the face. */
+
+.widget-title { font: 600 11px/1.2 var(--font-mono); color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.widget-plot { display: flex; flex-direction: column; gap: 2px; }
+.widget-plot .plot-wrap, .face-body .plot-wrap { position: relative; flex: 1; min-height: 40px; }
+.widget-plot .plot, .face-body .plot { position: absolute; inset: 0; width: 100%; height: 100%; }
+/* What a small screen says while it has nothing to plot, centered in its space. */
+.widget-plot .panel-empty, .face-body .panel-empty { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding: 6px 10px; overflow: hidden; }
+.widget-plot .panel-empty { font-size: 11px; }
+.widget-plot .plot { cursor: inherit; }
+
+.widget-value { font: 600 24px/1.15 var(--font-mono); overflow-wrap: anywhere; }
+.widget-value.error { color: var(--warn); }
+.widget-from { font: 400 11px/1.3 var(--font-mono); color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.widget-readout, .widget-control { display: grid; align-content: center; gap: 3px; min-width: 0; }
+.instrument-face .widget-value { font-size: 16px; }
+.widget-note { overflow: auto; font-size: 14px; }
+.instrument-face .widget-note { font-size: 12px; }
+.widget-note p { margin: 0 0 6px; }
+
+/* A knob: a dark dial in a bright rim, its value lit around the edge and
+   written in the middle, and the ends of its range under it. */
+.knob-control { display: grid; justify-items: center; align-content: center; gap: 4px; height: 100%; }
+.knob-control .control-label { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.knob-well { display: grid; place-items: center; padding: 4px; }
+.knob-well > * { grid-area: 1 / 1; }
+.knob {
+  width: 60px; height: 60px; border-radius: 50%; cursor: ns-resize; touch-action: none;
+  background: radial-gradient(circle at 50% 26%, var(--knob-high), var(--knob) 64%);
+  box-shadow: 0 0 0 3px var(--knob-rim), 0 0 0 4px var(--knob-rim-edge), 0 4px 9px 1px rgba(0, 0, 0, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.16);
+}
+.knob:focus-visible { outline-offset: 7px; }
+.knob-dial { display: block; width: 100%; height: 100%; overflow: visible; }
+.knob-track, .knob-fill { fill: none; stroke-width: 5; stroke-linecap: round; }
+.knob-track { stroke: var(--knob-track); }
+.knob-fill { stroke: var(--lit); filter: drop-shadow(0 0 2px var(--lit-glow)); }
+.knob-tip { fill: var(--knob-ink); }
+/* The value sits in the middle of the dial, and takes typing on a double-click. */
+input.knob-value {
+  width: 46px; padding: 1px 0; text-align: center; color: var(--knob-ink); background: none; border: 0; border-radius: 3px;
+  font: 600 10px/1.1 var(--font-mono); font-variant-numeric: tabular-nums; pointer-events: none;
+}
+input.knob-value.long { font-size: 9px; letter-spacing: -0.04em; }
+.knob-control.typing input.knob-value { width: 72px; pointer-events: auto; background: var(--knob); outline: 1px solid var(--lit); }
+.knob-range { display: flex; justify-content: space-between; gap: 6px; width: 84px; font: 500 9px/1 var(--font-mono); color: var(--muted); white-space: nowrap; }
+.knob-range span { overflow: hidden; text-overflow: ellipsis; }
+/* On the diagram, the value sits beside a smaller dial. */
+.instrument-face .knob-control { grid-template-columns: 40px minmax(0, 1fr); justify-items: start; column-gap: 10px; row-gap: 2px; }
+.instrument-face .knob-well { display: contents; }
+.instrument-face .knob { grid-row: 1 / span 2; grid-column: 1; width: 38px; height: 38px; margin-left: 4px; }
+.instrument-face .knob-control .control-label { grid-column: 2; grid-row: 1; }
+.instrument-face input.knob-value { grid-column: 2; grid-row: 2; width: 100%; color: var(--ink); text-align: left; font-size: 12px; pointer-events: auto; }
+.instrument-face .knob-range { display: none; }
+
+/* A speaker: a perforated grille in a rim, and a switch with a light. */
+.widget-speaker { display: grid; justify-items: center; align-content: center; gap: 10px; }
+.speaker-grille {
+  width: 54px; height: 54px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(0, 0, 0, 0.62) 1.2px, transparent 1.7px) 0 0 / 6px 6px, radial-gradient(circle at 50% 30%, var(--module), var(--grille) 70%);
+  box-shadow: 0 0 0 3px var(--knob-rim), 0 0 0 4px var(--knob-rim-edge), 0 3px 8px rgba(0, 0, 0, 0.25), inset 0 2px 5px rgba(0, 0, 0, 0.35);
+}
+.widget-speaker.playing .speaker-grille { box-shadow: 0 0 0 3px var(--knob-rim), 0 0 0 4px var(--lit), 0 0 14px var(--lit-glow), inset 0 2px 5px rgba(0, 0, 0, 0.35); animation: thump 0.5s ease-in-out infinite alternate; }
+@keyframes thump { to { transform: scale(1.05); } }
+.instrument-face .widget-speaker { padding: 4px; gap: 6px; }
+.instrument-face .speaker-grille { width: 28px; height: 28px; background-size: 5px 5px, auto; }
+.instrument-face .widget-speaker .play { padding: 1px 5px; font-size: 9px; }
+@media (prefers-reduced-motion: reduce) {
+  .widget-speaker.playing .speaker-grille { animation: none; }
+}
+
+/* The panel face, with the stream's transport along the top. */
+
+.face { background: var(--panel); }
+.face-head { position: sticky; top: -10px; z-index: 2; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: -10px -12px 10px; padding: 7px 12px; background: var(--strip); border-bottom: 1px solid var(--module-edge); }
+.face-title { margin: 0; font: 700 11px/1 var(--font-display); font-stretch: 112%; letter-spacing: 0.24em; text-transform: uppercase; color: var(--silk); }
+.transport { display: flex; flex: 1; align-items: center; gap: 6px; min-width: 260px; }
+/* The stream's clock, on a small LCD. */
+.transport-time {
+  min-width: 6.5em; padding: 3px 8px; text-align: right;
+  font: 600 12px/1.2 var(--font-mono); font-variant-numeric: tabular-nums; letter-spacing: 0.04em;
+  color: var(--lcd-ink); text-shadow: var(--lcd-glow); background: var(--lcd); border-radius: 3px;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+/* Running slower than asked, because the simulation can't keep up. */
+.transport-time.behind { color: var(--warn); }
+.run { min-width: 7.5em; }
+
+/* Buttons and choosers on the panel: small, raised, lettered in capitals. */
+.face button.small, .face select {
+  width: auto; padding: 4px 8px; border: 1px solid var(--module-edge); border-radius: 4px;
+  background: linear-gradient(var(--module), var(--module-low)); box-shadow: inset 0 1px 0 var(--module-shine), 0 1px 1px rgba(0, 0, 0, 0.1);
+  font: 600 10px/1.2 var(--font-mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--silk);
+}
+.face button.small:hover:not(:disabled), .face select:hover { color: var(--ink); border-color: var(--lit); }
+.face button.small[aria-pressed="true"] { color: var(--ink); background: linear-gradient(var(--module-low), var(--module)); border-color: var(--module-edge); }
+/* Switches with a light in them: Listen, a speaker's power, Run. */
+.face button.play, .face button.run { display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+.face button.play::before, .face button.run::before { content: ""; flex: none; width: 7px; height: 7px; border-radius: 50%; background: var(--led-off); box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.35); }
+.face button.play[aria-pressed="true"]::before, .face button.run[aria-pressed="true"]::before { background: var(--lit); box-shadow: 0 0 6px 1px var(--lit-glow); }
+
+/* Panels hold panes and panes hold instruments. A panel is a housing, a pane
+   a raised plate, and the instruments sit on the plate. Panes wrap to fit
+   their panel, and panels stack, tile or take turns as tabs. */
+.face-panels { position: relative; display: flex; flex-direction: column; gap: 14px; }
+.face-panels[data-mode="tile"] { flex-direction: row; flex-wrap: wrap; align-items: stretch; }
+.face-panels[data-mode="tile"] > .face-panel { flex-shrink: 1; }
+.face-panels[data-mode="tile"] > .scope-pane { flex-grow: 0; }
+.face-panel { display: flex; flex-direction: column; gap: 6px; min-width: 0; padding: 6px; background: var(--housing); border: 1px solid var(--module-edge); border-radius: 8px; box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.12); }
+.panel-head, .pane-head { display: flex; align-items: center; gap: 6px; min-width: 0; }
+/* A pane with nothing to say in its head, out of arranging, has none. */
+.face-panels:not(.arranging) .pane-head:has(> .pane-title[hidden]) { display: none; }
+.panel-head { height: 24px; padding: 0 4px; }
+.panel-title, .pane-title { margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 700 10px/1.2 var(--font-display); font-stretch: 112%; letter-spacing: 0.18em; text-transform: uppercase; color: var(--silk); }
+.panel-title { letter-spacing: 0.24em; }
+.panel-panes { display: flex; flex-wrap: wrap; gap: 10px; align-items: stretch; }
+.pane {
+  display: flex; flex-direction: column; flex: 1 1 auto; gap: 8px; min-width: 0; padding: 8px 10px 10px;
+  background: linear-gradient(var(--module), var(--module-low)); border: 1px solid var(--module-edge); border-radius: 6px;
+  box-shadow: inset 0 1px 0 var(--module-shine), 0 1px 3px rgba(0, 0, 0, 0.14);
+}
+.pane-head { height: 18px; }
+/* A pane's instruments, each placed where the pane's layout puts it. */
+.pane-grid { position: relative; flex: 1 1 auto; min-width: 0; }
+.pane-grid > .face-item { position: absolute; }
+.scope-pane { border-style: dashed; }
+.face-item { display: flex; min-width: 0; min-height: 0; }
+/* An instrument sits on its pane, with no plate of its own. */
+.face-body { display: flex; flex: 1; flex-direction: column; min-width: 0; min-height: 0; overflow: hidden; border-radius: 4px; }
+.face-body > * { flex: 1; min-height: 0; }
+.face-item.selected .face-body { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* The tabs, one to a panel. */
+.face-tabs { display: flex; gap: 2px; margin: -4px 0 8px; overflow-x: auto; border-bottom: 1px solid var(--module-edge); }
+.face button.face-tab { padding: 6px 12px; border: 0; border-bottom: 2px solid transparent; border-radius: 0; background: none; box-shadow: none; font: 600 10px/1.2 var(--font-mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--silk); white-space: nowrap; }
+.face button.face-tab:hover:not(:disabled) { color: var(--ink); }
+.face button.face-tab[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--lit); }
+.face-modes { display: flex; gap: 2px; }
+
+/* Arranging: grips to drag instruments, panes and panels by, names to edit,
+   and a bar where what is dragged would land. */
+.panel-name, .pane-name, .panel-tools, .face-panel .grip, .pane .grip, .pane-head .small { display: none; }
+.face-panels.arranging .panel-title, .face-panels.arranging .pane-title { display: none; }
+.face-panels.arranging .panel-name, .face-panels.arranging .pane-name { display: block; flex: 1; min-width: 0; padding: 2px 6px; font: 600 11px/1.2 var(--font-mono); background: var(--module); }
+.face-panels.arranging .panel-tools { display: flex; gap: 4px; }
+.face-panels.arranging .pane-head .small { display: grid; place-items: center; width: 22px; height: 20px; padding: 0; }
+.face-panels.arranging .grip { display: block; flex: none; width: 10px; height: 16px; cursor: grab; touch-action: none; background: radial-gradient(var(--silk) 1px, transparent 1.3px) 0 0 / 5px 5px; opacity: 0.7; }
+.face-panels.arranging .pane.empty .pane-grid { min-height: 72px !important; border: 1px dashed var(--module-edge); border-radius: 4px; }
+.face-panels.arranging .dragging { opacity: 0.45; }
+.drop-bar { position: absolute; z-index: 4; pointer-events: none; background: var(--lit); border-radius: 2px; box-shadow: 0 0 6px var(--lit-glow); }
+.face-panels > .small { align-self: flex-start; }
+.face-body .control-label { font: 600 10px/1.2 var(--font-mono); letter-spacing: 0.12em; color: var(--silk); }
+.face-body .widget-value { color: var(--ink); }
+.face-body .widget-note { color: var(--silk); }
+
+/* A screen module: its name and Listen along the top, over a screen set
+   into the plate, with the views and what it measures on the screen. */
+.face-body .signal-panel { display: flex; flex-direction: column; gap: 6px; padding: 0; background: none; border: 0; }
+.face-body .signal-head { gap: 8px; margin: 0; }
+.face-body .signal-name { flex: 1 1 0; }
+.face-body .signal-title, .face-body .widget-symbols > .widget-title { font: 700 10px/1.3 var(--font-display); font-stretch: 112%; letter-spacing: 0.16em; text-transform: uppercase; color: var(--silk); }
+.face-body .swatch { display: none; }
+.signal-display, .face-body .widget-symbols .plot-wrap {
+  --surface: var(--screen); --ink: var(--screen-ink); --muted: var(--screen-muted); --rule: var(--screen-rule); --grid: var(--screen-grid); --accent: var(--screen-trace);
+  background: var(--screen); border: 1px solid var(--screen-edge); border-radius: 4px; box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.22);
+}
+.signal-display { display: flex; flex: 1; flex-direction: column; min-height: 0; overflow: hidden; }
+.signal-bar { display: flex; align-items: center; gap: 8px; padding: 4px 6px 0; }
+.signal-bar .segmented-buttons { flex: none; gap: 2px; }
+.signal-bar .segment-button {
+  margin: 0; padding: 2px 6px; border: 0; border-radius: 3px; background: none; box-shadow: none;
+  font: 600 9px/1.3 var(--font-mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--screen-muted);
+}
+.signal-bar .segment-button:hover:not(:disabled) { color: var(--screen-ink); }
+.signal-bar .segment-button[aria-pressed="true"] { color: var(--screen); background: var(--screen-trace); }
+.signal-meta { flex: 1; min-width: 0; text-align: right; font: 500 10px/1.3 var(--font-mono); color: var(--screen-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.face-body .widget-symbols { gap: 6px; }
+.face-body .widget-readout { gap: 4px; }
+/* Readouts, fields and buttons sit in the middle of their row, a button with
+   room above it for a label, so their displays and caps line up; a button is
+   as tall as an LCD. */
+.face-body .widget-readout, .face-body .widget-control, .face-body .widget-button { align-content: center; }
+.face-body .widget-button::before { content: ""; height: 16px; }
+.face-body button.push { min-height: 34px; height: 34px; padding: 0 18px; border-radius: 5px; }
+/* A knob with room to spare grows, its value and range with it. */
+.face-body .knob { width: var(--knob-size, 60px); height: var(--knob-size, 60px); }
+.face-body input.knob-value { width: calc(var(--knob-size, 60px) * 0.78); font-size: calc(var(--knob-size, 60px) / 6); }
+.face-body input.knob-value.long { font-size: calc(var(--knob-size, 60px) / 6.7); }
+.face-body .knob-range { width: calc(var(--knob-size, 60px) + 24px); }
+/* A speaker sits as a knob does, and grows as one does. */
+.face-body .widget-speaker { gap: 4px; }
+.face-body .speaker-well { padding: 4px; }
+.face-body .speaker-grille { width: var(--knob-size, 60px); height: var(--knob-size, 60px); cursor: pointer; }
+.face-body .widget-speaker .play { padding: 2px 8px; }
+
+/* A faux LCD, for readouts and for typing into: a recessed panel with a faint
+   dot-matrix grid behind segment-colored mono text. */
+.lcd {
+  display: block; width: 100%; min-width: 0; padding: 5px 9px;
+  background-color: var(--lcd);
+  background-image: linear-gradient(var(--lcd-dots) 1px, transparent 1px), linear-gradient(90deg, var(--lcd-dots) 1px, transparent 1px);
+  background-size: 3px 3px;
+  color: var(--lcd-ink); text-shadow: var(--lcd-glow);
+  font: 600 18px/1.25 var(--font-mono); letter-spacing: 0.08em; text-transform: uppercase;
+  white-space: pre; overflow: hidden; text-overflow: ellipsis;
+  border: 1px solid color-mix(in srgb, var(--lcd-ink) 25%, transparent); border-radius: 4px;
+  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.35);
+}
+input[type="text"].lcd {
+  cursor: text; color: var(--lcd-ink); text-shadow: var(--lcd-glow);
+  background-color: var(--lcd);
+  background-image: linear-gradient(var(--lcd-dots) 1px, transparent 1px), linear-gradient(90deg, var(--lcd-dots) 1px, transparent 1px);
+  background-size: 3px 3px;
+  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.35);
+  border: 1px solid color-mix(in srgb, var(--lcd-ink) 25%, transparent); border-radius: 4px;
+  font: 600 18px/1.25 var(--font-mono); letter-spacing: 0.08em; text-transform: uppercase;
+}
+input.lcd:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+/* On the face an LCD is the same height whether it shows or takes text, and
+   sits the same distance under its label, so a row of them lines up. */
+.face-body .widget-value.lcd, .face-body input[type="text"].lcd { height: 34px; padding: 0 9px; font-size: 16px; line-height: 32px; letter-spacing: 0.04em; }
+.face-body .widget-readout:has(> .lcd) { gap: 4px; }
+/* On the diagram, an LCD that shows and one that takes text are one size. */
+.instrument-face .widget-value.lcd, .instrument-face input[type="text"].lcd { height: 24px; padding: 0 6px; font-size: 12px; line-height: 22px; }
+.lcd-control { display: grid; gap: 4px; min-width: 0; }
+
+/* A push button: a dark cap in a bright rim, lit for a moment when pressed. */
+.widget-button { display: grid; place-items: center; height: 100%; }
+button.push {
+  min-width: 64px; min-height: 40px; padding: 8px 16px; border: 0; border-radius: 8px;
+  font: 700 11px/1.1 var(--font-display); font-stretch: 112%; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--knob-ink); background: radial-gradient(circle at 50% 20%, var(--knob-high), var(--knob) 80%);
+  box-shadow: 0 0 0 3px var(--knob-rim), 0 0 0 4px var(--knob-rim-edge), 0 3px 6px rgba(0, 0, 0, 0.3);
+}
+button.push:hover:not(:disabled) { color: var(--knob-ink); }
+button.push:active, button.push.pressed {
+  transform: translateY(1px); color: var(--lit);
+  box-shadow: 0 0 0 3px var(--knob-rim), 0 0 0 4px var(--lit), 0 0 14px var(--lit-glow);
+}
+.instrument-face button.push { min-width: 48px; min-height: 28px; padding: 4px 10px; font-size: 10px; }
+
+/* A Recording's sound in the inspector. */
+.clip-picker { display: grid; gap: 6px; }
+.clip-name { font: 400 12px/1.3 var(--font-mono); color: var(--muted); }
+.clip-buttons { display: flex; flex-wrap: wrap; gap: 6px; }
+.clip-status { font: 400 11px/1.3 var(--font-mono); color: var(--muted); }
+.clip-status:empty { display: none; }
+.face-body .widget-value { font-size: 20px; line-height: 1.1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* A number on the face shows on a small screen set into the module, as the
+   LCDs do. */
+.face-body .widget-value:not(.lcd) {
+  height: 34px; padding: 0 9px; line-height: 32px; font-size: 17px; font-variant-numeric: tabular-nums;
+  color: var(--screen-trace); background: var(--screen); border: 1px solid var(--screen-edge); border-radius: 4px;
+  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.22);
+}
+.face-body .widget-value.error { color: var(--warn); }
+.instrument-face .segment span { padding: 3px 5px; font-size: 11px; }
+.face-grip, .face-resize { display: none; }
+.face-panels.arranging .face-grip { position: absolute; inset: 0; display: block; cursor: grab; touch-action: none; border-radius: 4px; outline: 1px dashed var(--accent); background: color-mix(in srgb, var(--accent) 7%, transparent); }
+.face-panels.arranging .face-resize { position: absolute; right: -5px; bottom: -5px; display: block; width: 14px; height: 14px; border-radius: 4px; background: var(--accent); cursor: nwse-resize; touch-action: none; }
+.face-empty { max-width: 34rem; margin: 24px auto; text-align: center; color: var(--muted); }
+.face-empty p { margin: 0 0 8px; }
+.reading-add .icon { padding: 0 6px; font-size: 13px; }
+
+.noscript { padding: 24px; }
+
+/* Narrow screens: stack everything and let the page scroll. */
+
+@media (max-width: 900px) {
+  body { display: block; height: auto; overflow: auto; }
+  .topbar { position: sticky; top: 0; z-index: 2; }
+  .workspace {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto auto auto;
+    grid-template-areas: "center" "blocks" "inspector";
+  }
+  .workspace .center, .workspace.panel-right .center { grid-template-columns: minmax(0, 1fr); grid-template-rows: 62vh auto; grid-template-areas: "canvas" "face"; }
+  .workspace.no-panel .center { grid-template-rows: 62vh; grid-template-areas: "canvas"; }
+  .workspace.panel-max .center { grid-template-rows: auto; grid-template-areas: "face"; }
+  .workspace.panel-right .face { border-left: 0; border-top: 1px solid var(--rule); }
+  .sash { display: none; }
+  .area-blocks, .area-inspector { border: 0; border-top: 1px solid var(--rule); }
+  .face { overflow: auto; }
+}

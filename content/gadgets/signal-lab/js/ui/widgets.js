@@ -1,0 +1,591 @@
+// What each instrument looks like, on the diagram and on the panel face. Both
+// places show the same live state as of the playhead: the face's widgets are
+// larger, and its screens zoom and listen. A widget is rebuilt only when what
+// it is built from changes, so a knob keeps working while it turns and changes
+// the document under it.
+import { BUTTON, CONTROL, NOTE, PLOT, READOUT, SPEAKER, SYMBOLS, } from '../blocks/instruments.js';
+import { portKey } from '../engine/circuit.js';
+import { formatReading } from '../engine/format.js';
+import { coerceParam, } from '../engine/params.js';
+import { diagramAt, pathId, resolveRef, setParam, updateDiagramAt, wireInto, } from '../model/document.js';
+import { controlState, symbolSources, } from '../model/instruments.js';
+import { formatParam, fromFraction, paramControl, parseQuantity, toFraction, } from './controls.js';
+import { html, svg } from './dom.js';
+import { blockLabel } from './labels.js';
+import { renderMarkdown } from './markdown.js';
+import { plotSettings, Screen, SignalPanel, } from './signal-panel.js';
+import { SymbolView } from './symbols.js';
+/** The output wired into an instrument's input, as a full port reference. */
+export function inputOf(doc, item) {
+    const diagram = diagramAt(doc, item.path);
+    const wire = diagram && wireInto(diagram, { block: item.block.id, port: 0 });
+    return (wire && { block: pathId(item.path, wire.from.block), port: wire.from.port });
+}
+/**
+ * The current version of an instrument, which may have changed since it was
+ * built.
+ */
+function current(context, item) {
+    const block = diagramAt(context.doc, item.path)?.blocks.find((b) => b.id === item.block.id);
+    return block ? { ...item, block } : item;
+}
+/** The angle of a knob's pointer, from -135 degrees at 0 to 135 at 1. */
+const angle = (fraction) => -135 + 270 * fraction;
+/** The radius of a knob's value arc, in a dial 100 across. */
+const RIM = 40;
+/** The point `radius` out at `degrees`, clockwise from up. */
+function polar(degrees, radius) {
+    const radians = ((degrees - 90) * Math.PI) / 180;
+    return [radius * Math.cos(radians), radius * Math.sin(radians)];
+}
+/** An arc on the knob's face from `from` to `to` degrees, clockwise from up. */
+function arc(from, to, radius = RIM) {
+    const point = (degrees) => polar(degrees, radius)
+        .map((n) => n.toFixed(2))
+        .join(' ');
+    return `M${point(from)} A${radius} ${radius} 0 ${to - from > 180 ? 1 : 0} 1 ${point(to)}`;
+}
+/**
+ * A rotary knob: a dark dial with its value lit around the rim and written in
+ * the middle, and the ends of its range under it. Drag up or down (with Shift
+ * for fine steps), scroll, or use the arrow keys; double-click it, or press
+ * Enter, to type a value.
+ */
+function knob(spec, value, onChange) {
+    const fill = svg('path', { class: 'knob-fill' });
+    const tip = svg('circle', { class: 'knob-tip', r: 4.5 });
+    const dial = html('div', {
+        class: 'knob',
+        role: 'slider',
+        tabindex: 0,
+        'aria-label': spec.label,
+        'data-live': '',
+    }, svg('svg', {
+        class: 'knob-dial',
+        viewBox: '-50 -50 100 100',
+        'aria-hidden': 'true',
+    }, svg('path', { class: 'knob-track', d: arc(-135, 135) }), fill, tip));
+    const text = html('input', {
+        class: 'control-value knob-value',
+        type: 'text',
+        inputmode: 'decimal',
+        spellcheck: 'false',
+        autocomplete: 'off',
+        tabindex: -1,
+        'aria-label': `${spec.label} value`,
+    });
+    const element = html('div', { class: 'knob-control' }, html('span', { class: 'control-label', title: spec.label }, spec.label), html('div', { class: 'knob-well' }, dial, text), html('div', { class: 'knob-range', 'aria-hidden': 'true' }, html('span', {}, formatParam(spec.min, spec)), html('span', {}, formatParam(spec.max, spec))));
+    let shown = value;
+    const snap = (v) => {
+        const presets = spec.presets;
+        return presets?.length
+            ? presets.reduce((best, p) => Math.abs(p - v) < Math.abs(best - v) ? p : best)
+            : v;
+    };
+    const show = (v) => {
+        shown = v;
+        const t = toFraction(spec, v);
+        fill.setAttribute('d', t > 0.002 ? arc(-135, angle(t)) : '');
+        const [x, y] = polar(angle(t), RIM);
+        tip.setAttribute('cx', x.toFixed(2));
+        tip.setAttribute('cy', y.toFixed(2));
+        dial.setAttribute('aria-valuenow', String(v));
+        dial.setAttribute('aria-valuetext', formatParam(v, spec));
+        if (document.activeElement !== text) {
+            text.value = formatParam(v, spec);
+            // A long value takes a smaller size to fit inside the dial.
+            text.classList.toggle('long', text.value.length > 6);
+        }
+    };
+    // Typing a value: the field in the middle of the dial takes the keys.
+    const type = () => {
+        element.classList.add('typing');
+        text.focus();
+        text.select();
+    };
+    const turn = (fraction, mode) => {
+        const v = snap(fromFraction(spec, fraction));
+        if (v !== shown || mode === 'commit') {
+            show(v);
+            onChange(v, mode);
+        }
+    };
+    show(value);
+    let drag;
+    dial.addEventListener('pointerdown', (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        dial.focus();
+        dial.setPointerCapture(event.pointerId);
+        drag = { y: event.clientY, from: toFraction(spec, shown) };
+    });
+    dial.addEventListener('pointermove', (event) => {
+        if (drag) {
+            const travel = event.shiftKey ? 800 : 200;
+            turn(drag.from + (drag.y - event.clientY) / travel, 'preview');
+        }
+    });
+    const release = () => {
+        if (drag) {
+            drag = undefined;
+            onChange(shown, 'commit');
+        }
+    };
+    dial.addEventListener('pointerup', release);
+    dial.addEventListener('pointercancel', release);
+    dial.addEventListener('dblclick', type);
+    let settle;
+    dial.addEventListener('wheel', (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        turn(toFraction(spec, shown) - event.deltaY / 1500, 'preview');
+        clearTimeout(settle);
+        settle = setTimeout(() => onChange(shown, 'commit'), 300);
+    }, { passive: false });
+    dial.addEventListener('keydown', (event) => {
+        const steps = {
+            ArrowUp: 0.01,
+            ArrowRight: 0.01,
+            ArrowDown: -0.01,
+            ArrowLeft: -0.01,
+            PageUp: 0.1,
+            PageDown: -0.1,
+        };
+        const step = steps[event.key];
+        if (step !== undefined) {
+            event.preventDefault();
+            turn(toFraction(spec, shown) + step, 'commit');
+        }
+        else if (event.key === 'Home' || event.key === 'End') {
+            event.preventDefault();
+            turn(event.key === 'Home' ? 0 : 1, 'commit');
+        }
+        else if (event.key === 'Enter') {
+            event.preventDefault();
+            type();
+        }
+    });
+    text.addEventListener('change', () => {
+        const parsed = parseQuantity(text.value);
+        if (parsed === undefined) {
+            text.value = formatParam(shown, spec);
+            return;
+        }
+        const v = coerceParam(spec, parsed);
+        show(v);
+        onChange(v, 'commit');
+    });
+    text.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' || event.key === 'Escape') {
+            text.blur();
+            dial.focus();
+        }
+    });
+    text.addEventListener('blur', () => {
+        element.classList.remove('typing');
+        show(shown);
+    });
+    return { element, update: (v) => show(v) };
+}
+/**
+ * An LCD you type into, as on the front of a radio: a text setting, or a
+ * number that the wheel and the arrow keys also step.
+ */
+function lcd(spec, value, onChange) {
+    const input = html('input', {
+        type: 'text',
+        class: 'lcd',
+        spellcheck: 'false',
+        autocomplete: 'off',
+        'aria-label': spec.label,
+    });
+    let shown = value;
+    const text = (v) => spec.type === 'number' ? formatParam(v, spec) : String(v);
+    const show = (v) => {
+        shown = v;
+        if (document.activeElement !== input) {
+            input.value = text(v);
+        }
+    };
+    show(value);
+    input.addEventListener('change', () => {
+        const parsed = spec.type === 'number' ? parseQuantity(input.value) : input.value.trim();
+        if (parsed === undefined) {
+            input.value = text(shown);
+            return;
+        }
+        shown = coerceParam(spec, parsed);
+        onChange(shown, 'commit');
+    });
+    input.addEventListener('blur', () => (input.value = text(shown)));
+    input.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') {
+            input.blur();
+        }
+    });
+    if (spec.type === 'number') {
+        const step = (by, mode) => {
+            const v = fromFraction(spec, toFraction(spec, shown) + by);
+            shown = coerceParam(spec, v);
+            input.value = text(shown);
+            onChange(shown, mode);
+        };
+        let settle;
+        input.addEventListener('wheel', (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            step(-event.deltaY / 1500, 'preview');
+            clearTimeout(settle);
+            settle = setTimeout(() => onChange(shown, 'commit'), 300);
+        }, { passive: false });
+        input.addEventListener('keydown', (event) => {
+            if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
+                event.preventDefault();
+                step(event.key === 'ArrowUp' ? 0.01 : -0.01, 'commit');
+            }
+        });
+    }
+    return {
+        element: html('label', { class: 'lcd-control' }, html('span', { class: 'control-label' }, spec.label), input),
+        update: (v) => show(v),
+    };
+}
+/** What a control is built from, besides its block. */
+function controlShape(state) {
+    return 'problem' in state
+        ? state.problem
+        : JSON.stringify([
+            state.label,
+            { ...state.spec, default: undefined },
+            state.binding,
+        ]);
+}
+export class Widgets {
+    #events;
+    #instances = new Map();
+    #live = new Set();
+    #context;
+    constructor(events) {
+        this.#events = events;
+    }
+    /** Starts a render pass with the latest state. */
+    update(context) {
+        this.#context = context;
+        this.#live.clear();
+    }
+    /** The element for an instrument, reused while it still fits, and up to date. */
+    get(place, item) {
+        const context = this.#context;
+        const key = JSON.stringify([
+            item.block.kind,
+            item.block.name ?? '',
+            item.block.params,
+            item.block.kind === CONTROL
+                ? controlShape(controlState(context.doc, context.bindings, item.path, item.block))
+                : '',
+        ]);
+        const id = `${place}:${item.id}`;
+        let widget = this.#instances.get(id);
+        if (widget?.key !== key) {
+            widget = { key, ...this.#build(place, item) };
+            this.#instances.set(id, widget);
+        }
+        this.#live.add(id);
+        widget.sync(context);
+        return widget.element;
+    }
+    /** Forgets the widgets no view asked for in this pass. */
+    sweep() {
+        for (const id of this.#instances.keys()) {
+            if (!this.#live.has(id)) {
+                this.#instances.delete(id);
+            }
+        }
+    }
+    /** Moves the playhead: readouts and plots catch up. */
+    setTime(time, readings) {
+        if (!this.#context) {
+            return;
+        }
+        this.#context = { ...this.#context, time, readings };
+        for (const id of this.#live) {
+            this.#instances.get(id)?.sync(this.#context);
+        }
+    }
+    #change(change, mode) {
+        if (this.#context) {
+            this.#events.change(change(this.#context.doc), mode);
+        }
+    }
+    #build(place, item) {
+        switch (item.block.kind) {
+            case PLOT:
+                return place === 'face' ? this.#screenCard(item) : this.#screen(item);
+            case SPEAKER:
+                return this.#speaker(place, item);
+            case CONTROL:
+                return this.#control(place, item);
+            case READOUT:
+                return this.#readout(item);
+            case SYMBOLS:
+                return this.#symbols(item);
+            case BUTTON:
+                return this.#button(place, item);
+            case NOTE:
+                return {
+                    element: html('div', { class: 'widget-note notes' }, renderMarkdown(String(item.block.params.text ?? ''))),
+                    sync: () => { },
+                };
+            default:
+                return { element: html('div', {}), sync: () => { } };
+        }
+    }
+    #screenState(context, item) {
+        const at = inputOf(context.doc, item);
+        return {
+            trace: at && context.live.traces.get(portKey(at)),
+            settings: plotSettings(current(context, item).block.params),
+            color: 'var(--accent)',
+            time: context.time,
+            problem: at
+                ? problemAt(context.status, at)
+                : 'Wire something into this plot.',
+        };
+    }
+    #toggle(context, item) {
+        const at = inputOf(context.doc, item);
+        if (at) {
+            this.#events.listen(at);
+        }
+    }
+    /** A small, still plot for the diagram. */
+    #screen(item) {
+        const screen = new Screen({ interactive: false });
+        const title = html('span', { class: 'widget-title' }, item.block.name || 'Plot');
+        return {
+            element: html('div', { class: 'widget-plot' }, title, screen.element),
+            sync: (context) => screen.update(this.#screenState(context, item)),
+        };
+    }
+    /** A face screen: zooms, switches view and plays. */
+    #screenCard(item) {
+        let context;
+        const panel = new SignalPanel({
+            view: (view) => this.#change((doc) => updateDiagramAt(doc, item.path, (d) => setParam(d, item.block.id, 'view', view)), 'commit'),
+            listen: () => context && this.#toggle(context, item),
+        });
+        return {
+            element: panel.element,
+            sync: (latest) => {
+                context = latest;
+                const at = inputOf(latest.doc, item);
+                panel.update({
+                    ...this.#screenState(latest, item),
+                    title: item.block.name ||
+                        (at ? blockLabel(latest.doc, at.block) : 'Plot'),
+                    listening: at !== undefined && latest.listening.has(portKey(at)),
+                });
+            },
+        };
+    }
+    #speaker(place, item) {
+        let context;
+        const power = html('button', { type: 'button', class: 'small play', 'data-live': '' }, 'Off');
+        power.addEventListener('click', (event) => {
+            event.stopPropagation();
+            if (context) {
+                this.#toggle(context, item);
+            }
+        });
+        // On the face a speaker is laid out as a knob is: its name over it, the
+        // grille as big as a knob there, and its switch where a knob's range
+        // goes. The grille switches it too.
+        const grille = html('div', {
+            class: 'speaker-grille',
+            'aria-hidden': 'true',
+            'data-live': '',
+        });
+        grille.addEventListener('click', (event) => {
+            event.stopPropagation();
+            if (context && !power.disabled) {
+                this.#toggle(context, item);
+            }
+        });
+        const label = html('span', { class: 'control-label' }, item.block.name || 'Speaker');
+        const element = html('div', { class: `widget-speaker on-${place}` }, ...(place === 'face' ? [label] : []), html('div', { class: 'speaker-well' }, grille), power);
+        return {
+            element,
+            sync: (latest) => {
+                context = latest;
+                const at = inputOf(latest.doc, item);
+                const on = at !== undefined && latest.listening.has(portKey(at));
+                element.classList.toggle('playing', on);
+                power.textContent = on ? 'On' : 'Off';
+                power.title = on ? 'Turn this speaker off' : 'Turn this speaker on';
+                power.setAttribute('aria-pressed', String(on));
+                power.disabled = !at;
+            },
+        };
+    }
+    #control(place, item) {
+        const context = this.#context;
+        const state = controlState(context.doc, context.bindings, item.path, item.block);
+        const label = item.block.name || ('problem' in state ? 'Control' : state.label);
+        if ('problem' in state) {
+            return {
+                element: html('div', { class: 'widget-control' }, html('span', { class: 'control-label' }, label), html('p', { class: 'control-help' }, state.problem)),
+                sync: () => { },
+            };
+        }
+        // Help text belongs in the inspector; a widget has no room for it.
+        const spec = { ...state.spec, label, help: undefined };
+        if (state.binding !== undefined) {
+            // A bound setting follows its expression, so show it rather than offer a
+            // control that would do nothing.
+            const value = html('span', { class: 'widget-value' });
+            return {
+                element: html('div', { class: 'widget-control' }, html('span', { class: 'control-label' }, label), value, html('p', { class: 'control-help' }, `= ${state.binding}`)),
+                sync: (latest) => {
+                    const now = controlState(latest.doc, latest.bindings, item.path, item.block);
+                    const bound = 'problem' in now ? undefined : now.bound;
+                    value.textContent =
+                        bound === undefined || spec.type !== 'number'
+                            ? '–'
+                            : formatParam(bound, spec);
+                },
+            };
+        }
+        const set = (value, mode) => this.#change((doc) => {
+            const now = controlState(doc, this.#context.bindings, item.path, item.block);
+            return 'problem' in now ? doc : now.set(doc, value);
+        }, mode);
+        const style = item.block.params.style;
+        const control = style === 'lcd' && (spec.type === 'number' || spec.type === 'text')
+            ? lcd(spec, state.value, set)
+            : spec.type === 'number' && style !== 'slider'
+                ? knob(spec, state.value, set)
+                : paramControl(spec, state.value, set);
+        return {
+            element: html('div', { class: `widget-control on-${place}` }, control.element),
+            sync: (latest) => {
+                const now = controlState(latest.doc, latest.bindings, item.path, item.block);
+                if (!('problem' in now)) {
+                    control.update(now.value);
+                }
+            },
+        };
+    }
+    /** A push button: each press sends a pulse from the block. */
+    #button(place, item) {
+        const push = html('button', { type: 'button', class: 'push', 'data-live': '' }, item.block.name || 'Push');
+        push.addEventListener('pointerdown', (event) => event.stopPropagation());
+        push.addEventListener('click', (event) => {
+            event.stopPropagation();
+            this.#events.press(item.id);
+            // A moment of light, as a lit push button gives.
+            push.classList.add('pressed');
+            setTimeout(() => push.classList.remove('pressed'), 150);
+        });
+        return {
+            element: html('div', { class: `widget-button on-${place}` }, push),
+            sync: () => { },
+        };
+    }
+    /** A Bits to tones view, here and on the face alike. */
+    #symbols(item) {
+        const view = new SymbolView();
+        const title = html('span', { class: 'widget-title' });
+        // Worked out again only when the document or its statuses change.
+        let made;
+        return {
+            element: html('div', { class: 'widget-plot widget-symbols' }, title, view.element),
+            sync: (context) => {
+                const now = current(context, item);
+                title.textContent = now.block.name || 'Bits to tones';
+                if (made?.doc !== context.doc || made.status !== context.status) {
+                    made = {
+                        doc: context.doc,
+                        status: context.status,
+                        sources: symbolSources(context.doc, now, context),
+                    };
+                }
+                const { sources } = made;
+                const trace = (at) => at && context.live.traces.get(portKey(at));
+                view.update('problem' in sources
+                    ? {
+                        time: context.time,
+                        start: 0,
+                        span: 0,
+                        tone: undefined,
+                        bits: undefined,
+                        glide: undefined,
+                        stacked: [],
+                        problem: sources.problem,
+                    }
+                    : {
+                        time: context.time,
+                        start: sources.start,
+                        span: Number(now.block.params.span ?? 2.4),
+                        tone: trace(sources.tone),
+                        bits: trace(sources.bits),
+                        glide: sources.glide && {
+                            trace: trace(sources.glide.at),
+                            lag: sources.glide.lag,
+                        },
+                        stacked: sources.stacked.map((row) => ({
+                            name: row.item.block.name || 'Plot',
+                            trace: trace(row.at),
+                            lag: row.lag,
+                        })),
+                        problem: undefined,
+                    });
+            },
+        };
+    }
+    #readout(item) {
+        const label = html('span', { class: 'control-label' });
+        const value = html('span', {
+            class: item.block.params.style === 'lcd'
+                ? 'widget-value lcd'
+                : 'widget-value',
+        });
+        // A line under the value, only when something is wrong; where the
+        // reading comes from is in the tooltip, so readouts and controls line up.
+        const problem = html('span', { class: 'widget-from' });
+        const element = html('div', { class: 'widget-readout' }, label, value, problem);
+        return {
+            element,
+            sync: (context) => {
+                const block = String(item.block.params.block ?? '');
+                const wanted = String(item.block.params.reading ?? '');
+                const id = resolveRef(item.path, block) ?? '';
+                const status = context.status.get(id);
+                const reading = context.readings
+                    .get(id)
+                    ?.find((r) => r.label === wanted);
+                label.textContent = item.block.name || wanted || 'Readout';
+                value.textContent = reading ? formatReading(reading) : '–';
+                value.classList.toggle('error', status?.state === 'error');
+                const trouble = status?.state === 'error'
+                    ? status.message
+                    : block
+                        ? ''
+                        : 'Choose a reading in the inspector.';
+                problem.textContent = trouble;
+                problem.hidden = !trouble;
+                element.title = block
+                    ? `${value.textContent}\n${wanted}, from ${blockLabel(context.doc, id)}`
+                    : '';
+            },
+        };
+    }
+}
+/** Why nothing comes out of a port, if nothing does. */
+export function problemAt(status, at) {
+    const source = status.get(at.block);
+    return source?.state === 'error'
+        ? `No signal here: ${source.message}`
+        : source?.state === 'idle'
+            ? `No signal here: ${source.reason}`
+            : undefined;
+}

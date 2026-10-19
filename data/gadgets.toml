@@ -17,3 +17,10 @@ title = "Voice on an AM Carrier"
 summary = "Amplitude modulation from microphone to antenna and back. A vowel, your own clip or an FT8 packet goes through an envelope detector, then DSB-SC and SSB, with every plot and sound computed live from the knobs."
 image = "preview.webp"
 image_dark = "preview-dark.webp"
+
+[[gadgets]]
+slug = "signal-lab"
+title = "Signal Lab"
+summary = "A block-diagram radio bench. Wire up oscillators, mixers, filters, antennas and detectors, or open an AM, SSB, speech or FT8 example, and it runs live: plots, knobs and the speaker on a front panel you arrange, and the FT8 transmitter shows its bits turning into tones."
+image = "preview.webp"
+image_dark = "preview-dark.webp"
