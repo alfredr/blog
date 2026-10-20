@@ -12,6 +12,9 @@
   --rule: light-dark(#e2e4e7, #33322f);
   --accent: light-dark(#2b4c9b, #93a5cc);
   --code-bg: light-dark(#eef0f2, #292926);
+  /* Selected text, and selected formulas (js/math.js), which the browser
+     can't highlight itself. */
+  --selection: color-mix(in srgb, var(--accent) 25%, transparent);
 
   --serif: Charter, "Bitstream Charter", "Sitka Text", Cambria, serif;
   --sans: system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -81,6 +84,10 @@ a:hover {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
   border-radius: 2px;
+}
+
+::selection {
+  background: var(--selection);
 }
 
 /* Site navigation */
@@ -428,6 +435,12 @@ cite[data-key] a {
   padding: 0.25em 0;
   overflow-x: auto;
   text-align: center;
+}
+
+/* A formula that a selection touches (js/math.js), in the same color as
+   selected text. */
+.math.selected svg {
+  background: var(--selection);
 }
 
 footer {
