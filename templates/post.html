@@ -2,6 +2,10 @@
 
 {% block title %}{{ title }} — {{ site_title }}{% endblock %}
 
+{% block head %}
+  <script src="{{ asset_url(path="js/sidenotes.js") }}" defer></script>
+{% endblock %}
+
 {% block content %}
 <article>
   <header>

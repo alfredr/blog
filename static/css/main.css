@@ -329,6 +329,78 @@ cite[data-key] a {
   text-decoration: none;
 }
 
+/* Footnotes (kiln's [^label]). The number is raised without opening up the
+   line it sits in. The notes are listed after the post; where the page has
+   room beside the text, js/sidenotes.js shows each one in the right margin
+   next to its reference instead. */
+.footnote-ref {
+  position: relative;
+  top: -0.5em;
+  font-size: 0.75em;
+  line-height: 0;
+  vertical-align: baseline;
+}
+
+.footnote-ref a,
+.footnote-back {
+  text-decoration: none;
+}
+
+.footnotes {
+  margin-top: 2rem;
+  font-size: 0.9375rem;
+}
+
+.footnotes ol {
+  padding-left: 1.5rem;
+}
+
+.sidenote {
+  display: none;
+}
+
+/* Room for a 14rem note and a 2rem gap on each side of the 42rem column. */
+@media (min-width: 76rem) {
+  .sidenote {
+    display: block;
+    float: right;
+    clear: right;
+    width: 14rem;
+    margin-right: -16rem;
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    text-align: left;
+    text-indent: 0;
+    -webkit-hyphens: manual;
+    hyphens: manual;
+  }
+
+  .sidenote-number {
+    font-size: 0.75em;
+    vertical-align: 0.4em;
+  }
+
+  .sidenote.flash {
+    animation: sidenote-flash 1.2s ease-out;
+  }
+
+  /* The margin notes replace the list on screen; screen readers keep it. */
+  .footnotes {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+
+@keyframes sidenote-flash {
+  from {
+    background: color-mix(in srgb, var(--accent) 25%, transparent);
+  }
+}
+
 /* A post's references (data/references.bib, through kiln.toml). The number
    sits in its own column and the entry wraps under itself; long URLs and
    DOIs may break anywhere. */
