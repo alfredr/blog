@@ -99,9 +99,9 @@ $$
 "Adv" <= R EE[sqrt(1/2 "KL"(P_(Y, Z) || P_Z))] <= R sqrt(1/2 I(Y; X | Z)).
 $$
 
-When $"Adv" >= 0$, both sides are nonnegative, so squaring and rearranging gives the second bound. $square.stroked$
+When $"Adv" >= 0$, both sides are nonnegative, so squaring and rearranging gives the second bound.[^pinsker-jensen] $square.stroked$
 
-The same combination of Pinsker's and Jensen's inequalities appears in information-theoretic analyses of learning, for example of Thompson sampling (Fact 9, p. 15; Appendix A.1, pp. 20–21) [@russo2016].
+[^pinsker-jensen]: See, e.g., [@russo2016], Fact 9 (p. 15) and Appendix A.1 (pp. 20–21), for the same combination of Pinsker's and Jensen's inequalities.
 
 The lower bound on information grows with the square of the advantage relative to $R$. A release that delivers a substantial fraction of the possible benefit must carry a corresponding amount of information about you.
 
