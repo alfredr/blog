@@ -47,7 +47,7 @@ The inequality compares this action with the best action available given $Z$. Av
 
 Claim 1 is a familiar fact of decision theory: information that leaves the relevant beliefs unchanged cannot improve on the best decision already available [@howard1966; @blackwell1953].
 
-The conditional mutual information $I(Y; X | Z)$ measures how much $Y$ tells the recipient about $X$ beyond what it already knew from $Z$. It is zero exactly when $Y$ is independent of $X$ given $Z$ [@cover2006], so by Claim 1, positive advantage requires $I(Y; X | Z) > 0$.
+The conditional mutual information $I(Y; X | Z)$ measures how much $Y$ tells the recipient about $X$ beyond what it already knew from $Z$. It is zero exactly when $Y$ is independent of $X$ given $Z$ (§2.6, eq. (2.92), p. 29) [@cover2006], so by Claim 1, positive advantage requires $I(Y; X | Z) > 0$.
 
 ## How much information
 
@@ -81,7 +81,7 @@ EE_P[V] - EE_Q[V] &= integral_0^R (P(V > t) - Q(V > t)) dif t \
   &<= R sqrt(1/2 "KL"(P || Q)),
 $$
 
-where at every threshold $t$, the probabilities differ by at most total variation, and the interval has length $R$. The last inequality follows by Pinsker's inequality [@cover2006].
+where at every threshold $t$, the probabilities differ by at most total variation, and the interval has length $R$. The last inequality follows by Pinsker's inequality (Lemma 11.6.1, p. 370) [@cover2006].
 
 Write $P_z$ for the recipient's beliefs about $X$ given $Z = z$, and $P_(y, z)$ for its beliefs after also seeing $Y = y$. As in Claim 1, fixing the seed changes neither.
 
@@ -101,7 +101,7 @@ $$
 
 When $"Adv" >= 0$, both sides are nonnegative, so squaring and rearranging gives the second bound. $square.stroked$
 
-The same combination of Pinsker's and Jensen's inequalities appears in information-theoretic analyses of learning, for example of Thompson sampling [@russo2016].
+The same combination of Pinsker's and Jensen's inequalities appears in information-theoretic analyses of learning, for example of Thompson sampling (Fact 9, p. 15; Appendix A.1, pp. 20–21) [@russo2016].
 
 The lower bound on information grows with the square of the advantage relative to $R$. A release that delivers a substantial fraction of the possible benefit must carry a corresponding amount of information about you.
 
@@ -115,8 +115,8 @@ A promise that the data teaches nobody anything new about you would go further. 
 
 ## Learning from other people
 
-Your record need never appear in the data. A study of smokers can teach a recipient something about you, a smoker, whether or not you took part [@dwork2014]. Models trained on other people's data work because some of what they learn applies to you.
+Your record need never appear in the data. A study of smokers can teach a recipient something about you, a smoker, whether or not you took part (pp. 5–6) [@dwork2014]. Models trained on other people's data work because some of what they learn applies to you.
 
 The EDPB draft recognises population learning in its inference test. Paragraph 67 counts an inference as meaningful only if it relies on the given data and "could not be obtained from general knowledge or from data about the population at large" [@edpb2026]. The distinction to make precise is between what a release teaches us about the population and what it reveals specifically about an individual.
 
-Both kinds of learning can tell us something about you. One way to make the distinction precise is to compare releases with and without your contribution, taking account of what the recipient already knows. This hints at a definition of relative anonymisation that allows population learning while bounding the effect of your contribution. I'll develop that comparison, including what counts as your contribution, in the next post. As a nice surprise, we'll see that this definition aligns with the EDPB's inference test, which already suggests comparing inferences with and without a person's data, in a way that makes the test more precise.
+Both kinds of learning can tell us something about you. One way to make the distinction precise is to compare releases with and without your contribution, taking account of what the recipient already knows. This hints at a definition of relative anonymisation that allows population learning while bounding the effect of your contribution. I'll develop that comparison, including what counts as your contribution, in the next post. As a nice surprise, we'll see that this definition aligns with the EDPB's inference test, which already suggests comparing inferences with and without a person's data, in a way that makes the test more precise (paragraph 71(b), footnote 43) [@edpb2026].
