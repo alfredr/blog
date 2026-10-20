@@ -195,11 +195,15 @@ article > h1 {
   margin-bottom: 1.75rem;
 }
 
-/* A post's subtitle (front matter `subtitle`), set like the CV's headline. */
+/* A post's subtitle (front matter `subtitle`). It finishes the title, so it
+   sits close under it, in the text color and italic, with the date below as
+   metadata. */
 article header .subtitle {
   font-size: 1.25rem;
+  font-style: italic;
   line-height: 1.4;
-  color: var(--ink-2);
+  color: var(--ink);
+  margin-top: -0.25rem;
   margin-bottom: 0.5rem;
 }
 
