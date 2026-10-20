@@ -195,6 +195,14 @@ article > h1 {
   margin-bottom: 1.75rem;
 }
 
+/* A post's subtitle (front matter `subtitle`), set like the CV's headline. */
+article header .subtitle {
+  font-size: 1.25rem;
+  line-height: 1.4;
+  color: var(--ink-2);
+  margin-bottom: 0.5rem;
+}
+
 article header time {
   font-family: var(--sans);
   color: var(--ink-2);

@@ -10,6 +10,7 @@
 <article>
   <header>
     <h1>{{ title }}</h1>
+    {% if extra.subtitle %}<p class="subtitle">{{ extra.subtitle }}</p>{% endif %}
     <time datetime="{{ date }}">{{ date }}</time>
     {% if tags %}
     <div class="tags">

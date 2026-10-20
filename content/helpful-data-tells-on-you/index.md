@@ -1,6 +1,9 @@
 ---
-title: "If it helps you, it's about you"
+title: "Helpful data tells on you"
+subtitle: "...even when it's not yours"
 date: "2026-10-20"
+aliases:
+  - if-it-helps-you
 summary: "Data that improves a decision for you carries information about you. A short proof, and what it means for anonymization."
 ---
 
