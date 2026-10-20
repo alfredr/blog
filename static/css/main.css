@@ -19,7 +19,7 @@
 
   /* Page width, the prose measure (about 70 characters), and the CV's
      timeline column for dates. */
-  --measure: 44rem;
+  --measure: 42rem;
   --prose: 38rem;
   --gutter: 5.5rem;
   --gap: 1.75rem;
@@ -233,8 +233,9 @@ article header time {
   line-height: 1.3;
 }
 
-/* Prose keeps a comfortable measure; link rows can use the full width. */
-.post-body :is(p, ul, ol, blockquote):not(.links),
+/* Page prose keeps a comfortable measure; link rows can use the full width.
+   Posts use the full width, so the text meets the nav's right edge and the
+   right margin matches the left. */
 .page-body :is(p, ul, ol, blockquote):not(.links) {
   max-width: var(--prose);
 }
@@ -315,6 +316,49 @@ pre {
 pre code {
   background: none;
   padding: 0;
+}
+
+/* Numbered citations from the bibliography are upright, unlike titles in
+   <cite>. The number links to its reference without an underline; hovering
+   shows the link color as usual. */
+cite[data-key] {
+  font-style: normal;
+}
+
+cite[data-key] a {
+  text-decoration: none;
+}
+
+/* A post's references (data/references.bib, through kiln.toml). The number
+   sits in its own column and the entry wraps under itself; long URLs and
+   DOIs may break anywhere. */
+.post-body .references {
+  list-style: none;
+  padding-left: 0;
+  font-size: 0.9375rem;
+}
+
+.references li {
+  margin-bottom: 0.5em;
+  padding-left: 2.25em;
+  text-indent: -2.25em;
+  overflow-wrap: anywhere;
+}
+
+.references .label {
+  display: inline-block;
+  min-width: 2.25em;
+  text-indent: 0;
+}
+
+/* Display math is an SVG from Typst (kiln.toml), centered on the text
+   column. A long equation scrolls sideways on a phone instead of widening
+   the page. */
+.math.display {
+  margin: 1.25em 0;
+  padding: 0.25em 0;
+  overflow-x: auto;
+  text-align: center;
 }
 
 footer {
@@ -908,19 +952,29 @@ footer {
 }
 
 /* Justified paragraphs with hyphenation. The CV lede is included; page
-   templates can include theirs with page-body--justified. Other ledes and narrow screens
-   keep a ragged right edge. Citations stay ragged too: titles and DOIs are
-   long unbreakable runs that open wide gaps when justified. */
+   templates can include theirs with page-body--justified. Other ledes keep a
+   ragged right edge, and so do narrow screens, where short lines justify with
+   wide gaps; they still hyphenate, which evens out the ragged edge. Citations
+   stay ragged too: titles and DOIs are long unbreakable runs that open wide
+   gaps when justified. A numbered citation from the bibliography
+   (cite[data-key]) is short, so it does not count. */
+.page-body:not(.page-body--justified) > p:not(:first-of-type, :has(cite:not([data-key])), .links),
+.post-body p:not(:has(cite:not([data-key])), .links),
+.cv-lede,
+.cv-note,
+.cv-entry li {
+  -webkit-hyphens: auto;
+  hyphens: auto;
+  hyphenate-limit-chars: 6 3 2;
+}
+
 @media (min-width: 36rem) {
-  .page-body:not(.page-body--justified) > p:not(:first-of-type, :has(cite), .links),
-  .post-body p:not(:has(cite), .links),
+  .page-body:not(.page-body--justified) > p:not(:first-of-type, :has(cite:not([data-key])), .links),
+  .post-body p:not(:has(cite:not([data-key])), .links),
   .cv-lede,
   .cv-note,
   .cv-entry li {
     text-align: justify;
-    -webkit-hyphens: auto;
-    hyphens: auto;
-    hyphenate-limit-chars: 6 3 2;
   }
 }
 
@@ -928,7 +982,7 @@ footer {
    only from 42rem: on narrower screens the lines beside the portrait are too
    short to justify without wide gaps. */
 @media (min-width: 42rem) {
-  .page-body--justified p:not(:has(cite), .links) {
+  .page-body--justified p:not(:has(cite:not([data-key])), .links) {
     text-align: justify;
     -webkit-hyphens: auto;
     hyphens: auto;

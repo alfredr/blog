@@ -1,0 +1,37 @@
+# The blog's prelude, which replaces kiln's built-in one (kiln.toml).
+#
+# The built-in prelude prints a Roman numeral before every section heading.
+# This one still numbers sections and figures, so cross-references resolve
+# ("Section 2.1", "Figure 3"), but prints nothing before a heading.
+
+@def(numbering, format=["1","1"]) {
+  @var(fig, 0);
+  @var(index, [0], format=@arg(format));
+  @var(val, 0);
+
+  @on(enter, section > section) {
+    @pop(index, val);
+    @inc(val);
+    @push(index, val);
+    @push(index, 0);
+  }
+
+  @on(exit, section > section) {
+    @pop(index);
+  }
+
+  @on(enter, heading) {
+    @pop(index, val);
+    @store(number, index);
+    @push(index, val);
+  }
+
+  @on(enter, figure) {
+    @inc(fig);
+    @store(number, fig);
+  }
+}
+
+@use(numbering);
+@init(figure, label="Figure {n}");
+@init(heading, label="Section {n}");

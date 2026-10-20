@@ -3,3 +3,38 @@ title = "Alfred Rossi"
 url = "https://www.alfredrossi.com"
 description = ""
 author = "Alfred Rossi"
+
+[build]
+# Replaces kiln's built-in prelude, which puts Roman numerals on headings.
+prelude = "prelude.kiln"
+
+# Works that [@key] can cite, site-wide. A page lists the ones it cites
+# (templates/post.html).
+[bibliography]
+file = "data/references.bib"
+style = "ieee"
+
+# Math is Typst, typeset to SVG at build time. Without these rules kiln
+# leaves $...$ as source text.
+#
+# The preamble matches the math to the body text, Charter. New Computer
+# Modern Math has an x-height of 0.431 em against Charter's 0.481 em, so
+# math is set at 11pt * 0.481 / 0.431 = 12.3pt (kiln maps 11pt to 1em). The
+# Book weight (450) is drawn for screens and sits better beside Charter.
+[[hints]]
+selector = 'math[display="false"]'
+format = "math"
+
+[[hints]]
+selector = 'math[display="true"]'
+format = "math-display"
+
+[[typst.formats]]
+name = "math"
+preamble = "#set text(size: 12.3pt, weight: 450)"
+template = "${source}$"
+
+[[typst.formats]]
+name = "math-display"
+preamble = "#set text(size: 12.3pt, weight: 450)"
+template = "$ {source} $"
