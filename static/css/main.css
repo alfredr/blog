@@ -437,6 +437,17 @@ cite[data-key] a {
   text-align: center;
 }
 
+/* Selections pass over a formula's image rather than into it. Otherwise
+   Firefox ends a selection that stops on a formula inside a glyph's <use>
+   copy, out of reach of the page, where the selection looks empty: formulas
+   lose their highlight and copying gets nothing. The pointer passing through
+   lets Chromium start a selection on a formula all the same. */
+.math svg {
+  pointer-events: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
 /* A formula that a selection touches (js/math.js), in the same color as
    selected text. */
 .math.selected svg {
