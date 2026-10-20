@@ -14,7 +14,7 @@ const ft8Notes = String.raw `FT8's transmitter in steps, from text to bits to to
 2. The **CRC-14** adds 14 check bits, so the receiver can tell a good decode from a bad one: 91.
 3. The **LDPC encoder** adds 83 parity bits, which let the receiver correct bits it hears wrong: 174.
 4. The **symbol mapper** reads them three at a time, Gray-codes each three onto a tone from 0 to 7, and sets them between three Costas arrays for sync: 79 tones, one every $T = 0.16$ s.
-5. The **Gaussian filter** smooths each step from tone to tone into a glide ($BT = 2$), so the signal throws less energy onto its neighbours.
+5. The **Gaussian filter** smooths each step from tone to tone into a glide ($BT = 2$), so the signal throws less energy onto its neighbors.
 6. The **VCO** turns the glide into audio: tone 0 at ${code('offset')}, and 6.25 Hz higher for each tone up. Its phase adds up the frequency, so it never jumps, and since $6.25 \text{ Hz} \times 0.16 \text{ s} = 1$, tone $k$ makes exactly $k$ more cycles a symbol than tone 0.
 7. The mapper's **key** turns it on for the transmission, once it has waited the 42.4 ms the filter takes, so the first tone starts on its own frequency.`;
 export const templates = [

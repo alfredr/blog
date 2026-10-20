@@ -669,7 +669,7 @@ Between the first four blocks the bits travel as **NRZ**: $+1$ for a 1, $-1$ for
 2. The **CRC-14** passes them on and adds 14 check bits, so the receiver can tell a good decode from a bad one. The **CRC** readout shows them.
 3. The **LDPC encoder** passes those 91 on and adds 83 parity bits, which let the receiver correct bits it hears wrong: 174 coded bits.
 4. The **symbol mapper** reads them three at a time and Gray-codes each three onto a **Tone** from 0 to 7, between three 7-tone Costas arrays for sync: 79 tones, one every 0.16 s. The **Bits to tones** view hanging off it lines up its last few symbols a column each: the three bits each **carries** and the tone they pick, the tone, the glide, and the baseband stacked under it.
-5. The **Gaussian filter** smooths those steps into a **Glide** ($BT = 2$), so the tone moves rather than jumps and splashes less energy onto its neighbours.
+5. The **Gaussian filter** smooths those steps into a **Glide** ($BT = 2$), so the tone moves rather than jumps and splashes less energy onto its neighbors.
 6. The **VCO** turns the glide into audio, tone 0 at 1500 Hz and 6.25 Hz higher for each tone up, and the mapper's key turns it on once the filter has caught up. A second VCO at rest at 0 Hz makes the **Baseband**: the audio as if tone 0 sat at 0 Hz, so tone $k$ makes $k$ cycles a symbol and you can count them. The real audio is far too fast to see, so the waterfall shows it instead.
 
 ### Things to try

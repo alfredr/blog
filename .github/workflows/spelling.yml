@@ -1,0 +1,17 @@
+# Check the site's spelling with typos on pushes to main: common misspellings, and American English (_typos.toml).
+name: Spelling
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  typos:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: crate-ci/typos@v1.51.1

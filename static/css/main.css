@@ -783,7 +783,7 @@ footer {
     white-space: nowrap;
   }
 
-  /* A year already labelled above keeps only its dot. */
+  /* A year already labeled above keeps only its dot. */
   .cv-date--repeat {
     color: transparent;
   }

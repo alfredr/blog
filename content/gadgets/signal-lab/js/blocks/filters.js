@@ -130,7 +130,7 @@ export const gaussian = defineBlock({
     kind: 'gaussian',
     label: 'Gaussian filter',
     category: 'Filters',
-    description: String.raw `Smooths its input with a Gaussian bell, so a step becomes a glide with no overshoot. In GFSK, which FT8 uses, it rounds each step of the frequency, so the signal throws less energy onto its neighbours. Its width is set against a symbol time $T$ by the bandwidth-time product $BT$: the bell's standard deviation is $\sigma = \frac{\sqrt{\ln 2}}{2\pi \cdot BT}\, T$, so FT8's $BT = 2$ smooths each step over about a quarter of a symbol. It reaches four standard deviations each way, so it delays the signal by $4\sigma$: 42.4 ms for FT8.`,
+    description: String.raw `Smooths its input with a Gaussian bell, so a step becomes a glide with no overshoot. In GFSK, which FT8 uses, it rounds each step of the frequency, so the signal throws less energy onto its neighbors. Its width is set against a symbol time $T$ by the bandwidth-time product $BT$: the bell's standard deviation is $\sigma = \frac{\sqrt{\ln 2}}{2\pi \cdot BT}\, T$, so FT8's $BT = 2$ smooths each step over about a quarter of a symbol. It reaches four standard deviations each way, so it delays the signal by $4\sigma$: 42.4 ms for FT8.`,
     inputs: [{ name: 'in' }],
     outputs: [{ name: 'out' }],
     params: {

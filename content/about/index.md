@@ -13,7 +13,7 @@ My background is in physics, mathematics, and theoretical computer science. I co
 <!--
 Third-person bio (British English)
 
-Alfred Rossi is a Senior Fellow in Privacy Enhancing Technologies (PETs) at the Brussels Privacy Hub, Vrije Universiteit Brussel (VUB), and a Distinguished Scientist and Engineer at Immuta. At Immuta, his work has included privacy-preserving query processing and methods for quantifying re-identification risk, and he is a named inventor on six issued US patents in this area. As a computer scientist working in mathematical privacy and data protection, he has recently focused on formal models of the legal definitions of anonymisation and pseudonymisation, as well as on systems for computer-assisted data protection assessments such as Parajudica.
+Alfred Rossi is a Senior Fellow in Privacy Enhancing Technologies (PETs) at the Brussels Privacy Hub, Vrije Universiteit Brussel (VUB), and a Distinguished Scientist and Engineer at Immuta. At Immuta, his work has included privacy-preserving query processing and methods for quantifying re-identification risk, and he is a named inventor on six issued US patents in this area. As a computer scientist working in mathematical privacy and data protection, he has recently focused on formal models of the legal definitions of anonymization and pseudonymization, as well as on systems for computer-assisted data protection assessments such as Parajudica.
 
 Alfred’s writing on privacy and data protection has appeared in Privacy & Data Protection, the CPDP book series, and the Oxford Encyclopedia of EU Law. He has participated in the PETs Expert Forum of the UK Information Commissioner’s Office and contributed to consultations by the European Data Protection Board and Germany’s BfDI.
 

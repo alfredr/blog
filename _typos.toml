@@ -1,0 +1,40 @@
+# Spelling for the whole site, checked by typos (https://github.com/crate-ci/typos):
+# common misspellings, and American English through the en-us locale. Run
+# `typos` here to check, or `typos -w` to fix. CI runs it on every push
+# (.github/workflows/spelling.yml).
+
+[default]
+locale = "en-us"
+extend-ignore-re = [
+  # Titles and journals are cited as published, in their own spelling.
+  '(?m)^\s*(title|journal) = [{"].*$',
+  # A company's name.
+  '(?i)under armour',
+  # Long hex constants in gadget code.
+  '\b[0-9a-f]{16,}\b',
+]
+
+[default.extend-words]
+# British spellings typos doesn't know, held to American English too.
+anonymisation = "anonymization"
+anonymise = "anonymize"
+anonymised = "anonymized"
+pseudonymisation = "pseudonymization"
+pseudonymise = "pseudonymize"
+pseudonymised = "pseudonymized"
+# Correct as written: a resonance of the voice.
+formant = "formant"
+
+[default.extend-identifiers]
+# Variable names in gadget code: gamma, and the plural of `from`.
+gam = "gam"
+froms = "froms"
+
+[files]
+extend-exclude = [
+  "dist/",
+  # Third-party code and data, shipped as is.
+  "content/gadgets/*/vendor/",
+  # Phoneme codes and letter-to-sound rules, which are not words.
+  "content/gadgets/signal-lab/js/dsp/speech/",
+]
