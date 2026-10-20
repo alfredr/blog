@@ -19,6 +19,12 @@
   </header>
   <div class="post-body">
     {{ body | safe }}
+    {% if footnotes %}
+    <section class="notes-section" role="doc-endnotes">
+      <h2>Notes</h2>
+      {{ footnotes | safe }}
+    </section>
+    {% endif %}
     {% if bibliography %}
     <section class="references-section">
       <h2>References</h2>

@@ -330,9 +330,10 @@ cite[data-key] a {
 }
 
 /* Footnotes (kiln's [^label]). The number is raised without opening up the
-   line it sits in. The notes are listed after the post; where the page has
-   room beside the text, js/sidenotes.js shows each one in the right margin
-   next to its reference instead. */
+   line it sits in. The notes are listed under "Notes" after the post
+   (templates/post.html); where the page has room beside the text,
+   js/sidenotes.js shows each one in the right margin next to its reference
+   instead. */
 .footnote-ref {
   position: relative;
   top: -0.5em;
@@ -346,13 +347,8 @@ cite[data-key] a {
   text-decoration: none;
 }
 
-.footnotes {
-  margin-top: 2rem;
+.post-body .footnotes {
   font-size: 0.9375rem;
-}
-
-.footnotes ol {
-  padding-left: 1.5rem;
 }
 
 .sidenote {
@@ -384,8 +380,9 @@ cite[data-key] a {
     animation: sidenote-flash 1.2s ease-out;
   }
 
-  /* The margin notes replace the list on screen; screen readers keep it. */
-  .footnotes {
+  /* The margin notes replace the Notes section on screen; screen readers keep
+     it. */
+  .notes-section {
     position: absolute;
     width: 1px;
     height: 1px;

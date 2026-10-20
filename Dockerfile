@@ -5,7 +5,7 @@
 # plain HTML); only the final Caddy stage is per target platform.
 FROM --platform=$BUILDPLATFORM rust:1-bookworm AS build
 # The kiln commit that builds the site. Bump it to pick up kiln changes.
-ARG KILN_REV=e5150d426ffec035d828eea0c0f6c0940963a264
+ARG KILN_REV=c59b3e0ae38d43e9a1229833f6924a36dcd681d3
 RUN cargo install --locked --git https://github.com/alfredr/kiln --rev "$KILN_REV" kiln
 WORKDIR /site
 COPY . .
